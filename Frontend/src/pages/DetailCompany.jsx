@@ -8,7 +8,7 @@ import {
   faMoneyBill,
   faCalendar,
   faStar,
-} from "@fortawesome/free-solid-svg-icons"; // import icon star
+} from "@fortawesome/free-solid-svg-icons"; 
 import "./DetailCompany.scss";
 import companyAPI from "../api/companyAPI";
 import LoadingOverlay from "../components/loading_overlay";
@@ -46,18 +46,18 @@ const DetailCompany = () => {
 
   const handleThumbnailClick = (image, imageKey) => {
     setCompanyDetail((prevDetails) => {
-      // Hoán đổi ảnh chính và ảnh được nhấn
+     
       const updatedDetail = { ...prevDetails, [imageKey]: mainImage };
-      setMainImage(image); // Cập nhật ảnh chính
+      setMainImage(image); 
       return updatedDetail;
     });
   };
 
   // Hàm hiển thị số sao dựa trên rating
   const renderStars = (rating) => {
-    const fullStars = Math.floor(rating); // Số sao đầy đủ
-    const halfStar = rating % 1 >= 0.5; // Sao nửa nếu rating có phần thập phân >= 0.5
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Số sao trống
+    const fullStars = Math.floor(rating); 
+    const halfStar = rating % 1 >= 0.5; 
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
     return (
       <>
@@ -144,18 +144,27 @@ const DetailCompany = () => {
                 {companyDetail.company_name}
               </h2>
               <p
-                style={{
-                  fontWeight: "normal",
-                  color: "#555",
-                  marginLeft: "10px",
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={faMoneyBill}
-                  style={{ marginRight: "8px" }}
-                />
-                {companyDetail.service_cost} đ / giờ
-              </p>
+  style={{
+    fontWeight: "normal",
+    color: "#555",
+    marginLeft: "10px",
+    fontSize: "16px",
+    textAlign: "center",
+    display: "inline-block", 
+    width: "260px", 
+    borderTop: "1px solid #ccc", 
+    borderBottom: "1px solid #ccc", 
+    padding: "10px 0", 
+ 
+  }}
+>
+ 
+<span style={{ marginLeft: "150px", fontWeight: "bold" }}>
+    {companyDetail.service_cost} đ / giờ
+  </span>
+</p>
+
+
               <br />
               <p>
                 <b>Giới thiệu:</b>
@@ -164,7 +173,8 @@ const DetailCompany = () => {
                 style={{
                   fontWeight: "normal",
                   color: "#555",
-                  marginLeft: "10px",
+                  marginLeft: "20px",
+                  fontSize: "15px"
                 }}
               >
                 {companyDetail.description}
@@ -177,7 +187,8 @@ const DetailCompany = () => {
                 style={{
                   fontWeight: "normal",
                   color: "#555",
-                  marginLeft: "10px",
+                  marginLeft: "20px",
+                  fontSize: "15px"
                 }}
               >
                 {companyDetail.service}
@@ -189,15 +200,16 @@ const DetailCompany = () => {
               <p>
                 <FontAwesomeIcon
                   icon={faCalendar}
-                  style={{ marginLeft: "10px" }}
-                />{" "}
-                Khung giờ làm việc :
+                  style={{ marginLeft: "25px" , fontSize: "15px",color: "#555"}}
+                />     {"  "}
+             <a style={{ marginLeft: "10px" , fontSize: "15px" ,}} >   Khung giờ làm việc :</a>
               </p>
               <p
                 style={{
                   fontWeight: "normal",
                   color: "#555",
-                  marginLeft: "10px",
+                  marginLeft: "53px",
+                   fontSize: "15px",marginTop:'12px'
                 }}
               >
                 {companyDetail.worktime}
@@ -208,33 +220,36 @@ const DetailCompany = () => {
                 style={{
                   fontWeight: "normal",
                   color: "#555",
-                  marginLeft: "10px",
+                  marginLeft: "25px",
+                   fontSize: "15px"
                 }}
               >
-                <FontAwesomeIcon icon={faPhone} /> Số điện thoại:{" "}
-                {companyDetail.phone}
+                <FontAwesomeIcon icon={faPhone} />  <span  style={{ marginLeft: "10px" }}> Số điện thoại:{" "}
+                {companyDetail.phone}</span>
               </p>
               <br />
               <p
                 style={{
                   fontWeight: "normal",
                   color: "#555",
-                  marginLeft: "10px",
+                  marginLeft: "25px",
+                   fontSize: "15px"
                 }}
               >
-                <FontAwesomeIcon icon={faEnvelope} /> Email:{" "}
-                {companyDetail.account.email}
+                <FontAwesomeIcon icon={faEnvelope} /> <span  style={{ marginLeft: "10px" }}>Email:{" "}
+                {companyDetail.account.email}</span>
               </p>
               <br />
               <p
                 style={{
                   fontWeight: "normal",
                   color: "#555",
-                  marginLeft: "10px",
+                  marginLeft: "25px",
+                   fontSize: "15px"
                 }}
               >
-                <FontAwesomeIcon icon={faMapMarkerAlt} /> Địa chỉ:{" "}
-                {companyDetail.address} , {companyDetail.address_tinh}
+                <FontAwesomeIcon icon={faMapMarkerAlt} />  <span  style={{ marginLeft: "14px" }}>Địa chỉ:
+                {companyDetail.address} , {companyDetail.address_tinh}</span>
               </p>
               <br />
             </div>
