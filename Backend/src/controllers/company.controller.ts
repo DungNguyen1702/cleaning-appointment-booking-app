@@ -59,4 +59,3 @@ export const getAllCompanies = async (req: Request, res: Response) => {
   }
 };
 
-
