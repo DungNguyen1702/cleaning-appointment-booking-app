@@ -86,9 +86,3 @@ export const fetchAllCompanies = async (page: number, limit: number, location: s
   return { companies: companiesWithRequestCount, totalCompanies };
 };
 
-
-
-
-
-
-
