@@ -6,6 +6,7 @@ const Wrapper = styled.section`
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
+    padding: 10px;
   }
 
   .landing-header {
@@ -13,7 +14,7 @@ const Wrapper = styled.section`
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #ffffff;
+    background-color: #FFF8F8;
   }
 
   .landing-doublebutton {
@@ -176,8 +177,22 @@ const Wrapper = styled.section`
   }
 
   .footer-section.logo {
-    flex: 1; 
-  }
+  flex: 2;
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+}
+
+
+.logo-text {
+  font-family: 'Train One', cursive;
+  font-size: 30px !important;
+  color: #438D7E;
+}
+
+.logo-img {
+  height: 60px; /* Đặt chiều cao cho logo */
+}
 
   .footer-section h2 {
     font-size: 1.5em;
@@ -239,11 +254,10 @@ const Wrapper = styled.section`
     font-size: 0.9em;
   }
 
-  /* Thêm khoảng cách giữa icon và text */
+  
   .contact span svg,
   .footer-section ul li a svg {
     margin-right: 8px;
-    /* Điều chỉnh khoảng cách tùy ý */
   }
 
   @media (max-width: 768px) {

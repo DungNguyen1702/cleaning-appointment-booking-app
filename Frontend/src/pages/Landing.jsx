@@ -1,5 +1,6 @@
 import React from 'react';
 import deservebetter from '../assets/images/Deservebetter.png';
+import deserve from '../assets/images/log_deserve.png';
 import timelanding from '../assets/images/timelanding.png';
 import image1 from '../assets/images/image-1.svg';
 import image2 from '../assets/images/image-2.svg';
@@ -68,7 +69,8 @@ const Landing = () => {
               </ul>
             </div>
             <div className="footer-section logo">
-              <img src={deservebetter} alt="deservebetter" className="logo-img" />
+              <img src={deserve} alt="deservebetter" className="logo-img" />
+              <p className="logo-text">Deserve better</p>
             </div>
 
           </div>
