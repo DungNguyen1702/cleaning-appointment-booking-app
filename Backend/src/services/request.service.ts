@@ -212,4 +212,29 @@ export class RequestService {
   // }
 
 
+  async getRequestDetailsById(id: number) {
+    const requestDetails = await this.requestRepo
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.user', 'user')
+      .where('request.request_id = :id', { id })
+      .select([
+        'request.price',
+        'request.request',
+        'request.notes',
+        'request.timejob',
+        'request.status',
+        'user.full_name',
+        'user.phone_number',
+      ])
+      .getOne();
+
+    if (!requestDetails) {
+      throw new Error('Request not found');
+    }
+
+    return requestDetails;
+  }
+
+
+
 }
