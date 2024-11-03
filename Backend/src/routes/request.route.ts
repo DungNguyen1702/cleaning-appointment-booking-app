@@ -33,4 +33,16 @@ router.delete(
   requestController.delete.bind(requestController)
 );
 
+router.get(
+  '/:id/userrentalhistory',
+  verifyToken,
+  requestController.getRequestsCompanyHistory.bind(requestController)
+);
+
+router.get(
+  '/:id/customerrequestsforweek',
+  verifyToken,
+  requestController.getCustomerRequestsForWeek.bind(requestController)
+);
+
 export default router;

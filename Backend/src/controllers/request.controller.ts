@@ -65,4 +65,70 @@ export class RequestController {
       res.status(500).json({ message: err.message });
     }
   }
+
+  async getRequestsCompanyHistory(req: Request, res: Response) {
+    let page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 100;
+    let userId = parseInt(req.params.id, 10);
+    const startDate = req.query.startDate as string || ''; // Lấy tham số startDate
+    const companyName = req.query.companyName as string || ''; // Lấy tham số companyName
+
+    // Kiểm tra dữ liệu đầu vào
+    if (isNaN(page) || page <= 0) {
+      return res.status(400).json({ message: 'Tham số page không hợp lệ!' });
+    }
+
+    if (isNaN(limit) || limit <= 0) {
+      return res.status(400).json({ message: 'Tham số limit không hợp lệ!' });
+    }
+
+    if (isNaN(userId) || userId <= 0 || null) {
+      return res.status(400).json({ message: 'Tham số userId không hợp lệ!' });
+    }
+
+    try {
+      const { companies, totalCompanies, totalPages, currentPage } = await requestService.getPagedRequests(userId, page, limit, startDate, companyName);
+
+      if (!companies || companies.length === 0) {
+        return res.status(404).json({ message: 'Không tìm thấy yêu cầu nào.' });
+      }
+
+      return res.status(200).json({
+        companies,
+        totalCompanies,
+        totalPages,
+        currentPage,
+      });
+    } catch (error) {
+      console.error('Lỗi trong quá trình lấy dữ liệu yêu cầu:', error);
+      return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+    }
+  }
+
+  async getCustomerRequestsForWeek(req: Request, res: Response) {
+    const companyId = parseInt(req.params.id, 10);
+    const startDate = new Date(req.query.startDate as string);
+    const endDate = new Date(req.query.endDate as string);
+
+    // Kiểm tra dữ liệu đầu vào
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Tham số startDate và endDate là bắt buộc!' });
+    }
+
+    try {
+      const weekData = await requestService.getCustomerRequestsForWeek(companyId, startDate, endDate);
+
+      if (!weekData || Object.keys(weekData).length === 0) {
+        return res.status(404).json({ message: 'Không tìm thấy yêu cầu nào.' });
+      }
+
+      return res.status(200).json(weekData);
+    } catch (error) {
+      console.error('Lỗi trong quá trình lấy dữ liệu yêu cầu:', error);
+      return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+    }
+  }
+
+
+
 }
