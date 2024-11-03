@@ -2,12 +2,12 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Account } from '../entity/account.entity';
 import { RatingStatistic } from '../entity/ratingStatistic.entity';
@@ -17,7 +17,7 @@ export class Company extends BaseEntity {
   @PrimaryGeneratedColumn()
   company_id: number;
 
-  @ManyToOne(() => Account)
+  @OneToOne(() => Account)
   @JoinColumn({ name: 'account_id' })
   account: Account;
 
@@ -27,7 +27,7 @@ export class Company extends BaseEntity {
   @Column()
   address: string;
 
-  @Column({ type: 'text'})
+  @Column({ type: 'text' })
   address_tinh: string;
 
   @Column({ type: 'text', nullable: true })

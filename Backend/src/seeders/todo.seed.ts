@@ -19,7 +19,7 @@ export async function seedTodos() {
     todo.end_time = '21:00:00';
     todo.task_content = `Nội dung công việc ${i}`;
     todo.location = `Địa điểm ${i}`;
-    todo.status = RequestStatusEnum.ACCEPTED;  // Trạng thái công việc
+    todo.status = RequestStatusEnum.ACCEPTED; // Trạng thái công việc
 
     await todoRepository.save(todo);
   }
