@@ -12,6 +12,16 @@ import { AppDataSource } from './config/data-source';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: number;
+      companyId?: number;
+      role?: 'USER' | 'COMPANY';
+    }
+  }
+}
+
 // establish database connection
 AppDataSource.initialize()
   .then(() => {
@@ -23,7 +33,6 @@ AppDataSource.initialize()
 
 // create and setup express app
 const app = express();
-
 
 app.use(
   cors({

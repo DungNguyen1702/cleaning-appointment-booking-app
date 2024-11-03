@@ -29,21 +29,34 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     const account = await authenticateAccount(email, password);
-    const token = generateToken(account.account_id);
 
     // Kiểm tra vai trò và lấy thông tin người dùng hoặc công ty
     let userOrCompany;
+    let idToIncludeInToken;
     if (account.role === 'CUSTOMER') {
-      // Lấy thông tin user
+      // Lấy thông tin người dùng
       userOrCompany = await getUserByAccountId(account.account_id);
+      if (!userOrCompany) {
+        return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      }
+      idToIncludeInToken = userOrCompany.user_id; // Dùng user_id cho token
     } else if (account.role === 'COMPANY') {
       // Lấy thông tin công ty
       userOrCompany = await getCompanyByAccountId(account.account_id);
+      if (!userOrCompany) {
+        return res.status(404).json({ message: 'Công ty không tồn tại' });
+      }
+      idToIncludeInToken = userOrCompany.company_id; // Dùng company_id cho token
+    } else {
+      return res.status(403).json({ message: 'Vai trò không hợp lệ' });
     }
+
+    const token = generateToken(idToIncludeInToken);
 
     return res.status(200).json({
       message: 'Đăng nhập thành công',
       token,
+      role: account.role,
       userOrCompany,
     });
   } catch (error: unknown) {

@@ -2,11 +2,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  OneToOne,
 } from 'typeorm';
 import { Account } from '../entity/account.entity';
 
@@ -15,7 +15,7 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   user_id: number;
 
-  @ManyToOne(() => Account, { eager: true })
+  @OneToOne(() => Account, { eager: true })
   @JoinColumn({ name: 'account_id' })
   account: Account;
 

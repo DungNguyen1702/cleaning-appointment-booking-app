@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import { getCompanyById, fetchAllCompanies } from '../services/company.service';
+import { RequestService } from '../services/request.service';
+
+const requestService = new RequestService();
 
 export const getCompanyDetails = async (req: Request, res: Response) => {
   const companyId = parseInt(req.params.id, 10);
@@ -25,8 +28,8 @@ export const getCompanyDetails = async (req: Request, res: Response) => {
 export const getAllCompanies = async (req: Request, res: Response) => {
   let page = parseInt(req.query.page as string);
   let limit = parseInt(req.query.limit as string);
-  const location = req.query.location as string || '';
-  const name = req.query.name as string || '';
+  const location = (req.query.location as string) || '';
+  const name = (req.query.name as string) || '';
 
   // Kiểm tra dữ liệu đầu vào
   if (isNaN(page) || page <= 0) {
@@ -38,7 +41,12 @@ export const getAllCompanies = async (req: Request, res: Response) => {
   }
 
   try {
-    const { companies, totalCompanies } = await fetchAllCompanies(page, limit, location, name);
+    const { companies, totalCompanies } = await fetchAllCompanies(
+      page,
+      limit,
+      location,
+      name
+    );
 
     if (!companies) {
       return res.status(404).json({ message: 'Không tìm thấy công ty nào.' });
@@ -53,9 +61,52 @@ export const getAllCompanies = async (req: Request, res: Response) => {
       currentPage: page,
     });
   } catch (error) {
-
     console.error('Lỗi trong quá trình lấy dữ liệu công ty:', error);
-    return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+    return res
+      .status(500)
+      .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
   }
 };
 
+export const getRequestsByCompanyId = async (req: Request, res: Response) => {
+  const companyId = parseInt(req.params.companyId);
+  const page = parseInt(req.query.page as string) || 1; // Mặc định là trang 1
+  const limit = parseInt(req.query.limit as string) || 10; // Mặc định là 10 yêu cầu trên mỗi trang
+  const name = req.query.name as string | undefined;
+
+  try {
+    const { requests, totalRequests, totalPages } =
+      await requestService.getRequestsByCompanyId(companyId, page, limit, name);
+
+    return res.status(200).json({
+      totalRequests,
+      totalPages,
+      currentPage: page,
+      requests,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Đã xảy ra lỗi', error });
+  }
+};
+
+export const editRequestByCompany = async (req: Request, res: Response) => {
+  const { requestId } = req.params;
+  const { workingHours, status } = req.body;
+
+  try {
+    const updatedRequest = await requestService.updateRequest(
+      parseInt(requestId),
+      { workingHours, status }
+    );
+
+    return res.status(200).json({
+      message: 'Chỉnh sửa yêu cầu thành công',
+      updatedRequest,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(400).json({ message: 'Đã xảy ra lỗi' });
+  }
+};

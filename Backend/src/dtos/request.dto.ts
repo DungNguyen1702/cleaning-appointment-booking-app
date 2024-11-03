@@ -12,4 +12,5 @@ export class CreateRequestDto {
   price: number;
   notes?: string;
   request: string;
+  workingHours?: number;
 }

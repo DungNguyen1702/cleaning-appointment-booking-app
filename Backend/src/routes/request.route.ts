@@ -16,11 +16,13 @@ router.post(
   requestController.create.bind(requestController)
 );
 router.get('/', verifyToken, requestController.getAll.bind(requestController));
+
 router.get(
   '/:id',
   verifyToken,
   requestController.getById.bind(requestController)
 );
+
 router.put(
   '/:id',
   verifyToken,

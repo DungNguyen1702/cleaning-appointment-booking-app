@@ -4,18 +4,18 @@ import { CreateRequestDto } from '../dtos/request.dto';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
-import { DayOfWeekEnum } from '../enums/dayOfWeek.enum'
-
+import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
+import { RequestStatusEnum } from '../enums/requestStatus.enum';
 
 // Tạo ánh xạ chỉ số ngày tới enum
 const dayOfWeekMap: { [key: number]: DayOfWeekEnum } = {
   0: DayOfWeekEnum.CHU_NHAT, // Chủ Nhật
-  1: DayOfWeekEnum.THU_HAI,  // Thứ Hai
-  2: DayOfWeekEnum.THU_BA,   // Thứ Ba
-  3: DayOfWeekEnum.THU_TU,   // Thứ Tư
-  4: DayOfWeekEnum.THU_NAM,  // Thứ Năm
-  5: DayOfWeekEnum.THU_SAU,   // Thứ Sáu
-  6: DayOfWeekEnum.THU_BAY,   // Thứ Bảy
+  1: DayOfWeekEnum.THU_HAI, // Thứ Hai
+  2: DayOfWeekEnum.THU_BA, // Thứ Ba
+  3: DayOfWeekEnum.THU_TU, // Thứ Tư
+  4: DayOfWeekEnum.THU_NAM, // Thứ Năm
+  5: DayOfWeekEnum.THU_SAU, // Thứ Sáu
+  6: DayOfWeekEnum.THU_BAY, // Thứ Bảy
 };
 
 export class RequestService {
@@ -31,7 +31,6 @@ export class RequestService {
 
   async createRequest(data: CreateRequestDto) {
     console.log(data);
-
 
     const userExists = await this.userRepo.findOne({
       where: { user_id: data.user_id },
@@ -93,8 +92,13 @@ export class RequestService {
     });
   }
 
-
-  async getPagedRequests(userId: number, page: number, limit: number, startDate: string, companyName: string) {
+  async getPagedRequests(
+    userId: number,
+    page: number,
+    limit: number,
+    startDate: string,
+    companyName: string
+  ) {
     const query: SelectQueryBuilder<Request> = this.requestRepo
       .createQueryBuilder('request')
       .leftJoinAndSelect('request.company', 'company')
@@ -114,14 +118,19 @@ export class RequestService {
       const nextDay = new Date(parsedStartDate);
       nextDay.setDate(nextDay.getDate() + 1);
 
-      query.andWhere('DATE(request.timejob) >= :startDate AND DATE(request.timejob) < :nextDay', {
-        startDate: parsedStartDate.toISOString().slice(0, 10),
-        nextDay: nextDay.toISOString().slice(0, 10),
-      });
+      query.andWhere(
+        'DATE(request.timejob) >= :startDate AND DATE(request.timejob) < :nextDay',
+        {
+          startDate: parsedStartDate.toISOString().slice(0, 10),
+          nextDay: nextDay.toISOString().slice(0, 10),
+        }
+      );
     }
 
     if (companyName) {
-      query.andWhere('company.company_name LIKE :companyName', { companyName: `%${companyName}%` });
+      query.andWhere('company.company_name LIKE :companyName', {
+        companyName: `%${companyName}%`,
+      });
     }
 
     const [companies, totalCompanies] = await query
@@ -130,7 +139,6 @@ export class RequestService {
       .getManyAndCount();
 
     const totalPages = Math.ceil(totalCompanies / limit);
-
 
     const formattedCompanies = companies.map(company => ({
       request_id: company.request_id,
@@ -141,7 +149,7 @@ export class RequestService {
         company_id: company.company.company_id,
         company_name: company.company.company_name,
         address_tinh: company.company.address_tinh,
-      }
+      },
     }));
 
     return {
@@ -152,13 +160,19 @@ export class RequestService {
     };
   }
 
-
-  async getCustomerRequestsForWeek(companyId: number, startDate: Date, endDate: Date) {
+  async getCustomerRequestsForWeek(
+    companyId: number,
+    startDate: Date,
+    endDate: Date
+  ) {
     const query: SelectQueryBuilder<Request> = this.requestRepo
       .createQueryBuilder('request')
       .leftJoinAndSelect('request.user', 'user')
       .leftJoinAndSelect('request.company', 'company')
-      .where('DATE(request.timejob) BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .where('DATE(request.timejob) BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
       .andWhere('request.company_id = :companyId', { companyId })
       .select([
         'request.request_id',
@@ -179,10 +193,19 @@ export class RequestService {
     });
 
     requests.forEach(request => {
-      const dayOfWeek = new Date(request.timejob).toLocaleDateString('vi-VN', { weekday: 'long' }).toUpperCase();
-      const dayKey = Object.keys(DayOfWeekEnum).find(key => DayOfWeekEnum[key as keyof typeof DayOfWeekEnum] === dayOfWeek);
-      if (dayKey && weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]) {
-        weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]?.push(request);
+      const dayOfWeek = new Date(request.timejob)
+        .toLocaleDateString('vi-VN', { weekday: 'long' })
+        .toUpperCase();
+      const dayKey = Object.keys(DayOfWeekEnum).find(
+        key => DayOfWeekEnum[key as keyof typeof DayOfWeekEnum] === dayOfWeek
+      );
+      if (
+        dayKey &&
+        weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]
+      ) {
+        weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]?.push(
+          request
+        );
       }
     });
 
@@ -210,31 +233,119 @@ export class RequestService {
   //     .orderBy('request.timejob', 'ASC')
   //     .getMany();
   // }
+  
+    async getRequestDetailsById(id: number) {
+  const requestDetails = await this.requestRepo
+    .createQueryBuilder('request')
+    .leftJoinAndSelect('request.user', 'user')
+    .where('request.request_id = :id', { id })
+    .select([
+      'request.price',
+      'request.request',
+      'request.notes',
+      'request.timejob',
+      'request.status',
+      'user.full_name',
+      'user.phone_number',
+    ])
+    .getOne();
 
-
-  async getRequestDetailsById(id: number) {
-    const requestDetails = await this.requestRepo
-      .createQueryBuilder('request')
-      .leftJoinAndSelect('request.user', 'user')
-      .where('request.request_id = :id', { id })
-      .select([
-        'request.price',
-        'request.request',
-        'request.notes',
-        'request.timejob',
-        'request.status',
-        'user.full_name',
-        'user.phone_number',
-      ])
-      .getOne();
-
-    if (!requestDetails) {
-      throw new Error('Request not found');
-    }
-
-    return requestDetails;
+  if (!requestDetails) {
+    throw new Error('Request not found');
   }
 
+  return requestDetails;
+} 
+  
+  
+  
+  async getRequestsByCompanyId(
+    companyId: number,
+    page: number,
+    limit: number,
+    name?: string
+  ) {
+    const requestRepository = AppDataSource.getRepository(Request);
 
+    const queryBuilder = requestRepository
+      .createQueryBuilder('request')
+      .where('request.company_id = :companyId', { companyId })
+      .skip((page - 1) * limit) // Xác định vị trí bắt đầu
+      .take(limit); // Số lượng bản ghi trả về
+
+    // Nếu có tên, thêm điều kiện tìm kiếm
+    if (name) {
+      queryBuilder.andWhere('request.name LIKE :name', {
+        name: `%${name}%`,
+      });
+    }
+
+    const [requests, totalRequests] = await queryBuilder.getManyAndCount();
+
+    // Tính toán tổng số trang
+    const totalPages = Math.ceil(totalRequests / limit);
+
+    return {
+      totalRequests,
+      totalPages,
+      currentPage: page,
+      requests,
+    };
+  }
+  async updateRequestByCompany(
+    requestId: number,
+    updateData: { workingHours?: string; status?: string }
+  ) {
+    const requestRepository = AppDataSource.getRepository(Request);
+    const request = await requestRepository.findOneBy({
+      request_id: requestId,
+    });
+
+    if (!request) {
+      throw new Error('Yêu cầu không tồn tại');
+    }
+
+    if (updateData.workingHours !== undefined) {
+      // Chuyển đổi từ string sang number
+      const workingHours = parseFloat(updateData.workingHours as string);
+
+      // Kiểm tra xem workingHours có phải là một số hợp lệ không
+      if (!isNaN(workingHours)) {
+        request.workingHours = workingHours;
+      } else {
+        throw new Error('workingHours phải là một số hợp lệ');
+      }
+    }
+    if (updateData.status) {
+      if (
+        Object.values(RequestStatusEnum).includes(
+          updateData.status as RequestStatusEnum
+        )
+      ) {
+        request.status = updateData.status as RequestStatusEnum; // Gán giá trị đã kiểm tra
+      } else {
+        throw new Error(
+          'status phải là một giá trị hợp lệ trong RequestStatusEnum'
+        );
+      }
+    }
+
+    await requestRepository.save(request);
+    return request;
+  }
+  async getRequestByIdAndUserId(
+    requestId: number,
+    userId: number
+  ): Promise<Request | null> {
+    const requestRepository = AppDataSource.getRepository(Request);
+
+    const query = requestRepository
+      .createQueryBuilder('request')
+      .where('request.request_id = :requestId', { requestId })
+      .andWhere('request.user_id = :userId', { userId });
+
+    const request = await query.getOne();
+    return request; // Trả về yêu cầu hoặc null nếu không tìm thấy
+  }
 
 }
