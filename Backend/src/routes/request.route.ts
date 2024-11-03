@@ -47,4 +47,6 @@ router.get(
   requestController.getCustomerRequestsForWeek.bind(requestController)
 );
 
+router.get('/requests/:id/details', requestController.getRequestDetails.bind(requestController));
+
 export default router;
