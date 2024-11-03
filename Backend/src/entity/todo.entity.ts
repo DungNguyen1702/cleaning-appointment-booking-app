@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../entity/user.entity';
+import { RequestStatusEnum } from '../enums/requestStatus.enum';
 
 @Entity()
 export class Todo {
@@ -39,8 +40,8 @@ export class Todo {
   @Column()
   location: string;
 
-  @Column()
-  status: string;
+  @Column({ type: 'enum', enum: RequestStatusEnum })
+  status: RequestStatusEnum;
 
   @CreateDateColumn()
   createdAt: Date;

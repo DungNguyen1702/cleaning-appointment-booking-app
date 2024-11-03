@@ -16,13 +16,13 @@ async function runSeed() {
   // await seedCustomers();
   // await seedCompanies();
   // await seedRatingStatistics();
-  // await seedRequests();
+  await seedRequests();
   // await seedReviews();
   // await seedStatistics();
   // await seedTodos();
   // await seedTodoRepeats();
-  await updateCompanyAddressTinh();
-  await updateCompanyImage();
+  // await updateCompanyAddressTinh();
+  // await updateCompanyImage();
 
   // Đóng kết nối
   await AppDataSource.destroy();
