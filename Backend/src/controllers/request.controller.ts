@@ -70,8 +70,8 @@ export class RequestController {
     let page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 100;
     let userId = parseInt(req.params.id, 10);
-    const startDate = req.query.startDate as string || ''; // Lấy tham số startDate
-    const companyName = req.query.companyName as string || ''; // Lấy tham số companyName
+    const startDate = (req.query.startDate as string) || ''; // Lấy tham số startDate
+    const companyName = (req.query.companyName as string) || ''; // Lấy tham số companyName
 
     // Kiểm tra dữ liệu đầu vào
     if (isNaN(page) || page <= 0) {
@@ -87,7 +87,14 @@ export class RequestController {
     }
 
     try {
-      const { companies, totalCompanies, totalPages, currentPage } = await requestService.getPagedRequests(userId, page, limit, startDate, companyName);
+      const { companies, totalCompanies, totalPages, currentPage } =
+        await requestService.getPagedRequests(
+          userId,
+          page,
+          limit,
+          startDate,
+          companyName
+        );
 
       if (!companies || companies.length === 0) {
         return res.status(404).json({ message: 'Không tìm thấy yêu cầu nào.' });
@@ -101,7 +108,9 @@ export class RequestController {
       });
     } catch (error) {
       console.error('Lỗi trong quá trình lấy dữ liệu yêu cầu:', error);
-      return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+      return res
+        .status(500)
+        .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
     }
   }
 
@@ -112,11 +121,17 @@ export class RequestController {
 
     // Kiểm tra dữ liệu đầu vào
     if (!startDate || !endDate) {
-      return res.status(400).json({ message: 'Tham số startDate và endDate là bắt buộc!' });
+      return res
+        .status(400)
+        .json({ message: 'Tham số startDate và endDate là bắt buộc!' });
     }
 
     try {
-      const weekData = await requestService.getCustomerRequestsForWeek(companyId, startDate, endDate);
+      const weekData = await requestService.getCustomerRequestsForWeek(
+        companyId,
+        startDate,
+        endDate
+      );
 
       if (!weekData || Object.keys(weekData).length === 0) {
         return res.status(404).json({ message: 'Không tìm thấy yêu cầu nào.' });
@@ -125,10 +140,44 @@ export class RequestController {
       return res.status(200).json(weekData);
     } catch (error) {
       console.error('Lỗi trong quá trình lấy dữ liệu yêu cầu:', error);
-      return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+      return res
+        .status(500)
+        .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
     }
   }
+  async getRequestDetails(req: Request, res: Response) {
+    const requestId = parseInt(req.params.requestId);
+    const userId = req.userId; // userId nên được lấy từ token
 
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng không hợp lệ' });
+    }
 
+    console.log('requestId:', requestId);
+    console.log('userId:', userId);
 
+    try {
+      const request = await requestService.getRequestByIdAndUserId(
+        requestId,
+        userId
+      );
+
+      // Kiểm tra xem request có tồn tại không
+      if (!request) {
+        console.log(
+          `Không tìm thấy yêu cầu với requestId: ${requestId} và userId: ${userId}`
+        );
+        return res.status(404).json({
+          message: 'Yêu cầu không tồn tại hoặc bạn không có quyền truy cập',
+        });
+      }
+
+      return res.status(200).json(request);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(400).json({ message: error.message });
+      }
+      return res.status(400).json({ message: 'Đã xảy ra lỗi' });
+    }
+  }
 }

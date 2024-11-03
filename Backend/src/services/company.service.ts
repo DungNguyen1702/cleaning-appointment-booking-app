@@ -4,7 +4,6 @@ import { RequestStatusEnum } from '../enums/requestStatus.enum';
 import { AppDataSource } from '../config/data-source'; // Sử dụng DataSource từ file cấu hình
 import { SelectQueryBuilder } from 'typeorm';
 
-
 export const getCompanyByAccountId = async (accountId: number) => {
   const company = await Company.findOne({
     where: {
@@ -34,7 +33,12 @@ export const getCompanyById = async (companyId: number) => {
   return company;
 };
 
-export const fetchAllCompanies = async (page: number, limit: number, location: string, name: string) => {
+export const fetchAllCompanies = async (
+  page: number,
+  limit: number,
+  location: string,
+  name: string
+) => {
   const companyRepository = AppDataSource.getRepository(Company); // Lấy repository của Company
   const requestRepository = AppDataSource.getRepository(Request); // Lấy repository của Request
 
@@ -51,7 +55,9 @@ export const fetchAllCompanies = async (page: number, limit: number, location: s
 
   // Thêm điều kiện lọc theo địa điểm
   if (location) {
-    query.andWhere('company.address_tinh LIKE :location', { location: `%${location}%` });
+    query.andWhere('company.address_tinh LIKE :location', {
+      location: `%${location}%`,
+    });
   }
 
   // Thêm điều kiện tìm kiếm theo tên công ty
@@ -65,24 +71,28 @@ export const fetchAllCompanies = async (page: number, limit: number, location: s
     .getManyAndCount();
 
   // Thêm bước đếm số lượng request có trạng thái COMPLETED cho mỗi công ty
-  const companiesWithRequestCount = await Promise.all(companies.map(async (company) => {
-    const completedRequestsCount = await requestRepository
-      .createQueryBuilder('request')
-      .where('request.company_id = :companyId', { companyId: company.company_id })
-      .andWhere('request.status = :status', { status: RequestStatusEnum.COMPLETED })
-      .getCount();
+  const companiesWithRequestCount = await Promise.all(
+    companies.map(async company => {
+      const completedRequestsCount = await requestRepository
+        .createQueryBuilder('request')
+        .where('request.company_id = :companyId', {
+          companyId: company.company_id,
+        })
+        .andWhere('request.status = :status', {
+          status: RequestStatusEnum.COMPLETED,
+        })
+        .getCount();
 
-
-    return {
-      company_id: company.company_id,
-      company_name: company.company_name,
-      address_tinh: company.address_tinh,
-      service_cost: company.service_cost,
-      main_image: company.main_image,
-      completedRequestsCount,
-    };
-  }));
+      return {
+        company_id: company.company_id,
+        company_name: company.company_name,
+        address_tinh: company.address_tinh,
+        service_cost: company.service_cost,
+        main_image: company.main_image,
+        completedRequestsCount,
+      };
+    })
+  );
 
   return { companies: companiesWithRequestCount, totalCompanies };
 };
-
