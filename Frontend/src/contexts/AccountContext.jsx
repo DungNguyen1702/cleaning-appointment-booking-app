@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import axiosClient from "../utils/customFetch";
 import LoginAPI from "../api/loginAPI";
+
 const AccountContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
@@ -10,13 +10,8 @@ export const AuthProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user_info"))
   );
 
-  const providerValue = useMemo(
-    () => ({ token, setToken, account, setAccount }),
-    [token, setToken, account, setAccount]
-  );
-
   useEffect(() => {
-    if (token !== "null") {
+    if (token) {
       // Set authenticate token to axios
       axiosClient.application.defaults.headers.common[
         "Authorization"
@@ -34,11 +29,28 @@ export const AuthProvider = ({ children }) => {
       // User logout
       delete axiosClient.application.defaults.headers.common["Authorization"];
 
-      setAccount("null");
+      setAccount(null);
       localStorage.removeItem("access_token");
       localStorage.removeItem("user_info");
     }
   }, [token]);
+
+  const login = (userInfo, accessToken) => {
+    console.log(userInfo);
+    localStorage.setItem("user_info", JSON.stringify(userInfo));
+    localStorage.setItem("access_token", accessToken);
+    setAccount(userInfo);
+    setToken(accessToken);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("user_info");
+    localStorage.removeItem("access_token");
+    setAccount(null);
+    setToken(null);
+  };
+
+  const providerValue = { token, setToken, account, setAccount, login, logout };
 
   return (
     <AccountContext.Provider value={providerValue}>

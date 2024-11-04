@@ -1,5 +1,9 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { BrowserRouter } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  BrowserRouter,
+} from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AccountContext";
 import { useEffect } from "react";
 import {
@@ -24,7 +28,7 @@ import useAuth from "./hooks/useAuth";
 export const AdminRoute = () => {
   const { account } = useAuth();
 
-  if (account && account.role === 2) {
+  if (account && account.role === "ADMIN") {
     return <Outlet />;
   } else {
     return <Navigate to="/" />;
@@ -33,8 +37,9 @@ export const AdminRoute = () => {
 
 export const CompanyRoute = () => {
   const { account } = useAuth();
-
-  if (account && account.role === 1) {
+  console.log(account);
+  console.log(account.role);
+  if (account && account.role === "COMPANY") {
     return <Outlet />;
   } else {
     return <Navigate to="/" />;
@@ -43,8 +48,9 @@ export const CompanyRoute = () => {
 
 export const UserRoute = () => {
   const { account } = useAuth();
-
-  if (account && account.role === 0) {
+  console.log(account);
+  console.log(account.role);
+  if (account && account.role === "CUSTOMER") {
     return <Outlet />;
   } else {
     return <Navigate to="/" />;
@@ -54,7 +60,7 @@ export const UserRoute = () => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ListRequest />,
+    element: <HomeLayout />,
     errorElement: <Error />,
     children: [
       {
@@ -69,66 +75,63 @@ const router = createBrowserRouter([
         path: "login",
         element: <Login />,
       },
-      { // để path ở đây để nó chạy thử
-        path: "calendar",
-        element: <Com_Calendar />,
+
+      {
+        element: <UserRoute />,
+        children: [
+          {
+            path: "user",
+            element: <DashboardLayout />,
+            children: [
+              {
+                index: true,
+                path: "calendar",
+                element: <Com_Calendar />,
+              },
+              {
+                path: "company",
+                element: <CleaningCompany />,
+              },
+              {
+                path: "history",
+                element: <History />,
+              },
+              {
+                path: "profile",
+                element: <Profile />,
+              },
+              {
+                path: "logout",
+                element: <Logout />,
+              },
+              {
+                path: "company/:companyId",
+                element: <DetailCompany />,
+              },
+              {
+                path: "appointmentform",
+                element: <AppointmentForm />,
+              },
+            ],
+          },
+        ],
       },
 
       {
-        // element: <UserRoute />,
-        // children: [
-        //   {
-        //     path: "user",
-        element: <DashboardLayout />,
+        element: <CompanyRoute />,
         children: [
           {
-            index: true,
-            element: <Schedule />,
-          },
-          {
             path: "company",
-            element: <CleaningCompany />,
-          },
-          {
-            path: "history",
-            element: <ListRequest />,
-          },
-          {
-            path: "profile",
-            element: <Profile />,
-          },
-          {
-            path: "logout",
-            element: <Logout />,
-          },
-          {
-            path: "company/:companyId",
-            element: <DetailCompany />,
-          },
-          {
-            path: "appointmentform",
-            element: <AppointmentForm />,
+            element: <DashboardLayout />,
+            children: [
+              {
+                path: "history",
+                element: <ListRequest />,
+              },
+            ],
           },
         ],
-        //   },
-        // ],
       },
-
-      // {
-      //   element: <CompanyRoute />,
-      //   children: [
-      //     {
-      //       path: "company",
-      //       element: <DashboardLayout />,
-      //       children: [
-      //         {
-      //           path: "history",
-      //           element: <ListRequest />,
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
     ],
   },
 ]);

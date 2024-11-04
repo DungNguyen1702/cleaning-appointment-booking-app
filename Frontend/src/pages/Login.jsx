@@ -4,28 +4,44 @@ import Wrapper from "../assets/wrappers/RegisterAndLoginPage";
 import { Link, useNavigate } from "react-router-dom";
 import image from "../assets/images/imagelogin.png"; // Thay đổi đường dẫn tới hình ảnh của bạn
 import LoginAPI from "../api/loginAPI";
-
+import useAuth from "../hooks/useAuth";
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [textError, setTextError] = useState("");
-
+  const { login } = useAuth();
   const fetchLogin = async (formData) => {
     try {
       const res = await LoginAPI.login(formData);
       const accessToken = res.data.token;
       const User = res.data.userOrCompany;
-      const userInfo = {
-        user_id: User.user_id,
-        name: User.full_name,
-        phone_number: User.phone_number,
-        email: User.account.email,
-      };
+      const role = res.data.role;
+      let userInfo = {};
+      if (role === "CUSTOMER") {
+        userInfo = {
+          user_id: User.user_id,
+          name: User.full_name,
+          phone_number: User.phone_number,
+          email: User.account.email,
+          role: role,
+        };
+      } else if (role === "COMPANY") {
+        userInfo = {
+          company_id: User.company_id,
+          name: User.company_name,
+          phone_number: User.phone,
+          role: role,
+        };
+      }
       if (accessToken) {
         localStorage.setItem("access_token", accessToken);
-        localStorage.setItem("user_info", JSON.stringify(userInfo));
-        navigate("/dashboard");
+        login(userInfo, accessToken);
+        if (role === "CUSTOMER") {
+          navigate("/user");
+        } else if (role === "COMPANY") {
+          navigate("/company");
+        }
       } else {
         setTextError("* Login failed, no access token received");
       }

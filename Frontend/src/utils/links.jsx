@@ -8,27 +8,52 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
 const links = [
   // users
-  { text: "Lịch trình", path: ".", icon: <FaWpforms />, roles: 0 },
+  { text: "Lịch", path: "calendar", icon: <FaWpforms />, roles: "CUSTOMER" },
   {
     text: "Công ty dọn dẹp",
     path: "company",
     icon: <MdQueryStats />,
-    roles: 0,
+    roles: "CUSTOMER",
   },
-  { text: "Lịch sử", path: "history", icon: <IoBarChartSharp />, roles: 0 },
-  { text: "Thông tin cá nhân", path: "profile", icon: <ImProfile />, roles: 0 },
-  { text: "Đăng xuất", path: "logout", icon: <LogoutOutlinedIcon />, roles: 0 },
+  {
+    text: "Lịch sử",
+    path: "history",
+    icon: <IoBarChartSharp />,
+    roles: "CUSTOMER",
+  },
+  {
+    text: "Thông tin cá nhân",
+    path: "profile",
+    icon: <ImProfile />,
+    roles: "CUSTOMER",
+  },
+  {
+    text: "Đăng xuất",
+    path: "logout",
+    icon: <LogoutOutlinedIcon />,
+    roles: "CUSTOMER",
+  },
 
-  // admin
-  { text: "Trang chủ", path: ".", icon: <FaWpforms />, roles: 1 },
+  // company
+  { text: "Trang chủ", path: ".", icon: <FaWpforms />, roles: "COMPANY" },
   {
     text: "Thông tin công ty",
     path: "company",
     icon: <MdQueryStats />,
-    roles: 1,
+    roles: "COMPANY",
   },
-  { text: "Lịch sử", path: "history", icon: <IoBarChartSharp />, roles: 0 },
-  { text: "Đăng xuất", path: "logout", icon: <LogoutOutlinedIcon />, roles: 0 },
+  {
+    text: "Lịch sử",
+    path: "history",
+    icon: <IoBarChartSharp />,
+    roles: "COMPANY",
+  },
+  {
+    text: "Đăng xuất",
+    path: "logout",
+    icon: <LogoutOutlinedIcon />,
+    roles: "COMPANY",
+  },
 ];
 
 export default links;
