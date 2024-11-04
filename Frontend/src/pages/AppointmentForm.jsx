@@ -24,7 +24,7 @@ const AppointmentForm = () => {
   useEffect(() => {
     const now = new Date();
     now.setHours(now.getHours() + 7);
-    now.setMinutes(now.getMinutes() + 30);
+    now.setMinutes(now.getMinutes() + 60);
     const formattedDateTime = now.toISOString().slice(0, 16);
     setMinDateTime(formattedDateTime);
 
