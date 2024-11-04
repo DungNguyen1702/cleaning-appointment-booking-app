@@ -123,9 +123,9 @@ export const getRequestIdDetails = async (req: Request, res: Response) => {
     return res.status(200).json(request);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return res.status(400).json({ message: error.message });
+      return res.status(404).json({ message: error.message });
     }
-    return res.status(400).json({ message: 'Đã xảy ra lỗi' });
+    return res.status(500).json({ message: 'Đã xảy ra lỗi không xác định' });
   }
 }
 
