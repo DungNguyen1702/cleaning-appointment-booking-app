@@ -170,8 +170,8 @@ export class RequestService {
       .leftJoinAndSelect('request.user', 'user')
       .leftJoinAndSelect('request.company', 'company')
       .where('DATE(request.timejob) BETWEEN :startDate AND :endDate', {
-        startDate,
-        endDate,
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
       })
       .andWhere('request.company_id = :companyId', { companyId })
       .select([
@@ -193,19 +193,36 @@ export class RequestService {
     });
 
     requests.forEach(request => {
-      const dayOfWeek = new Date(request.timejob)
-        .toLocaleDateString('vi-VN', { weekday: 'long' })
-        .toUpperCase();
-      const dayKey = Object.keys(DayOfWeekEnum).find(
-        key => DayOfWeekEnum[key as keyof typeof DayOfWeekEnum] === dayOfWeek
-      );
-      if (
-        dayKey &&
-        weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]
-      ) {
-        weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]?.push(
-          request
-        );
+      const dayOfWeek = new Date(request.timejob).getDay();
+      const dayKey = dayOfWeekMap[dayOfWeek];
+      if (dayKey && weekData[dayKey]) {
+        // Tính toán timeWorking
+        const startTime = new Date(request.timejob);
+        const workingHours = request.workingHours;
+        const endTime = new Date(startTime.getTime() + workingHours * 60 * 60 * 1000);
+
+        const formatTime = (date: Date) => {
+          const hours = date.getHours().toString().padStart(2, '0');
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          return `${hours}:${minutes}`;
+        };
+
+        const timeWorking = `${formatTime(startTime)}-${formatTime(endTime)}`;
+
+        // Thêm timeWorking vào request
+        (request as any).timeWorking = timeWorking;
+
+        // Định dạng timejob
+        const formatDate = (date: Date) => {
+          const day = date.getDate().toString().padStart(2, '0');
+          const month = (date.getMonth() + 1).toString().padStart(2, '0'); // tháng bắt đầu từ 0
+          const year = date.getFullYear();
+          return `${formatTime(date)} ${day}/${month}/${year}`;
+        };
+
+        (request as any).timejob = formatDate(new Date(request.timejob)); // cập nhật timejob
+
+        weekData[dayKey]?.push(request);
       }
     });
 
@@ -215,64 +232,58 @@ export class RequestService {
         if (a.timejob === b.timejob) {
           return a.request_id - b.request_id;
         }
-        return a.timejob.getTime() - b.timejob.getTime();
+        return new Date(a.timejob).getTime() - new Date(b.timejob).getTime();
       });
     });
 
     return weekData;
   }
 
-  // async getCustomerRequestsForWeek(companyId: number, startDate: Date, endDate: Date) {
-  //   return await this.requestRepo.createQueryBuilder('request')
-  //     .leftJoinAndSelect('request.user', 'user')
-  //     .where('request.company_id = :companyId', { companyId })
-  //     .andWhere('request.timejob BETWEEN :start AND :end', {
-  //       start: startDate,
-  //       end: endDate,
-  //     })
-  //     .orderBy('request.timejob', 'ASC')
-  //     .getMany();
-  // }
 
   async getRequestDetailsById(id: number) {
-    const requestDetails = await this.requestRepo
-      .createQueryBuilder('request')
-      .leftJoinAndSelect('request.user', 'user')
-      .where('request.request_id = :id', { id })
-      .select([
-        'request.request_id',
-        'request.price',
-        'request.request',
-        'request.notes',
-        'request.timejob',
-        'request.workingHours',
-        'request.status',
-        'user.user_id',
-        'user.full_name',
-        'user.phone_number',
-        'user.address',
-        'user.address_tinh',
-      ])
-      .getOne();
+    try {
+      const requestDetails = await this.requestRepo
+        .createQueryBuilder('request')
+        .leftJoinAndSelect('request.user', 'user')
+        .where('request.request_id = :id', { id })
+        .select([
+          'request.request_id',
+          'request.price',
+          'request.request',
+          'request.notes',
+          'request.timejob',
+          'request.workingHours',
+          'request.status',
+          'user.user_id',
+          'user.full_name',
+          'user.phone_number',
+          'user.address',
+          'user.address_tinh',
+        ])
+        .getOne();
 
-    if (!requestDetails) {
-      throw new Error('Request not found');
+      if (!requestDetails) {
+        throw new Error('Yêu cầu không tồn tại');
+      }
+
+      // Định dạng lại timejob
+      const formattedTimejob = new Date(requestDetails.timejob).toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // Nếu muốn định dạng 24 giờ
+      });
+
+      return {
+        ...requestDetails,
+        timejob: formattedTimejob // Trả về timejob đã định dạng
+      };
+    } catch (error) {
+      // Xử lý lỗi liên quan đến cơ sở dữ liệu hoặc truy vấn
+      throw new Error('Lỗi khi truy vấn yêu cầu: ' + (error instanceof Error ? error.message : 'lỗi không xác định'));
     }
-
-    // Định dạng lại timejob
-    const formattedTimejob = new Date(requestDetails.timejob).toLocaleString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false // Nếu muốn định dạng 24 giờ
-    });
-
-    return {
-      ...requestDetails,
-      timejob: formattedTimejob // Trả về timejob đã định dạng
-    };
   }
 
   async getRequestsByCompanyId(

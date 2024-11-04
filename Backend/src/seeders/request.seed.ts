@@ -31,5 +31,5 @@ export async function seedRequests() {
     await requestRepository.save(request);
   }
 
-  console.log('20 yêu cầu đã được chèn thành công!');
+
 }
