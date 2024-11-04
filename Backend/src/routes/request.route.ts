@@ -16,11 +16,13 @@ router.post(
   requestController.create.bind(requestController)
 );
 router.get('/', verifyToken, requestController.getAll.bind(requestController));
+
 router.get(
   '/:id',
   verifyToken,
   requestController.getById.bind(requestController)
 );
+
 router.put(
   '/:id',
   verifyToken,
@@ -31,6 +33,12 @@ router.delete(
   '/:id',
   verifyToken,
   requestController.delete.bind(requestController)
+);
+
+router.get(
+  '/:id/userrentalhistory',
+  verifyToken,
+  requestController.getRequestsCompanyHistory.bind(requestController)
 );
 
 export default router;

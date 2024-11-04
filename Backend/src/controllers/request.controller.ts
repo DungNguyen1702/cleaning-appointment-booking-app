@@ -65,4 +65,94 @@ export class RequestController {
       res.status(500).json({ message: err.message });
     }
   }
+
+  async getRequestsCompanyHistory(req: Request, res: Response) {
+    let page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 100;
+    const userIdFromToken = req.userId; // Lấy userId từ token
+    let userId = parseInt(req.params.id, 10);
+    const startDate = (req.query.startDate as string) || ''; // Lấy tham số startDate
+    const companyName = (req.query.companyName as string) || ''; // Lấy tham số companyName
+
+    // Kiểm tra dữ liệu đầu vào
+    if (isNaN(page) || page <= 0) {
+      return res.status(400).json({ message: 'Tham số page không hợp lệ!' });
+    }
+
+    if (isNaN(limit) || limit <= 0) {
+      return res.status(400).json({ message: 'Tham số limit không hợp lệ!' });
+    }
+
+    if (isNaN(userId) || userId <= 0 || null) {
+      return res.status(400).json({ message: 'Tham số userId không hợp lệ!' });
+    }
+
+    // Kiểm tra quyền truy cập của user
+    if (userId !== userIdFromToken) {
+      return res.status(403).json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
+    }
+
+    try {
+      const { companies, totalCompanies, totalPages, currentPage } =
+        await requestService.getPagedRequests(
+          userId,
+          page,
+          limit,
+          startDate,
+          companyName
+        );
+
+      if (!companies || companies.length === 0) {
+        return res.status(404).json({ message: 'Không tìm thấy yêu cầu nào.' });
+      }
+
+      return res.status(200).json({
+        companies,
+        totalCompanies,
+        totalPages,
+        currentPage,
+      });
+    } catch (error) {
+      console.error('Lỗi trong quá trình lấy dữ liệu yêu cầu:', error);
+      return res
+        .status(500)
+        .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+    }
+  }
+
+  async getRequestDetails(req: Request, res: Response) {
+    const requestId = parseInt(req.params.requestId);
+    const userId = req.userId; // userId nên được lấy từ token
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng không hợp lệ' });
+    }
+
+    console.log('requestId:', requestId);
+    console.log('userId:', userId);
+
+    try {
+      const request = await requestService.getRequestByIdAndUserId(
+        requestId,
+        userId
+      );
+
+      // Kiểm tra xem request có tồn tại không
+      if (!request) {
+        console.log(
+          `Không tìm thấy yêu cầu với requestId: ${requestId} và userId: ${userId}`
+        );
+        return res.status(404).json({
+          message: 'Yêu cầu không tồn tại hoặc bạn không có quyền truy cập',
+        });
+      }
+
+      return res.status(200).json(request);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(400).json({ message: error.message });
+      }
+      return res.status(400).json({ message: 'Đã xảy ra lỗi' });
+    }
+  }
 }

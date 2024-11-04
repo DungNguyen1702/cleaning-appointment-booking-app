@@ -51,6 +51,9 @@ export class Request {
   @Column({ type: 'datetime' })
   timejob: Date;
 
+  @Column({ type: 'decimal', nullable: true, default: 0 })
+  workingHours: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

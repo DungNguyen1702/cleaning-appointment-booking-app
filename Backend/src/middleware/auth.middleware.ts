@@ -26,7 +26,7 @@ export const verifyToken = (
     // Kiểm tra xem decoded có chứa userId không
     if (decoded && typeof decoded === 'object' && 'userId' in decoded) {
       const payload = decoded as JwtPayload & { userId: number };
-      req.body.userId = payload.userId;
+      req.userId = payload.userId;
       return next();
     } else {
       return res.status(403).json({ message: 'Token không có id người dùng' });
