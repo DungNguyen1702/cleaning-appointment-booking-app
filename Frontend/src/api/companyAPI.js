@@ -1,8 +1,8 @@
 import axiosClient from "../utils/customFetch";
 
 const companyAPI = {
-    getListCompany: (page) => {
-        const url = `/company?page=${page}&limit=9`;
+    getListCompany: (page, location, name) => {
+        const url = `/company?page=${page}&limit=9&location=${location}&name=${name}`; // Đường dẫn tới API danh sách công ty
         return axiosClient.application.get(url);
     },
     getCompanyDetails: (companyId) => {

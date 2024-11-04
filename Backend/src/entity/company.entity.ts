@@ -27,6 +27,9 @@ export class Company extends BaseEntity {
   @Column()
   address: string;
 
+  @Column({ type: 'text'})
+  address_tinh: string;
+
   @Column({ type: 'text', nullable: true })
   phone: string;
 

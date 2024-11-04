@@ -14,8 +14,10 @@ const Wrapper = styled.aside`
       transition: margin-left 0.3s ease-in-out;
     }
     .content {
-      position: sticky;
+      position: fixed;
       top: 0;
+      background-color: #ffffff;
+      padding-right: 32px;
     }
     .show-sidebar {
       margin-left: 0;

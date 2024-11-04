@@ -2,6 +2,7 @@
     background-color: #FFF8F8;
     .container{
         width: 100%;
+        height: auto !important;
         .filter-options{
             display: flex;
             justify-content: space-between;
@@ -42,7 +43,8 @@
                         align-items: center;
                         gap: 9px;
                         .logo-company{
-                            width: 86px;
+                            width: 125px;
+                            border-radius: 6px;
                         }
                         .heading-card{
                             font-weight: 600 !important;
@@ -108,6 +110,14 @@
                     }
                 }
             }
+        }
+        .no-products{
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff0000;
+            margin: 76px 0;
+            height: 100vh;
         }
         nav.MuiPagination-root.MuiPagination-outlined.css-1xra8g6-MuiPagination-root{
             display: flex;

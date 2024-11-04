@@ -6,7 +6,7 @@ const Wrapper = styled.section`
     grid-template-columns: 1fr;
   }
   .dashboard-page {
-    padding: 2rem 4rem;
+    padding: 2rem 1rem;
     background-color: #FFF8F8;
   }
   @media (min-width: 992px) {

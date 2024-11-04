@@ -19,7 +19,7 @@ export async function seedRequests() {
     request.name = `Khách hàng ${i}`;
     request.phone = `012345678${i}`;
     request.address = `Địa chỉ ${i}`;
-    request.status = RequestStatusEnum.PENDING; // Giả sử trạng thái đang chờ
+    request.status = RequestStatusEnum.COMPLETED; // Giả sử trạng thái đang chờ
     request.price = Math.floor(Math.random() * 1000000); // Giá ngẫu nhiên
     request.notes = `Ghi chú cho yêu cầu ${i}`;
     request.request = `Yêu cầu từ khách hàng ${i}`;

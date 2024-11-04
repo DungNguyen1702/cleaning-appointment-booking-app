@@ -7,10 +7,19 @@ const Wrapper = styled.nav`
   justify-content: center;
   box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
   background: var(--background-secondary-color);
+  position: fixed;
+  z-index: 100;
+  width: 100%;
   .nav-center {
     display: flex;
     width: 90vw;
     align-items: center;
+    .toggle-dashboard{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
     justify-content: space-between;
   }
   .toggle-btn {

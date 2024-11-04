@@ -23,11 +23,27 @@ export const getCompanyDetails = async (req: Request, res: Response) => {
 };
 
 export const getAllCompanies = async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  let page = parseInt(req.query.page as string);
+  let limit = parseInt(req.query.limit as string);
+  const location = req.query.location as string || '';
+  const name = req.query.name as string || '';
+
+  // Kiểm tra dữ liệu đầu vào
+  if (isNaN(page) || page <= 0) {
+    return res.status(400).json({ message: 'Tham số page không hợp lệ!' });
+  }
+
+  if (isNaN(limit) || limit <= 0) {
+    return res.status(400).json({ message: 'Tham số limit không hợp lệ!' });
+  }
 
   try {
-    const { companies, totalCompanies } = await fetchAllCompanies(page, limit);
+    const { companies, totalCompanies } = await fetchAllCompanies(page, limit, location, name);
+
+    if (!companies) {
+      return res.status(404).json({ message: 'Không tìm thấy công ty nào.' });
+    }
+
     const totalPages = Math.ceil(totalCompanies / limit);
 
     return res.status(200).json({
@@ -37,6 +53,9 @@ export const getAllCompanies = async (req: Request, res: Response) => {
       currentPage: page,
     });
   } catch (error) {
-    return res.status(500).json({ message: 'Đã xảy ra lỗi' });
+
+    console.error('Lỗi trong quá trình lấy dữ liệu công ty:', error);
+    return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
   }
 };
+
