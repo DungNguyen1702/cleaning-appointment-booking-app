@@ -41,12 +41,4 @@ router.get(
   requestController.getRequestsCompanyHistory.bind(requestController)
 );
 
-router.get(
-  '/:id/customerrequestsforweek',
-  verifyToken,
-  requestController.getCustomerRequestsForWeek.bind(requestController)
-);
-
-router.get('/requests/:id/details', requestController.getRequestDetails.bind(requestController));
-
 export default router;

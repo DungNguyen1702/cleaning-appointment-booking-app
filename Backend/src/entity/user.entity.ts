@@ -25,6 +25,12 @@ export class User extends BaseEntity {
   @Column()
   phone_number: string;
 
+  @Column()
+  address: string;
+
+  @Column({ type: 'text' })
+  address_tinh: string;
+
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string | null;
 
