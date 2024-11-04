@@ -54,6 +54,7 @@
   display: flex;
   flex-direction: column;
   background-color: #fff5f7;
+  min-width: 105%;
 }
 
 .top-header {
@@ -214,7 +215,7 @@
         font-size: 0.875rem;
         border: 1px solid #e98080;
 
-        &.yellow {
+        &.pending {
           background-color: #fefcbf;
         }
 
@@ -222,7 +223,7 @@
           background-color: #f5c3c8
         }
 
-        &.green {
+        &.success {
           background-color: #c6f6d5;
         }
 

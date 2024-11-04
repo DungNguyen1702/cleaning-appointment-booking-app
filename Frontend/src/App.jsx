@@ -86,7 +86,7 @@ const router = createBrowserRouter([
               {
                 index: true,
                 path: "calendar",
-                element: <Com_Calendar />,
+                element: <Schedule />,
               },
               {
                 path: "company",
@@ -127,6 +127,10 @@ const router = createBrowserRouter([
               {
                 path: "history",
                 element: <ListRequest />,
+              },
+              {
+                path: "calendar",
+                element: <Com_Calendar />,
               },
             ],
           },
