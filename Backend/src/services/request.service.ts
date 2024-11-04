@@ -233,32 +233,48 @@ export class RequestService {
   //     .orderBy('request.timejob', 'ASC')
   //     .getMany();
   // }
-  
-    async getRequestDetailsById(id: number) {
-  const requestDetails = await this.requestRepo
-    .createQueryBuilder('request')
-    .leftJoinAndSelect('request.user', 'user')
-    .where('request.request_id = :id', { id })
-    .select([
-      'request.price',
-      'request.request',
-      'request.notes',
-      'request.timejob',
-      'request.status',
-      'user.full_name',
-      'user.phone_number',
-    ])
-    .getOne();
 
-  if (!requestDetails) {
-    throw new Error('Request not found');
+  async getRequestDetailsById(id: number) {
+    const requestDetails = await this.requestRepo
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.user', 'user')
+      .where('request.request_id = :id', { id })
+      .select([
+        'request.request_id',
+        'request.price',
+        'request.request',
+        'request.notes',
+        'request.timejob',
+        'request.workingHours',
+        'request.status',
+        'user.user_id',
+        'user.full_name',
+        'user.phone_number',
+        'user.address',
+        'user.address_tinh',
+      ])
+      .getOne();
+
+    if (!requestDetails) {
+      throw new Error('Request not found');
+    }
+
+    // Định dạng lại timejob
+    const formattedTimejob = new Date(requestDetails.timejob).toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false // Nếu muốn định dạng 24 giờ
+    });
+
+    return {
+      ...requestDetails,
+      timejob: formattedTimejob // Trả về timejob đã định dạng
+    };
   }
 
-  return requestDetails;
-} 
-  
-  
-  
   async getRequestsByCompanyId(
     companyId: number,
     page: number,

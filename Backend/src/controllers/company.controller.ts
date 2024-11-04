@@ -110,3 +110,61 @@ export const editRequestByCompany = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Đã xảy ra lỗi' });
   }
 };
+
+
+export const getRequestIdDetails = async (req: Request, res: Response) => {
+  const requestId = parseInt(req.params.requestId);
+
+  try {
+    const request = await requestService.getRequestDetailsById(
+      requestId,
+    );
+
+    return res.status(200).json(request);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(400).json({ message: 'Đã xảy ra lỗi' });
+  }
+}
+
+export const getCustomerRequestsForWeek = async (req: Request, res: Response) => {
+  const companyId = parseInt(req.params.companyId, 10);
+  const companyIdFromToken = req.userId;
+  const startDate = new Date(req.query.startDate as string);
+  const endDate = new Date(req.query.endDate as string);
+
+  // Kiểm tra dữ liệu đầu vào
+  if (!startDate || !endDate) {
+    return res
+      .status(400)
+      .json({ message: 'Tham số startDate và endDate là bắt buộc!' });
+  }
+
+  if (companyId !== companyIdFromToken) {
+    console.log(companyId, companyIdFromToken)
+    return res.status(403).json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
+  }
+
+  try {
+    const weekData = await requestService.getCustomerRequestsForWeek(
+      companyId,
+      startDate,
+      endDate
+    );
+
+    if (!weekData || Object.keys(weekData).length === 0) {
+      return res.status(404).json({ message: 'Không tìm thấy yêu cầu nào.' });
+    }
+
+    return res.status(200).json(weekData);
+  } catch (error) {
+    console.error('Lỗi trong quá trình lấy dữ liệu yêu cầu:', error);
+    return res
+      .status(500)
+      .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+  }
+}
+
+

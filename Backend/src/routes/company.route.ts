@@ -21,4 +21,12 @@ router.put(
   companyController.editRequestByCompany
 );
 
+router.get('/request/:requestId/details', verifyToken, companyController.getRequestIdDetails);
+
+router.get(
+  '/requests/:companyId/customerrequestsforweek',
+  verifyToken,
+  companyController.getCustomerRequestsForWeek
+);
+
 export default router;
