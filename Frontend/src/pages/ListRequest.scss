@@ -1,0 +1,171 @@
+.title-history{
+    font-size: 38px;
+    font-weight: 400;
+}
+.main {
+  height: 980px;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.background-shadow {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 1px 2px #00001414, 0px 2px 4px #00001414;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.input {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f1f5f9;
+  padding: 10px;
+  border-bottom: 1px solid #c1c4c7;
+
+  .cell-sub {
+    display: flex;
+    flex: 1;
+    text-align: left;
+    padding: 10px;
+    font-weight: bold;
+    align-items: center;
+    justify-content: center;
+   }
+
+   .account{
+     margin-right: 100px;
+   }
+   .phone{
+    margin-right: 0px;
+   }
+   .date{
+    margin-right: 10px;
+   }
+   
+}
+
+.table-body {
+  display: flex;
+  flex-direction: column;
+
+  .cell {
+    display: flex;
+    flex: 1;
+    text-align: left;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .account{
+    min-width: 233px;
+  }
+  .phone{
+    min-width: 130px;
+  }
+  .date{
+    min-width: 115px;
+  }
+  .hour{
+    min-width: 150px;
+  }
+  .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 24px;
+    border: 1px solid #e4e7e9ff;
+    span{
+        font-size: 18px;
+        font-weight: 600;
+    }
+  }
+
+  .status{
+    min-width: 0;
+  }
+
+    .quantity-control button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #e4e7e9;
+        background-color: #fff;
+        border-radius: 3px;
+        cursor: pointer;
+        border: none;
+        margin: 4px;
+        opacity: 0.5;
+        svg {
+            font-size: 20px;
+        }
+    }
+    .status {
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+  .row{
+    cursor: pointer;
+    &:hover {
+      background-color: #dddfe0;
+    }
+  }  
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+
+.avatar {
+  min-width: 56px;
+  max-height: 44px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.status.complete {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status.cancel {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.status.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status.in-progress {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: right;
+  margin-top: 20px;
+}
+
+.css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input{
+    padding: 4px !important;
+}
+

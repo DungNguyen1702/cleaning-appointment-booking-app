@@ -18,11 +18,43 @@ import {
   AppointmentForm,
   Com_Calendar,
 } from "./pages";
+import { ListRequest } from "./pages/ListRequest";
+import useAuth from "./hooks/useAuth";
+
+export const AdminRoute = () => {
+  const { account } = useAuth();
+
+  if (account && account.role === 2) {
+    return <Outlet />;
+  } else {
+    return <Navigate to="/" />;
+  }
+};
+
+export const CompanyRoute = () => {
+  const { account } = useAuth();
+
+  if (account && account.role === 1) {
+    return <Outlet />;
+  } else {
+    return <Navigate to="/" />;
+  }
+};
+
+export const UserRoute = () => {
+  const { account } = useAuth();
+
+  if (account && account.role === 0) {
+    return <Outlet />;
+  } else {
+    return <Navigate to="/" />;
+  }
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomeLayout />,
+    element: <ListRequest />,
     errorElement: <Error />,
     children: [
       {
@@ -43,7 +75,10 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "dashboard",
+        // element: <UserRoute />,
+        // children: [
+        //   {
+        //     path: "user",
         element: <DashboardLayout />,
         children: [
           {
@@ -56,7 +91,7 @@ const router = createBrowserRouter([
           },
           {
             path: "history",
-            element: <History />,
+            element: <ListRequest />,
           },
           {
             path: "profile",
@@ -67,7 +102,7 @@ const router = createBrowserRouter([
             element: <Logout />,
           },
           {
-            path: "company/:companyId",            
+            path: "company/:companyId",
             element: <DetailCompany />,
           },
           {
@@ -75,7 +110,25 @@ const router = createBrowserRouter([
             element: <AppointmentForm />,
           },
         ],
+        //   },
+        // ],
       },
+
+      // {
+      //   element: <CompanyRoute />,
+      //   children: [
+      //     {
+      //       path: "company",
+      //       element: <DashboardLayout />,
+      //       children: [
+      //         {
+      //           path: "history",
+      //           element: <ListRequest />,
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
   },
 ]);

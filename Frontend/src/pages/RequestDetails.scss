@@ -1,0 +1,111 @@
+.ReactModal__Content.ReactModal__Content--after-open{
+    height: fit-content !important;
+}
+.company-modal-hon {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-container {
+  background-color: #fff;
+  width: 750px;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 20px;
+  color: #e88080;
+  font-weight: 500;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.content {
+  margin-bottom: 20px;
+}
+
+.info {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  p{
+    margin-bottom: -8px;
+  }
+}
+
+.time-picker-section {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.label {
+  font-size: 14px;
+  color: #333;
+  margin-right: 10px;
+}
+
+.time-picker {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.time {
+  font-size: 16px;
+  color: #333;
+}
+
+.separator {
+  margin: 0 5px;
+  font-size: 16px;
+  color: #333;
+}
+
+.status-section {
+  margin-top: 20px;
+}
+
+.price {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.status {
+  font-size: 14px;
+  color: #333;
+}
+
+.status-label {
+  color: #e88080;
+  font-weight: 500;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.complete-button {
+  background-color: #e88080 !important;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 14px;
+  text-transform: none;
+}
