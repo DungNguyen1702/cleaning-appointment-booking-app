@@ -35,11 +35,17 @@ const links = [
   },
 
   // company
-  { text: "Trang chủ", path: ".", icon: <FaWpforms />, roles: "COMPANY" },
+
   {
     text: "Thông tin công ty",
     path: "company",
     icon: <MdQueryStats />,
+    roles: "COMPANY",
+  },
+  {
+    text: "Lịch làm việc",
+    path: "calendar",
+    icon: <FaWpforms />,
     roles: "COMPANY",
   },
   {

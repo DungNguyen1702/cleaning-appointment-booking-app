@@ -9,6 +9,10 @@ const companyAPI = {
         const url = `/company/${companyId}`; // Đường dẫn tới API chi tiết công ty
         return axiosClient.application.get(url);
       },
+      getRequestCustomer: (comapnyId, startDate, endDate) => {
+        const url = `/company/requests/${comapnyId}/customerrequestsforweek?startDate=${startDate}&endDate=${endDate}`; // Đường dẫn tới API lịch làm việc
+        return axiosClient.application.get(url);
+      }
 };
 
 export default companyAPI;

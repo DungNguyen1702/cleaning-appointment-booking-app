@@ -1,61 +1,138 @@
-import React from 'react';
-import { MdOutlineSearch, MdOutlineNavigateNext, MdOutlineNavigateBefore} from "react-icons/md";
-import './Com_Calendar.scss';
+import React, { useState, useEffect } from "react";
+import {
+  MdOutlineSearch,
+  MdOutlineNavigateNext,
+  MdOutlineNavigateBefore,
+} from "react-icons/md";
+import "./Com_Calendar.scss";
+import companyAPI from "../api/companyAPI";
+import useAuth from "../hooks/useAuth";
+import LoadingOverlay from "../components/loading_overlay";
 
 const Com_Calendar = () => {
-  const days = [
-    { name: "Thứ 2", date: "9/9/2024" },
-    { name: "Thứ 3", date: "10/9/2024" },
-    { name: "Thứ 4", date: "11/9/2024" },
-    { name: "Thứ 5", date: "12/9/2024" },
-    { name: "Thứ 6", date: "13/9/2024" },
-    { name: "Thứ 7", date: "14/9/2024" },
-    { name: "Chủ nhật", date: "15/9/2024" },
-  ];
+  const [days, setDays] = useState([]);
+  const [appointments, setAppointments] = useState({});
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { account } = useAuth();
+  const fetchData = async (startDate, endDate) => {
+    try {
+      setLoading(true);
+      const response = await companyAPI.getRequestCustomer(
+        account.company_id,
+        startDate,
+        endDate
+      );
+      console.log(response.data);
+      setAppointments(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  function formatDateToYYYYMMDD(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
-  const appointments = [
-    { day: 0, name: "Võ Việt Trường", time: "10:30-11:30 AM", color: "yellow" },
-    { day: 0, name: "Lê Tuấn Nguyễn Khôi", time: "12:30-13:30 PM", color: "pink" },
-    { day: 0, name: "Nguyễn Văn Dũng", time: "15:30-16:30 PM", color: "pink" },
-    { day: 1, name: "Phạm Duy Tín", time: "17:30-18:30 PM", color: "green" },
-    { day: 1, name: "Hoàng Minh Tín", time: "10:30-11:30 AM", color: "yellow" },
-    { day: 1, name: "Huỳnh Thị Thục Vi", time: "12:30-13:30 PM", color: "pink" },
-    { day: 2, name: "Anh Bình", time: "21:30-22:30 PM", color: "green" },
-    { day: 2, name: "Trần Minh Quân", time: "12:30-13:30 PM", color: "pink" },
-    { day: 3, name: "Hồ Văn Thảo", time: "23:30-0:30 AM", color: "purple" },
-    { day: 4, name: "Bạch Huỳnh Hải Phương", time: "21:30-22:30 PM", color: "green" },
-    { day: 5, name: "Kim Hiếu", time: "10:30-11:30 AM", color: "yellow" },
-  ];
+  useEffect(() => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Thứ 2
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() - today.getDay() + 7); // Chủ nhật
+
+    setStartDate(formatDateToYYYYMMDD(startOfWeek));
+    setEndDate(formatDateToYYYYMMDD(endOfWeek));
+
+    fetchData(
+      formatDateToYYYYMMDD(startOfWeek),
+      formatDateToYYYYMMDD(endOfWeek)
+    );
+  }, []);
+
+  const handleTodayClick = () => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Thứ 2
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() - today.getDay() + 7); // Chủ nhật
+
+    setStartDate(formatDateToYYYYMMDD(startOfWeek));
+    setEndDate(formatDateToYYYYMMDD(endOfWeek));
+
+    fetchData(
+      formatDateToYYYYMMDD(startOfWeek),
+      formatDateToYYYYMMDD(endOfWeek)
+    );
+  };
+
+  const handleNextWeekClick = () => {
+    const nextStartDate = new Date(startDate);
+    nextStartDate.setDate(nextStartDate.getDate() + 7);
+    const nextEndDate = new Date(endDate);
+    nextEndDate.setDate(nextEndDate.getDate() + 7);
+
+    setStartDate(formatDateToYYYYMMDD(nextStartDate));
+    setEndDate(formatDateToYYYYMMDD(nextEndDate));
+
+    fetchData(
+      formatDateToYYYYMMDD(nextStartDate),
+      formatDateToYYYYMMDD(nextEndDate)
+    );
+  };
+
+  const handlePrevWeekClick = () => {
+    const prevStartDate = new Date(startDate);
+    prevStartDate.setDate(prevStartDate.getDate() - 7);
+    const prevEndDate = new Date(endDate);
+    prevEndDate.setDate(prevEndDate.getDate() - 7);
+
+    setStartDate(formatDateToYYYYMMDD(prevStartDate));
+    setEndDate(formatDateToYYYYMMDD(prevEndDate));
+
+    fetchData(
+      formatDateToYYYYMMDD(prevStartDate),
+      formatDateToYYYYMMDD(prevEndDate)
+    );
+  };
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const daysArray = [];
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dayName = new Intl.DateTimeFormat("vi-VN", {
+          weekday: "long",
+        }).format(d);
+        const dayDate = d.toLocaleDateString("vi-VN");
+        daysArray.push({ name: dayName, date: dayDate });
+      }
+
+      setDays(daysArray);
+    }
+  }, [startDate, endDate]);
 
   return (
     <div className="dashboard">
-      {/* <aside className="sidebar">
-        <div className="logo">
-          <img src="/logo.png" alt="Dash UI" />
-          <span>Dash UI</span>
-        </div>
-        <nav className="nav-menu">
-          <a href="#" className="nav-item">Trang chủ</a>
-          <a href="#" className="nav-item">Tin nhắn</a>
-          <a href="#" className="nav-item">Dịch vụ</a>
-          <a href="#" className="nav-item active">Cuộc hẹn với người dùng</a>
-          <a href="#" className="nav-item">Thông tin công ty</a>
-        </nav>
-      </aside> */}
-
       <main className="main-content">
         <header className="top-header">
           <div className="search-bar">
-            <span className="search-icon"><MdOutlineSearch /></span>
+            <span className="search-icon">
+              <MdOutlineSearch />
+            </span>
             <input type="text" placeholder="Search" />
           </div>
           <div className="header-actions">
-            <button className="icon-button">
-              &#128276;
-            </button>
-            <button className="icon-button">
-              &#128100;
-            </button>
+            <button className="icon-button">&#128276;</button>
+            <button className="icon-button">&#128100;</button>
           </div>
         </header>
 
@@ -64,40 +141,52 @@ const Com_Calendar = () => {
             <h1>Cuộc hẹn với người dùng</h1>
           </div>
           <div className="calendar-actions">
-            <button className="nav-button">
+            <button className="nav-button" onClick={handlePrevWeekClick}>
               <MdOutlineNavigateBefore />
             </button>
-            <button className="nav-button">
+            <button className="nav-button" onClick={handleNextWeekClick}>
               <MdOutlineNavigateNext />
             </button>
-            <button className="today-button">hôm nay</button>
+            <button className="today-button" onClick={handleTodayClick}>
+              hôm nay
+            </button>
           </div>
         </div>
 
-        <div className="calendar-grid">
-          {days.map((day, index) => (
-            <div key={index} className="day-column">
-              <div className="day-header">
-                <span className="day-name">{day.name}</span>
-                <span className="day-date">{day.date}</span>
-              </div>
-              <div className="day-separator"></div>
-              <div className="appointments">
-                {appointments
-                  .filter(apt => apt.day === index)
-                  .map((apt, aptIndex) => (
-                    <div 
-                      key={aptIndex} 
-                      className={`appointment ${apt.color}`}
+        {loading ? (
+          <LoadingOverlay loading={loading} />
+        ) : (
+          <div className="calendar-grid">
+            {days.map((day, index) => (
+              <div key={index} className="day-column">
+                <div className="day-header">
+                  <span className="day-name">{day.name}</span>
+                  <span className="day-date">{day.date}</span>
+                </div>
+                <div className="day-separator"></div>
+                <div className="appointments">
+                  {appointments[
+                    day.name
+                      .toUpperCase()
+                      .replace(/\s+/g, "_")
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                  ]?.map((apt, aptIndex) => (
+                    <div
+                      key={aptIndex}
+                      className={`appointment ${apt.status.toLowerCase()}`}
                     >
-                      <div className="appointment-name">{apt.name}</div>
-                      <div className="appointment-time">{apt.time}</div>
+                      <div className="appointment-name">
+                        {apt.user.full_name}
+                      </div>
+                      <div className="appointment-time">{apt.timeWorking}</div>
                     </div>
                   ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
