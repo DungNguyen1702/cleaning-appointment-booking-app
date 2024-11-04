@@ -35,30 +35,30 @@ const History = () => {
     const fetchHistory = async () => {
         try {
           setLoading(true);
-          console.log(currentPage,user_id,dataSearch.name)
+        //   console.log(currentPage,user_id,dataSearch.name)
           const response = await RequestAPI.getHistory(currentPage,user_id,dataSearch.name)
           console.log(response);
-          if (response.status!==404){
+          
 
             setHistory(response.data.companies);
             setTotalPages(response.data.totalPages);
-            }
-          else{
-            setSttRes(0);
-          }
+            setSttRes(1);
+           
         } catch (error) {
           console.error("Error fetching history:", error);
+          setSttRes(0);
         } finally {
           setLoading(false);
         }
       };
     useEffect(() => {
         fetchHistory();
-    }, [currentPage, dataSearch.name]);
+    }, [currentPage]);
 
     const handleSearchKeyPress = (event) => {
         if (event.key === "Enter") {
           fetchHistory();
+          
         }
     };
 
@@ -77,7 +77,7 @@ const History = () => {
         setSelectedCompany(null); 
     };
 
-    console.log(dataSearch,user_id)
+    // console.log(dataSearch,user_id)
     return (
         <div>
             <h4 className="title-left">Lịch sử giao dịch</h4>
@@ -97,7 +97,7 @@ const History = () => {
                 {sttRes===0? 
                 (
                 <div className="no-products">
-                    <p>Không có sản phẩm hợp lệ</p>
+                    <p>Không tìm thấy lịch sử phù hợp</p>
                 </div>
                 ) : (
                     <>
