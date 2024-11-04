@@ -11,4 +11,4 @@ export { default as Register } from './Register'
 export { default as History } from './History'
 export {default as DetailCompany} from './DetailCompany'
 export {default as AppointmentForm} from './AppointmentForm'
-
+export {default as Com_Calendar} from "./Com_Calendar"

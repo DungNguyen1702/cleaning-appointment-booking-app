@@ -16,6 +16,7 @@ import {
   History,
   DetailCompany,
   AppointmentForm,
+  Com_Calendar,
 } from "./pages";
 
 const router = createBrowserRouter([
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      { // để path ở đây để nó chạy thử
+        path: "calendar",
+        element: <Com_Calendar />,
       },
 
       {
