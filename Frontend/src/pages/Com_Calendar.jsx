@@ -121,24 +121,30 @@ const Com_Calendar = () => {
   }, [startDate, endDate]);
 
   return (
-    <div className="dashboard">
+    <div className="calendarcontainer">
       <main className="main-content">
+        <div className="title">
+            <h1>Cuộc hẹn với người dùng</h1>
+        </div>
         <header className="top-header">
+          {/* <div className="search-bar">
+            <span className="search-icon">
+              <MdOutlineSearch />
+            </span>
+            <input type="text" placeholder="Search" />
+          </div> */}
+          {/* <div className="header-actions">
+            <button className="icon-button">&#128276;</button>
+            <button className="icon-button">&#128100;</button>
+          </div> */}
+        </header>
+
+        <div className="calendar-header">
           <div className="search-bar">
             <span className="search-icon">
               <MdOutlineSearch />
             </span>
             <input type="text" placeholder="Search" />
-          </div>
-          <div className="header-actions">
-            <button className="icon-button">&#128276;</button>
-            <button className="icon-button">&#128100;</button>
-          </div>
-        </header>
-
-        <div className="calendar-header">
-          <div className="title">
-            <h1>Cuộc hẹn với người dùng</h1>
           </div>
           <div className="calendar-actions">
             <button className="nav-button" onClick={handlePrevWeekClick}>

@@ -5,7 +5,7 @@ import "./RequestDetails.scss";
 
 export const RequestDetails = ({ item, onClose }) => {
   if (!item) return null;
-
+  
   return (
     <div className="company-modal-hon">
       <div className="modal-container">
@@ -55,7 +55,7 @@ export const RequestDetails = ({ item, onClose }) => {
             </div>
           </div>
         </div>
-
+        
         <div className="footer">
           <Button
             variant="contained"
@@ -68,4 +68,4 @@ export const RequestDetails = ({ item, onClose }) => {
       </div>
     </div>
   );
-};
+};  
