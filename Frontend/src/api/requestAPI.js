@@ -10,8 +10,8 @@ const RequestAPI = {
     return axiosClient.application.get(url);
   },
 
-  getHistory :(page,userid,name)=>{
-    const url = `/requests/${userid}/userrentalhistory?page=${page}&companyName=${name}&limit=12`
+  getHistory :(page,userid,name,starDate,limit)=>{
+    const url = `/requests/${userid}/userrentalhistory?page=${page}&companyName=${name}&startDate=${starDate}&limit=${limit}`
     ///requests/1/userrentalhistory?page=1&limit=10&companyName=C
     return axiosClient.application.get(url);
 

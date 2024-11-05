@@ -3,9 +3,10 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography }
 import "./DetailRequest.scss";
 import RequestAPI from "../api/requestAPI"; // Import the RequestAPI
 
-const CompanyDetailModal = ({ open, onClose }) => {
+const CompanyDetailModal = ({ open, onClose,company }) => {
   const [transactionData, setTransactionData] = useState(null);
-  const requestId = 1; // Set the request ID to fetch details
+  const requestId = company; // Set the request ID to fetch details
+  // console.log(company?.request_id,company)
 
   useEffect(() => {
     const fetchTransactionData = async () => {
