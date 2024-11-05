@@ -25,34 +25,30 @@ export const RequestDetails = ({ item, onClose }) => {
             <br />
             <p>Số điện thoại: {item.phone}</p>
             <br />
-            <p>Ngày đặt lịch: {item.date}</p>
+            <p>Ngày đặt lịch: {item.request_date}</p>
             <br />
-            <p>Địa chỉ: 123 Nguyễn Tri Phương, Thạc Gián, Thanh Khê, Đà Nẵng</p>
+            <p>Địa chỉ: {item.address || "Địa chỉ không xác định"}</p>
             <br />
-            <p>Yêu cầu: Lau nhà, kính,...</p>
+            <p>Yêu cầu: {item.requirements || "Không có yêu cầu"}</p>
             <br />
-            <p>
-              {" "}
-              Ghi chú: Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Expedita, eligendi magnam. Perferendis itaque nesciunt
-              consequuntur vitae accusamus, laudantium ex magnam odio eligendi
-              molestiae dignissimos at laboriosam, mollitia impedit quaerat.
-              Quis?
-            </p>
+            <p>Ghi chú: {item.notes || "Không có ghi chú"}</p>
           </p>
 
           <div className="time-picker-section">
             <div className="label">Thời gian làm:</div>
             <div className="time-picker">
-              <div className="time">02</div>
+              <div className="time">{item.timeHours || "00"}</div>
               <div className="separator">:</div>
-              <div className="time">32</div>
+              <div className="time">{item.timeMinutes || "00"}</div>
             </div>
           </div>
 
           <div className="status-section">
             <div className="price">
-              Thành tiền: {(item.hours * item.price).toLocaleString()}đ
+              Thành tiền: {(item.workingHours * item.price).toLocaleString()}đ
+            </div>
+            <div className="working-hours">
+              Số giờ làm: {item.workingHours} giờ {/* Hiển thị số giờ làm */}
             </div>
             <div className="status">
               Trạng thái: <span className="status-label">{item.status}</span>

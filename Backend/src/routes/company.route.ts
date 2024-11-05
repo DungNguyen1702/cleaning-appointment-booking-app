@@ -21,7 +21,17 @@ router.put(
   companyController.editRequestByCompany
 );
 
-router.get('/request/:requestId/details', verifyToken, companyController.getRequestIdDetails);
+router.put(
+  '/requests/:requestId/status',
+  verifyToken,
+  companyController.editRequestStatusByCompany
+);
+
+router.get(
+  '/request/:requestId/details',
+  verifyToken,
+  companyController.getRequestIdDetails
+);
 
 router.get(
   '/requests/:companyId/customerrequestsforweek',

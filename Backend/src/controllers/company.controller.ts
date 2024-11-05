@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { getCompanyById, fetchAllCompanies } from '../services/company.service';
 import { RequestService } from '../services/request.service';
+import { RequestStatusEnum } from '../enums/requestStatus.enum';
 
 const requestService = new RequestService();
 
@@ -110,15 +111,41 @@ export const editRequestByCompany = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Đã xảy ra lỗi' });
   }
 };
+export const editRequestStatusByCompany = async (
+  req: Request,
+  res: Response
+) => {
+  const { requestId } = req.params;
+  const { status } = req.body;
 
+  try {
+    // Kiểm tra xem status có phải là một giá trị hợp lệ trong RequestStatusEnum không
+    if (!Object.values(RequestStatusEnum).includes(status)) {
+      return res.status(400).json({ message: 'Trạng thái không hợp lệ' });
+    }
+
+    const updatedRequest = await requestService.updateRequest(
+      parseInt(requestId),
+      { status }
+    );
+
+    return res.status(200).json({
+      message: 'Chỉnh sửa trạng thái yêu cầu thành công',
+      updatedRequest,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(400).json({ message: 'Đã xảy ra lỗi' });
+  }
+};
 
 export const getRequestIdDetails = async (req: Request, res: Response) => {
   const requestId = parseInt(req.params.requestId);
 
   try {
-    const request = await requestService.getRequestDetailsById(
-      requestId,
-    );
+    const request = await requestService.getRequestDetailsById(requestId);
 
     return res.status(200).json(request);
   } catch (error: unknown) {
@@ -127,9 +154,12 @@ export const getRequestIdDetails = async (req: Request, res: Response) => {
     }
     return res.status(500).json({ message: 'Đã xảy ra lỗi không xác định' });
   }
-}
+};
 
-export const getCustomerRequestsForWeek = async (req: Request, res: Response) => {
+export const getCustomerRequestsForWeek = async (
+  req: Request,
+  res: Response
+) => {
   const companyId = parseInt(req.params.companyId, 10);
   const companyIdFromToken = req.userId;
   const startDate = new Date(req.query.startDate as string);
@@ -143,8 +173,10 @@ export const getCustomerRequestsForWeek = async (req: Request, res: Response) =>
   }
 
   if (companyId !== companyIdFromToken) {
-    console.log(companyId, companyIdFromToken)
-    return res.status(403).json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
+    console.log(companyId, companyIdFromToken);
+    return res
+      .status(403)
+      .json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
   }
 
   try {
@@ -165,6 +197,4 @@ export const getCustomerRequestsForWeek = async (req: Request, res: Response) =>
       .status(500)
       .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
   }
-}
-
-
+};
