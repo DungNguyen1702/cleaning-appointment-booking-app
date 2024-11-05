@@ -1,6 +1,9 @@
 .ReactModal__Content.ReactModal__Content--after-open{
     height: fit-content !important;
 }
+.ReactModal__Overlay.ReactModal__Overlay--after-open{
+  z-index: 1000 !important;
+}
 .company-modal-hon {
   background-color: #ffffff;
   display: flex;
@@ -79,17 +82,23 @@
 
 .status-section {
   margin-top: 20px;
-}
 
-.price {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 10px;
-}
+  .working-hours{
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 24px;
+  }
 
-.status {
-  font-size: 14px;
-  color: #333;
+  .price {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 24px;
+  }
+
+  .status {
+    font-size: 14px;
+    color: #333;
+  }
 }
 
 .status-label {

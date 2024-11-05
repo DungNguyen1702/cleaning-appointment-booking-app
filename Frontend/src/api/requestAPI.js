@@ -17,9 +17,11 @@ const RequestAPI = {
     const url = `/requests/${userid}/userrentalhistory?page=${page}&companyName=${name}&startDate=${starDate}&limit=${limit}`
     ///requests/1/userrentalhistory?page=1&limit=10&companyName=C
     return axiosClient.application.get(url);
-
+  },
+  updateStatusRQByCompany: (requestId, workingHours, status) => {
+    const url = `/company/requests/${requestId}`;
+    return axiosClient.application.put(url, { workingHours: workingHours, status: status });
   }
-
 };
 
 export default RequestAPI;
