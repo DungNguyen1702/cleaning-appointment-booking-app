@@ -148,7 +148,7 @@ const CleaningCompany = () => {
                       <hr className="hos-line" />
                       <div className="button-detail">
                         <Link
-                          to={`/dashboard/company/${company.company_id}`}
+                          to={`/user/company/${company.company_id}`}
                           className="member-btn"
                         >
                           <Button variant="outlined" className="btn_detail">

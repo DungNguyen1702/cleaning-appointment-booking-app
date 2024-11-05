@@ -133,7 +133,7 @@ const DetailCompany = () => {
               </div>
 
               <NavLink
-                to={`/dashboard/appointmentform?companyId=${companyDetail.company_id}`}
+                to={`/user/appointmentform?companyId=${companyDetail.company_id}`}
               >
                 <button className="button-booking">Đặt lịch</button>
               </NavLink>
