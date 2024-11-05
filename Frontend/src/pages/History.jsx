@@ -22,7 +22,7 @@ const History = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [sttRes,setSttRes] = useState(1)
+    const [sttRes,setSttRes] = useState("")
     const handleSearchChange = (e) =>{
         const { name, value } = e.target;
         setDataSearch({ ...dataSearch, [name]: value });
@@ -35,25 +35,25 @@ const History = () => {
     const fetchHistory = async () => {
         try {
           setLoading(true);
-        //   console.log(currentPage,user_id,dataSearch.name)
-          const response = await RequestAPI.getHistory(currentPage,user_id,dataSearch.name)
+          console.log(currentPage,user_id,dataSearch.name,dataSearch.date)
+          const response = await RequestAPI.getHistory(currentPage,user_id,dataSearch.name,dataSearch.date,8)
           console.log(response);
           
 
             setHistory(response.data.companies);
             setTotalPages(response.data.totalPages);
-            setSttRes(1);
+            setSttRes("");
            
         } catch (error) {
           console.error("Error fetching history:", error);
-          setSttRes(0);
+          setSttRes(error.response.data.message);
         } finally {
           setLoading(false);
         }
       };
     useEffect(() => {
         fetchHistory();
-    }, [currentPage]);
+    }, [currentPage,dataSearch.date]);
 
     const handleSearchKeyPress = (event) => {
         if (event.key === "Enter") {
@@ -80,6 +80,7 @@ const History = () => {
     // console.log(dataSearch,user_id)
     return (
         <div>
+            <LoadingOverlay loading={loading} />
             <h4 className="title-left">Lịch sử giao dịch</h4>
             <div className="abc">
                 <div className="nav-search">
@@ -94,10 +95,10 @@ const History = () => {
                     name="date" value={dataSearch.date} id="" 
                     onChange={handleSearchChange}   />
                 </div>
-                {sttRes===0? 
+                {sttRes!==""? 
                 (
                 <div className="no-products">
-                    <p>Không tìm thấy lịch sử phù hợp</p>
+                    <p>{sttRes}</p>
                 </div>
                 ) : (
                     <>
@@ -109,12 +110,12 @@ const History = () => {
                         </div>
                         <div className="avatar-name">
                             <div className="avatar">
-                                <img src="https://goldenpacific.vn//uploads/images/ve-sinh-nha-o.jpg" alt="" />
+                                <img src={h.company.main_image} alt="" />
 
                             </div>
                             <div className="name-address">
-                                <p className="name">Công ty1</p>
-                                <p className="address">Đà nẵng</p>
+                                <p className="name">{h.company.company_name}</p>
+                                <p className="address">{h.company.address_tinh}</p>
                             </div>
 
                         </div>
@@ -131,7 +132,7 @@ const History = () => {
                         </div>
                         <hr/>
                         <div className="view-detail">
-                            <Button onClick={() => handleOpenModal(h)}>
+                            <Button onClick={() => handleOpenModal(h.request_id)}>
                                 Xem chi tiết
                             </Button>    
                         </div>
