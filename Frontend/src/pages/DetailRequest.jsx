@@ -61,20 +61,21 @@ const CompanyDetailModal = ({ open, onClose, company }) => {
           </Typography><br />
           <Typography className="transaction-detail-label"><b>Nội dung công việc:</b></Typography>
           <ul>
+
             {Array.isArray(transactionData?.request)
               ? transactionData.request.map((item, index) => (
                 <li key={index}>• {item}</li>
               ))
               : <li>• {transactionData?.request || "Không có nội dung công việc"}</li>}
           </ul><br />
-          <Typography className="note-section"><b>Ghi chú:</b></Typography>
-          <ul>
-            {Array.isArray(transactionData?.notes)
-              ? transactionData.notes.map((note, index) => (
-                <li key={index}>{note}</li>
-              ))
-              : <li>{transactionData?.notes || "Ghi chú không có"}</li>}
-          </ul>
+          <Typography className="note-section"><b>Ghi chú:</b> {
+            transactionData?.notes
+              .replace(/<\/?[^>]+>/g, ', ')  
+              .replace(/,\s*,/g, ', ')      
+              .replace(/(^,\s*|\s*,\s*$)/g, '')  
+              .replace(/[, ]+$/, '')
+            || "Ghi chú không có"}</Typography><br/>
+
 
         </div>
         <div className="right-column">

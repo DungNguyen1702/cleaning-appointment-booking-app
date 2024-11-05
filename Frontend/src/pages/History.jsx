@@ -126,7 +126,10 @@ const History = () => {
                         </div>
                         <div className="content-descp">
                             <span>Nội dung công việc : </span>
-                            <p>{h.request}
+                            <p
+                                dangerouslySetInnerHTML={{ __html: h.request.replace(/\n/g, '<br>') }}
+                            >
+                                
                             </p>
 
                         </div>
