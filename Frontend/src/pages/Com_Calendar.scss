@@ -1,7 +1,7 @@
 .dashboard {
   display: flex;
   height: 100vh;
-  background-color: #ffffff;
+  // background-color: #ffffff;
 }
 
 .sidebar {
@@ -53,16 +53,29 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #fff5f7;
-  min-width: 105%;
+  min-width: 105%; // Đảm bảo chiều rộng của phần tử chiếm đủ màn hình
+  // height: 100%; // Đảm bảo phần tử chiếm đủ chiều cao màn hình
+  // box-sizing: border-box; // Đảm bảo padding không làm tràn phần tử
+
+  
+
+  .title {
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #000000;
+      text-align: left;
+      margin: 0;
+    }
+  }
 }
 
 .top-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
-  background-color: #ffffff;
+  padding: 1rem 1rem;
+  // background-color: #ffffff;
   border-bottom: 1px solid #e2e8f0;
 
   .search-bar {
@@ -122,7 +135,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: #ffffff;
+  // background-color: #ffffff;
   border-bottom: 1px solid #e2e8f0;
 
   .title {
@@ -130,6 +143,38 @@
       font-size: 1.25rem;
       font-weight: 600;
       color: #000000;
+    }
+  }
+
+  .search-bar {
+    position: relative;
+    width: 300px;
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a0aec0;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.375rem;
+      outline: none;
+      background-color: #f5f5f5;
+      color: #000; /* Màu chữ khi nhập */
+      caret-color: #000; /* Màu dấu nháy khi nhập */
+
+      &::placeholder {
+        color: #a0aec0; /* Màu của placeholder */
+      }
+
+      &:focus {
+        border-color: #000000;
+      }
     }
   }
 
