@@ -31,7 +31,11 @@ export const RequestDetails = ({ item, onClose }) => {
             <br />
             <p>Yêu cầu: {item.requirements || "Không có yêu cầu"}</p>
             <br />
-            <p>Ghi chú: {item.notes || "Không có ghi chú"}</p>
+            <p>Ghi chú: {item.notes
+                .replace(/<\/?[^>]+>/g, ', ')            // Thay thế tất cả các thẻ HTML bằng ", "
+                .replace(/,\s*,/g, ', ')                 // Xóa các dấu ", " thừa liên tiếp
+                .replace(/(^[, ]+|[, ]+$)/g, '')              
+                || "Không có ghi chú"} </p>
           </p>
 
           <div className="time-picker-section">
