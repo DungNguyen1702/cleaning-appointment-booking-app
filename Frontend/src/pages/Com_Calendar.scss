@@ -1,7 +1,12 @@
-.dashboard {
+.calendar-container {
+  // display: flex;
+  // height: 100vh;
+  // // background-color: #ffffff;
   display: flex;
+  flex-direction: column;
   height: 100vh;
-  // background-color: #ffffff;
+  width: 100%;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -53,9 +58,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 105%; // Đảm bảo chiều rộng của phần tử chiếm đủ màn hình
   // height: 100%; // Đảm bảo phần tử chiếm đủ chiều cao màn hình
   // box-sizing: border-box; // Đảm bảo padding không làm tràn phần tử
+  width: 100%; // Changed from min-width: 105% to width: 100%
+  overflow-x: hidden; // Added to prevent horizontal scrolling
 
   
 

@@ -121,7 +121,7 @@ const Com_Calendar = () => {
   }, [startDate, endDate]);
 
   return (
-    <div className="dashboard">
+    <div className="calendar-container">
       <main className="main-content">
         <div className="title">
             <h1>Cuộc hẹn với người dùng</h1>
