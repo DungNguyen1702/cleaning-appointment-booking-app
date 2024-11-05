@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from "@mui/material";
 import "./DetailRequest.scss";
-import RequestAPI from "../api/requestAPI"; // Import the RequestAPI
+import RequestAPI from "../api/requestAPI";
 
-const CompanyDetailModal = ({ open, onClose,company }) => {
+const CompanyDetailModal = ({ open, onClose, company }) => {
   const [transactionData, setTransactionData] = useState(null);
-  const requestId = company; // Set the request ID to fetch details
-  // console.log(company?.request_id,company)
+  const requestId = company;
 
   useEffect(() => {
     const fetchTransactionData = async () => {
       if (open) {
         try {
-          const response = await RequestAPI.getCompanyDetails(requestId); // Fetch company details
-          console.log("Fetched company details:", response.data); // Log the response
-          setTransactionData(response.data); // Store the transaction details
+          const response = await RequestAPI.getCompanyDetails(requestId);
+          console.log("Fetched company details:", response.data);
+          setTransactionData(response.data);
         } catch (error) {
           console.error("Error fetching company details:", error);
         }
@@ -22,9 +21,8 @@ const CompanyDetailModal = ({ open, onClose,company }) => {
     };
 
     fetchTransactionData();
-  }, [open]); // Fetch data when modal opens
+  }, [open, requestId]);
 
-  // Function to format the price to VND with thousand separators
   const formatCurrency = (amount) => {
     if (!amount) return "0";
     return `${Number(amount).toLocaleString('vi-VN')} VND`;
@@ -46,36 +44,48 @@ const CompanyDetailModal = ({ open, onClose,company }) => {
       <DialogTitle className="modal-title">
         <b>Chi tiết lịch sử giao dịch</b>
       </DialogTitle>
-      <hr className="separator" /> {/* Horizontal line separator */}
+      <hr className="separator" />
       <DialogContent className="modal-content">
         <div className="left-column">
           <Typography>
-            <span className="transaction-detail-label">Công ty giao dịch:</span> 
+            <span className="transaction-detail-label">Công ty giao dịch:</span>
             <span className="transaction-detail-value">{transactionData?.company?.company_name || "Công ty 1"}</span>
-          </Typography><br/>
+          </Typography><br />
           <Typography>
             <span className="transaction-detail-label">Ngày thuê:</span>
             <span className="transaction-detail-value">{transactionData?.timejob ? new Date(transactionData.timejob).toLocaleDateString('vi-VN') : "15/09/2024"}</span>
-          </Typography><br/>
+          </Typography><br />
           <Typography>
             <span className="transaction-detail-label">Ngày giao dịch:</span>
             <span className="transaction-detail-value">{transactionData?.request_date ? new Date(transactionData.request_date).toLocaleDateString('vi-VN') : "13/09/2024"}</span>
-          </Typography><br/>
+          </Typography><br />
           <Typography className="transaction-detail-label"><b>Nội dung công việc:</b></Typography>
           <ul>
-            <li>• {transactionData?.status}</li>
-          </ul><br/>
-          <Typography className="note-section"><b>Ghi chú:</b> {transactionData?.notes || "Ghi chú không có"}</Typography><br/>
+            {Array.isArray(transactionData?.request)
+              ? transactionData.request.map((item, index) => (
+                <li key={index}>• {item}</li>
+              ))
+              : <li>• {transactionData?.request || "Không có nội dung công việc"}</li>}
+          </ul><br />
+          <Typography className="note-section"><b>Ghi chú:</b></Typography>
+          <ul>
+            {Array.isArray(transactionData?.notes)
+              ? transactionData.notes.map((note, index) => (
+                <li key={index}>{note}</li>
+              ))
+              : <li>{transactionData?.notes || "Ghi chú không có"}</li>}
+          </ul>
+
         </div>
         <div className="right-column">
           <Typography>
             <span className="transaction-detail-label">Tên người giao dịch:</span>
             <span className="transaction-detail-value">{transactionData?.name || "Khách hàng 1"}</span>
-          </Typography><br/>
+          </Typography><br />
           <Typography>
             <span className="transaction-detail-label">Địa điểm:</span>
             <span className="transaction-detail-value">{transactionData?.address || "Địa chỉ 1"}</span>
-          </Typography><br/>
+          </Typography><br />
           <Typography>
             <span className="transaction-detail-label">Số điện thoại:</span>
             <span className="transaction-detail-value">{transactionData?.phone || "0123456781"}</span>
