@@ -111,6 +111,7 @@ export class RequestService {
         'company.company_id',
         'company.company_name',
         'company.address_tinh',
+        'company.main_image',
       ]);
 
     if (startDate) {
@@ -149,6 +150,7 @@ export class RequestService {
         company_id: company.company.company_id,
         company_name: company.company.company_name,
         address_tinh: company.company.address_tinh,
+        main_image: company.company.main_image,
       },
     }));
 
