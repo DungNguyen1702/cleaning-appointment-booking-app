@@ -154,19 +154,21 @@ export const ListRequest = () => {
     setModalIsOpen(false);
   };
 
-  const closeandUpdate = (items) => {
-    if (!validateWorkingHours(items.workingHours)) {
+  const closeandUpdate = (items,stt) => {
+    if (stt==="COMPLETED"&&!validateWorkingHours(items.workingHours)) {
       toast.warning("Số giờ làm phải lớn hơn hoặc bằng 1 để hoàn thành.");
       return;
     }
     setData((prevData) =>
       prevData.map((item) =>
         item.request_id === items.request_id
-          ? { ...item, status: "COMPLETED" }
+          ? { ...item, status: stt }
           : item
       )
     );
-    updateRequestStatus(items.request_id, "COMPLETED", items.workingHours);
+    
+    updateRequestStatus(items.request_id, stt, items.workingHours);
+   
     closeModal();
   };
 

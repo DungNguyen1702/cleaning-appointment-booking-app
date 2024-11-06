@@ -109,7 +109,9 @@
 .footer {
   display: flex;
   justify-content: flex-end;
+  gap:10px;
 }
+
 
 .complete-button {
   background-color: #e88080 !important;
@@ -117,4 +119,10 @@
   padding: 10px 20px;
   font-size: 14px;
   text-transform: none;
+}
+.reject-button{
+  background-color: #e88080 !important;
+}
+.accept-button{
+
 }
