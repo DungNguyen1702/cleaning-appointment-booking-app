@@ -47,7 +47,9 @@
 
 
    .account{
-     margin-right: 112px;
+
+     margin-right: 11%;
+
    }
    .phone{
     margin-right: 0px;
@@ -192,13 +194,12 @@
     background-color: #f0f0f0;
     padding: 5px 10px;
     border-radius: 5px;
-    width: 76%;
+    width: 60%;
     height: 90%;
     justify-content: center;
-}
 
-input[type="number"] {
-    width: 100%;
+    input[type="number"] {
+ width: 100%;
     border: none;
     background-color: #f0f0f0;
     align-items: center;
@@ -216,4 +217,22 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
+
+}
+
+.separate {
+    margin: 0 5px;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+input.hours {
+  text-align: right;
+}
+
+input.minutes{
+  text-align: left;
+}
+
 }
