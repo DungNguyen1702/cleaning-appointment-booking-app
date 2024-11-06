@@ -1,10 +1,11 @@
-import { Button } from "@mui/material";
+import { Button, isMuiElement } from "@mui/material";
 import React from "react";
 import deleteIcon from "../assets/icons/delete.png";
 import "./RequestDetails.scss";
 
 export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
   if (!item) return null;
+  console.log(item);
   const statusColors = {
     COMPLETED: "rgba(6, 95, 70, 0.5)",
     REJECTED: "rgba(185, 28, 28, 0.5)",
@@ -58,12 +59,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
           </p>
 
           <div className="time-picker-section">
-            <div className="label">Thời gian làm:</div>
-            <div className="time-pick">
-              <div className="time">{item.hours || "00"}</div>
-              <div className="separator">:</div>
-              <div className="time">{item.minutes || "00"}</div>
-            </div>
+            <div className="label">Thời gian bắt đầu: {item.timejob}</div>
           </div>
 
           <div className="status-section">
