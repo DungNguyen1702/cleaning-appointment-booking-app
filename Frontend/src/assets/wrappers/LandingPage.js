@@ -21,7 +21,7 @@ const Wrapper = styled.section`
     display: flex;
     align-items: center;
     padding: 10px;
-    background-color: #ffffff;    
+    background-color: #FFF8F8;    
   }
 
   .logo-img {
