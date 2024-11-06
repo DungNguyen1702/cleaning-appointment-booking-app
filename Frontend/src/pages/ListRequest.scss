@@ -1,7 +1,8 @@
-.title-history{
-    font-size: 38px;
-    font-weight: 400;
+.title-history {
+  font-size: 38px;
+  font-weight: 400;
 }
+
 .main {
   height: 980px;
   position: relative;
@@ -42,18 +43,20 @@
     font-weight: bold;
     align-items: center;
     justify-content: center;
-   }
+  }
 
-   .account{
-     margin-right: 100px;
-   }
-   .phone{
+  .account {
+    margin-right: 100px;
+  }
+
+  .phone {
     margin-right: 0px;
-   }
-   .date{
+  }
+
+  .date {
     margin-right: 10px;
-   }
-   
+  }
+
 }
 
 .table-body {
@@ -68,59 +71,68 @@
     align-items: center;
   }
 
-  .account{
+  .account {
     min-width: 233px;
   }
-  .phone{
+
+  .phone {
     min-width: 130px;
   }
-  .date{
+
+  .date {
     min-width: 115px;
   }
-  .hour{
+
+  .hour {
     min-width: 150px;
   }
+
   .quantity-control {
     display: flex;
     align-items: center;
     gap: 5px;
     margin-right: 24px;
     border: 1px solid #e4e7e9ff;
-    span{
-        font-size: 18px;
-        font-weight: 600;
+
+    span {
+      font-size: 18px;
+      font-weight: 600;
     }
   }
 
-  .status{
+  .status {
     min-width: 0;
   }
 
-    .quantity-control button {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #e4e7e9;
-        background-color: #fff;
-        border-radius: 3px;
-        cursor: pointer;
-        border: none;
-        margin: 4px;
-        opacity: 0.5;
-        svg {
-            font-size: 20px;
-        }
-    }
-    .status {
-      padding: 5px 10px;
-      border-radius: 4px;
-      text-align: center;
-    }
-  .row{
+  .quantity-control button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e4e7e9;
+    background-color: #fff;
+    border-radius: 3px;
     cursor: pointer;
+    border: none;
+    margin: 4px;
+    opacity: 0.5;
+
+    svg {
+      font-size: 20px;
+    }
+  }
+
+  .status {
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .row {
+    cursor: pointer;
+
     &:hover {
       background-color: #ccc;
     }
-  }  
+  }
 }
 
 .row {
@@ -165,7 +177,6 @@
   margin-top: 20px;
 }
 
-.css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input{
-    padding: 4px !important;
+.css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input {
+  padding: 4px !important;
 }
-
