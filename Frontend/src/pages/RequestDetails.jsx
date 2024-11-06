@@ -21,7 +21,9 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
     };
     return statusMap[status] || "Không xác định";
   };
-
+  const formatCurrency = (value) => {
+    return value.toLocaleString("vi-VN") + "đ";
+  };
   return (
     <div className="company-modal-hon">
       <div className="modal-container">
@@ -62,7 +64,13 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
 
           <div className="status-section">
             <div className="price">
-              Thành tiền: {(item.workingHours * item.price).toLocaleString()}đ
+              Thành tiền:{" "}
+              {formatCurrency(
+                Math.round(
+                  (parseInt(item.hours) + parseInt(item.minutes) / 60) *
+                    item.price
+                )
+              )}
             </div>
             <div className="status">
               Trạng thái:{" "}
@@ -105,6 +113,23 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
                 onClick={() => onCloseandUpdate(item, "ACCEPTED")}
               >
                 Tiếp nhận
+              </Button>
+            </>
+          ) : item.status === "ACCEPTED" ? (
+            <>
+              <Button
+                variant="contained"
+                className="reject-button"
+                onClick={() => onCloseandUpdate(item, "REJECTED")}
+              >
+                Huỷ
+              </Button>
+              <Button
+                variant="contained"
+                className="accept-button"
+                onClick={() => onCloseandUpdate(item, "COMPLETED")}
+              >
+                Hoàn thành
               </Button>
             </>
           ) : (

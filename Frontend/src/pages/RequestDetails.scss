@@ -53,15 +53,14 @@
   display: flex;
   align-items: center;
   margin-top: 20px;
-}
 
-.label {
+  .label {
   font-size: 14px;
   color: #333;
   margin-right: 10px;
 }
 
-.time-picker {
+.time-pick {
   display: flex;
   align-items: center;
   background-color: #f0f0f0;
@@ -72,6 +71,7 @@
 .time {
   font-size: 16px;
   color: #333;
+}
 }
 
 .separator {
