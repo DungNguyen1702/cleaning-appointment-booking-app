@@ -20,7 +20,9 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
     };
     return statusMap[status] || "Không xác định";
   };
-  
+  const formatCurrency = (value) => {
+    return value.toLocaleString("vi-VN") + "đ";
+  };
   return (
     <div className="company-modal-hon">
       <div className="modal-container">
@@ -57,16 +59,22 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
 
           <div className="time-picker-section">
             <div className="label">Thời gian làm:</div>
-            <div className="time-picker">
-              <div className="time">{item.workingHours || "00"}</div>
+            <div className="time-pick">
+              <div className="time">{item.hours || "00"}</div>
               <div className="separator">:</div>
-              <div className="time">{item.timeMinutes || "00"}</div>
+              <div className="time">{item.minutes || "00"}</div>
             </div>
           </div>
 
           <div className="status-section">
             <div className="price">
-              Thành tiền: {(item.workingHours * item.price).toLocaleString()}đ
+              Thành tiền:{" "}
+              {formatCurrency(
+                Math.round(
+                  (parseInt(item.hours) + parseInt(item.minutes) / 60) *
+                    item.price
+                )
+              )}
             </div>
             <div className="status">
               Trạng thái:{" "}
@@ -94,28 +102,45 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
             >
               Đóng
             </Button>
-          ) : item.status ==="PENDING"?(
+          ) : item.status === "PENDING" ? (
             <>
-            <Button
-              variant="contained"
-              className="reject-button"
-              onClick={() => onCloseandUpdate(item,"REJECTED")}
-            >
-              Từ chối
-            </Button>
-            <Button
-            variant="contained"
-            className="accept-button"
-            onClick={() => onCloseandUpdate(item,"ACCEPTED")}
-          >
-            Tiếp nhận
-          </Button>
-          </>
-          ):(
+              <Button
+                variant="contained"
+                className="reject-button"
+                onClick={() => onCloseandUpdate(item, "REJECTED")}
+              >
+                Từ chối
+              </Button>
+              <Button
+                variant="contained"
+                className="accept-button"
+                onClick={() => onCloseandUpdate(item, "ACCEPTED")}
+              >
+                Tiếp nhận
+              </Button>
+            </>
+          ) : item.status === "ACCEPTED" ? (
+            <>
+              <Button
+                variant="contained"
+                className="reject-button"
+                onClick={() => onCloseandUpdate(item, "REJECTED")}
+              >
+                Huỷ
+              </Button>
+              <Button
+                variant="contained"
+                className="accept-button"
+                onClick={() => onCloseandUpdate(item, "COMPLETED")}
+              >
+                Hoàn thành
+              </Button>
+            </>
+          ) : (
             <Button
               variant="contained"
               className="complete-button"
-              onClick={() => onCloseandUpdate(item,"COMPLETED")}
+              onClick={() => onCloseandUpdate(item, "COMPLETED")}
             >
               Hoàn thành
             </Button>

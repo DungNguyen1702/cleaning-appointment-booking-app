@@ -11,6 +11,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import RequestAPI from "../api/requestAPI";
 import { toast, ToastContainer } from "react-toastify";
 import LoadingOverlay from "../components/loading_overlay";
+
 const statusOptions = [
   { label: "Hoàn thành", value: "COMPLETED" },
   { label: "Hủy", value: "REJECTED" },
@@ -59,7 +60,11 @@ export const ListRequest = () => {
         console.log(response);
         const translatedData = response.data.requests.map((item) => ({
           ...item,
-          total: parseInt(item.workingHours) * item.price,
+          hours: Math.floor(item.workingHours),
+          minutes: Math.round(
+            (item.workingHours - Math.floor(item.workingHours)) * 60
+          ),
+          total: parseFloat(item.workingHours) * item.price,
         }));
         setData(translatedData);
         setTotalPages(response.data.totalPages);
@@ -75,18 +80,15 @@ export const ListRequest = () => {
     }
   }, [companyId, currentPage]);
 
-  const validateWorkingHours = (workingHours) => {
-    return workingHours >= 1;
+  const validateWorkingHours = (hours, minutes) => {
+    return hours >= 1 || minutes >= 1;
   };
 
-  const updateRequestStatus = async (id, status, workingHours) => {
+  const updateRequestStatus = async (id, status, workingHours, timeMinutes) => {
     try {
       setLoading(true);
-      await RequestAPI.updateStatusRQByCompany(
-        id,
-        parseInt(workingHours),
-        status
-      );
+      const hourWorks = parseInt(workingHours) + parseInt(timeMinutes) / 60;
+      await RequestAPI.updateStatusRQByCompany(id, parseInt(hourWorks), status);
       toast.success("Cập nhật trạng thái thành công");
     } catch (error) {
       console.error("Failed to update request status:", error);
@@ -98,8 +100,8 @@ export const ListRequest = () => {
   const handleStatusChange = (id, value) => {
     const item = data.find((item) => item.request_id === id);
     if (value === "COMPLETED") {
-      if (!validateWorkingHours(item.workingHours)) {
-        toast.warning("Số giờ làm phải lớn hơn hoặc bằng 1 để hoàn thành.");
+      if (!validateWorkingHours(item.hours, item.minutes)) {
+        toast.warning("Số giờ hoặc số phút phải lớn hơn 0 để hoàn thành.");
         return;
       }
     }
@@ -110,37 +112,21 @@ export const ListRequest = () => {
       )
     );
 
-    // Gọi API để cập nhật trạng thái và số giờ
-    updateRequestStatus(id, value, item.workingHours);
+    updateRequestStatus(id, value, item.hours, item.minutes);
   };
 
-  const handleHoursIncrement = (event, id) => {
-    event.stopPropagation();
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.request_id === id
-          ? { ...item, workingHours: parseInt(item.workingHours) + 1 }
-          : item
-      )
-    );
-  };
-
-  const handleHoursDecrement = (event, id) => {
-    event.stopPropagation();
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.request_id === id
-          ? { ...item, workingHours: Math.max(1, item.workingHours - 1) }
-          : item
-      )
-    );
-  };
   const handleHoursChange = (id, value) => {
     setData((prevData) =>
       prevData.map((item) =>
-        item.request_id === id
-          ? { ...item, workingHours: Math.max(1, value) }
-          : item
+        item.request_id === id ? { ...item, hours: Math.max(0, value) } : item
+      )
+    );
+  };
+
+  const handleMinutesChange = (id, value) => {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.request_id === id ? { ...item, minutes: Math.max(0, value) } : item
       )
     );
   };
@@ -154,21 +140,22 @@ export const ListRequest = () => {
     setModalIsOpen(false);
   };
 
-  const closeandUpdate = (items,stt) => {
-    if (stt==="COMPLETED"&&!validateWorkingHours(items.workingHours)) {
-      toast.warning("Số giờ làm phải lớn hơn hoặc bằng 1 để hoàn thành.");
+  const closeandUpdate = (items, stt) => {
+    if (
+      stt === "COMPLETED" &&
+      !validateWorkingHours(items.hours, items.minutes)
+    ) {
+      toast.warning("Số giờ hoặc số phút phải lớn hơn 0 để hoàn thành.");
       return;
     }
     setData((prevData) =>
       prevData.map((item) =>
-        item.request_id === items.request_id
-          ? { ...item, status: stt }
-          : item
+        item.request_id === items.request_id ? { ...item, status: stt } : item
       )
     );
-    
-    updateRequestStatus(items.request_id, stt, items.workingHours);
-   
+
+    updateRequestStatus(items.request_id, stt, items.hours, items.minutes);
+
     closeModal();
   };
 
@@ -180,7 +167,9 @@ export const ListRequest = () => {
   const filteredData = data.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  const formatCurrency = (value) => {
+    return value.toLocaleString("vi-VN") + "đ";
+  };
   return (
     <>
       <ToastContainer />
@@ -227,32 +216,64 @@ export const ListRequest = () => {
                       <div className="cell phone">{item.phone}</div>
                       <div className="cell date">{item.request_date}</div>
                       <div className="cell hour">
-                        <div className="quantity-control">
-                          <button
-                            onClick={(event) =>
-                              handleHoursDecrement(event, item.request_id)
+                        <div
+                          className="time-picker"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.hours}
+                            onChange={(e) => {
+                              if (
+                                item.status !== "COMPLETED" &&
+                                item.status !== "REJECTED"
+                              ) {
+                                handleHoursChange(
+                                  item.request_id,
+                                  parseInt(e.target.value)
+                                );
+                              }
+                            }}
+                            disabled={
+                              item.status === "COMPLETED" ||
+                              item.status === "REJECTED"
                             }
-                          >
-                            <RemoveIcon />
-                          </button>
-                          <span>{parseInt(item.workingHours)}</span>
-                          <button
-                            onClick={(event) =>
-                              handleHoursIncrement(event, item.request_id)
+                          />
+                          <div className="separator">:</div>
+                          <input
+                            type="number"
+                            min="0"
+                            value={item.minutes}
+                            onChange={(e) => {
+                              if (
+                                item.status !== "COMPLETED" &&
+                                item.status !== "REJECTED"
+                              ) {
+                                handleMinutesChange(
+                                  item.request_id,
+                                  parseInt(e.target.value)
+                                );
+                              }
+                            }}
+                            disabled={
+                              item.status === "COMPLETED" ||
+                              item.status === "REJECTED"
                             }
-                          >
-                            <AddIcon />
-                          </button>
+                          />
                         </div>
                       </div>
                       <div className="cell cost">
                         {parseFloat(item.price).toLocaleString()}đ
                       </div>
                       <div className="cell total-price">
-                        {(
-                          parseInt(item.workingHours) * item.price
-                        ).toLocaleString()}
-                        đ
+                        {formatCurrency(
+                          Math.round(
+                            (parseInt(item.hours) +
+                              parseInt(item.minutes) / 60) *
+                              item.price
+                          )
+                        )}
                       </div>
                       <div
                         className="cell status"
@@ -280,6 +301,12 @@ export const ListRequest = () => {
                             value={item.status}
                             onChange={(e) => {
                               e.stopPropagation();
+                              if (
+                                item.status === "ACCEPTED" &&
+                                e.target.value === "PENDING"
+                              ) {
+                                return;
+                              }
                               handleStatusChange(
                                 item.request_id,
                                 e.target.value
