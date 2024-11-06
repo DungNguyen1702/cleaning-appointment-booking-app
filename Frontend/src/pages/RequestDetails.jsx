@@ -20,6 +20,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
     };
     return statusMap[status] || "Không xác định";
   };
+  
   return (
     <div className="company-modal-hon">
       <div className="modal-container">
@@ -93,11 +94,28 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
             >
               Đóng
             </Button>
-          ) : (
+          ) : item.status ==="PENDING"?(
+            <>
+            <Button
+              variant="contained"
+              className="reject-button"
+              onClick={() => onCloseandUpdate(item,"REJECTED")}
+            >
+              Từ chối
+            </Button>
+            <Button
+            variant="contained"
+            className="accept-button"
+            onClick={() => onCloseandUpdate(item,"ACCEPTED")}
+          >
+            Tiếp nhận
+          </Button>
+          </>
+          ):(
             <Button
               variant="contained"
               className="complete-button"
-              onClick={() => onCloseandUpdate(item)}
+              onClick={() => onCloseandUpdate(item,"COMPLETED")}
             >
               Hoàn thành
             </Button>
