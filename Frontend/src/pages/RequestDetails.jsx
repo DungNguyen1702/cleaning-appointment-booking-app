@@ -1,10 +1,11 @@
-import { Button } from "@mui/material";
+import { Button, isMuiElement } from "@mui/material";
 import React from "react";
 import deleteIcon from "../assets/icons/delete.png";
 import "./RequestDetails.scss";
 
 export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
   if (!item) return null;
+  console.log(item);
   const statusColors = {
     COMPLETED: "rgba(6, 95, 70, 0.5)",
     REJECTED: "rgba(185, 28, 28, 0.5)",
@@ -20,7 +21,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
     };
     return statusMap[status] || "Không xác định";
   };
-  
+
   return (
     <div className="company-modal-hon">
       <div className="modal-container">
@@ -56,12 +57,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
           </p>
 
           <div className="time-picker-section">
-            <div className="label">Thời gian làm:</div>
-            <div className="time-picker">
-              <div className="time">{item.workingHours || "00"}</div>
-              <div className="separator">:</div>
-              <div className="time">{item.timeMinutes || "00"}</div>
-            </div>
+            <div className="label">Thời gian bắt đầu: {item.timejob}</div>
           </div>
 
           <div className="status-section">
@@ -94,28 +90,28 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
             >
               Đóng
             </Button>
-          ) : item.status ==="PENDING"?(
+          ) : item.status === "PENDING" ? (
             <>
-            <Button
-              variant="contained"
-              className="reject-button"
-              onClick={() => onCloseandUpdate(item,"REJECTED")}
-            >
-              Từ chối
-            </Button>
-            <Button
-            variant="contained"
-            className="accept-button"
-            onClick={() => onCloseandUpdate(item,"ACCEPTED")}
-          >
-            Tiếp nhận
-          </Button>
-          </>
-          ):(
+              <Button
+                variant="contained"
+                className="reject-button"
+                onClick={() => onCloseandUpdate(item, "REJECTED")}
+              >
+                Từ chối
+              </Button>
+              <Button
+                variant="contained"
+                className="accept-button"
+                onClick={() => onCloseandUpdate(item, "ACCEPTED")}
+              >
+                Tiếp nhận
+              </Button>
+            </>
+          ) : (
             <Button
               variant="contained"
               className="complete-button"
-              onClick={() => onCloseandUpdate(item,"COMPLETED")}
+              onClick={() => onCloseandUpdate(item, "COMPLETED")}
             >
               Hoàn thành
             </Button>
