@@ -209,8 +209,8 @@ export class RequestService {
           return `${hours}:${minutes}`;
         };
 
-        const timeWorking = `${formatTime(startTime)}-${formatTime(endTime)}`;
-
+        // const timeWorking = `${formatTime(startTime)}-${formatTime(endTime)}`;
+        const timeWorking = `${formatTime(startTime)}`;
         // Thêm timeWorking vào request
         (request as any).timeWorking = timeWorking;
 
