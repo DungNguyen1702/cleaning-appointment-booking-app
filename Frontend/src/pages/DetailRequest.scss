@@ -72,3 +72,32 @@ ul {
 ul li {
     margin-bottom: 4px; 
 }
+/* Base style for the status section */
+.status-section {
+    display: inline-block;
+    padding: 4px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  /* Colors for each status */
+  .status-COMPLETED {
+    background-color: #4CAF50; /* Green */
+  }
+  
+  .status-REJECTED {
+    background-color: #FFCDD2; /* Light Red */
+    color: #D32; /* Dark Red */
+  }
+  
+  .status-ACCEPTED {
+    background-color: #C8E6C9; /* Light Green */
+    color: #1565C0; /* Dark Blue */
+  }
+  
+  .status-PENDING {
+    background-color: #e1fbbb; /* Light Blue */
+    color: #a1c015; /* Dark Blue */
+  }
+  
