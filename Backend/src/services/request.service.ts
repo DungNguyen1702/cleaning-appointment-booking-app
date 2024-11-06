@@ -299,8 +299,9 @@ export class RequestService {
     const queryBuilder = requestRepository
       .createQueryBuilder('request')
       .where('request.company_id = :companyId', { companyId })
-      .skip((page - 1) * limit)
-      .take(limit);
+      .orderBy('request.createdAt', 'DESC')
+      .skip((page - 1) * limit) // Xác định vị trí bắt đầu
+      .take(limit); // Số lượng bản ghi trả về
 
     if (name) {
       queryBuilder.andWhere('request.name LIKE :name', {

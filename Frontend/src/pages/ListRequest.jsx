@@ -222,8 +222,13 @@ export const ListRequest = () => {
                         >
                           <input
                             type="number"
+                            className="hours"
                             min="0"
-                            value={item.hours}
+                            value={
+                              item.hours === undefined
+                                ? "00"
+                                : String(item.hours).padStart(2, "0")
+                            }
                             onChange={(e) => {
                               if (
                                 item.status !== "COMPLETED" &&
@@ -240,20 +245,29 @@ export const ListRequest = () => {
                               item.status === "REJECTED"
                             }
                           />
-                          <div className="separator">:</div>
+                          <div className="separate">:</div>
                           <input
                             type="number"
+                            className="minutes"
                             min="0"
-                            value={item.minutes}
+                            max="59"
+                            value={
+                              item.minutes === undefined
+                                ? "00"
+                                : String(item.minutes).padStart(2, "0")
+                            }
                             onChange={(e) => {
                               if (
                                 item.status !== "COMPLETED" &&
                                 item.status !== "REJECTED"
                               ) {
-                                handleMinutesChange(
-                                  item.request_id,
-                                  parseInt(e.target.value)
-                                );
+                                const newValue = parseInt(e.target.value);
+                                if (newValue <= 59) {
+                                  handleMinutesChange(
+                                    item.request_id,
+                                    newValue
+                                  );
+                                }
                               }
                             }}
                             disabled={
