@@ -47,7 +47,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
             <br />
             <p>Địa chỉ: {item.address || "Địa chỉ không xác định"}</p>
             <br />
-            <p>Yêu cầu: {item.requirements || "Không có yêu cầu"}</p>
+            <p>Yêu cầu: {item.request || "Không có yêu cầu"}</p>
             <br />
             <p>
               Ghi chú:{" "}

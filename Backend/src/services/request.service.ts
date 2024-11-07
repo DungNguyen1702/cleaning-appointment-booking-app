@@ -180,6 +180,7 @@ export class RequestService {
         'request.request_id',
         'request.timejob',
         'request.status',
+        'request.name',
         'request.workingHours',
         'user.user_id',
         'user.full_name',

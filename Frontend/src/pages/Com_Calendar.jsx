@@ -124,7 +124,7 @@ const Com_Calendar = () => {
     <div className="calendarcontainer">
       <main className="main-content">
         <div className="title">
-            <h1>Cuộc hẹn với người dùng</h1>
+          <h1>Cuộc hẹn với người dùng</h1>
         </div>
         <header className="top-header">
           {/* <div className="search-bar">
@@ -183,7 +183,7 @@ const Com_Calendar = () => {
                       className={`appointment ${apt.status.toLowerCase()}`}
                     >
                       <div className="appointment-name">
-                        {apt.user.full_name}
+                        {apt.name}
                       </div>
                       <div className="appointment-time">{apt.timeWorking}</div>
                     </div>
