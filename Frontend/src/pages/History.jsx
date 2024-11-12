@@ -15,9 +15,19 @@ import RequestAPI from "../api/requestAPI";
 import { Link, NavLink } from "react-router-dom";
 import LoadingOverlay from "../components/loading_overlay";
 const History = () => {
+    
+    const day_now = () => {
+        const now_date = new Date();
+        const day = now_date.getDate();
+        const month = now_date.getMonth()+1;
+        const year = now_date.getFullYear();
+        return `${year}-${month}-${day}`
+    }
+
     const [dataSearch,setDataSearch] = useState({
-        name:"",date:""
+        name:"",date:day_now()
     })
+    
     const [history,setHistory] = useState([])
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -76,8 +86,13 @@ const History = () => {
         setOpenModal(false); 
         setSelectedCompany(null); 
     };
+    const resetSearch = () =>{
+        setDataSearch({
+            name:"",date:day_now()
+        });
+    }
 
-    // console.log(dataSearch,user_id)
+    console.log(dataSearch,user_id)
     return (
         <div>
             <LoadingOverlay loading={loading} />
@@ -91,9 +106,15 @@ const History = () => {
                         onChange={handleSearchChange}
                         onKeyDown={handleSearchKeyPress} 
                         />
+                    <div className="input-wrapper">   
                     <input type="date" className="input-date"
                     name="date" value={dataSearch.date} id="" 
                     onChange={handleSearchChange}   />
+                    {!dataSearch.date && (
+                        <span className="placeholder">All ttime</span>
+                    )}
+                    </div> 
+                    <Button variant="contained" onClick={resetSearch}>Reset</Button>
                 </div>
                 {sttRes!==""? 
                 (
@@ -104,10 +125,8 @@ const History = () => {
                     <>
                 <div className="list-company">
                     {history.map((h, index) => (
-                    <div className="company">
-                        <div className="price">
-                            <span>{Number(h.price).toLocaleString("vi-VN")} VNĐ</span>
-                        </div>
+                    <div className="company" key={index}>
+                        
                         <div className="avatar-name">
                             <div className="avatar">
                                 <img src={h.company.main_image} alt="" />
@@ -134,10 +153,27 @@ const History = () => {
 
                         </div>
                         <hr/>
+                        <div className="footer-tag-company">
+                        <div className="price">
+                        {h.status==="COMPLETED" && (
+                            
+                            <span>{(Number(h.price) * Number(h.workingHours)).toLocaleString("vi-VN")} VNĐ</span>
+                            
+                        )}
+                        </div>
                         <div className="view-detail">
-                            <Button onClick={() => handleOpenModal(h.request_id)}>
+                            <Button 
+                                className="btn-view-detail" 
+                                sx={{ textTransform: 'none',
+                                    }} 
+                                onClick={
+                                    () => handleOpenModal(
+                                        h.request_id
+                                        )
+                                    }>
                                 Xem chi tiết
                             </Button>    
+                        </div>
                         </div>
 
 
