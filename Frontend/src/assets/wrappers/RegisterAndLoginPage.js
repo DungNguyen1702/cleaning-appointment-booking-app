@@ -5,6 +5,7 @@ const Wrapper = styled.section`
   display: grid;
   grid-template-columns: 1fr 1fr; 
   align-items: center;
+  background-color: #FFF8F8; 
 
   .left-side {
     padding: 2rem;

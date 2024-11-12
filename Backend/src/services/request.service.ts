@@ -106,13 +106,15 @@ export class RequestService {
       .select([
         'request.request_id',
         'request.timejob',
+        'request.workingHours',
+        'request.status',
         'request.price',
         'request.request',
         'company.company_id',
         'company.company_name',
         'company.address_tinh',
         'company.main_image',
-      ]);
+      ]).orderBy('request.timejob', 'DESC');
 
     if (startDate) {
       const parsedStartDate = new Date(startDate);
@@ -141,16 +143,18 @@ export class RequestService {
 
     const totalPages = Math.ceil(totalCompanies / limit);
 
-    const formattedCompanies = companies.map(company => ({
-      request_id: company.request_id,
-      price: company.price,
-      request: company.request,
-      timejob: company.timejob.toISOString().slice(0, 10),
+    const formattedCompanies = companies.map(request => ({
+      request_id: request.request_id,
+      price: request.price,
+      status: request.status,
+      request: request.request,
+      workingHours: request.workingHours,
+      timejob: request.timejob.toISOString().slice(0, 10),
       company: {
-        company_id: company.company.company_id,
-        company_name: company.company.company_name,
-        address_tinh: company.company.address_tinh,
-        main_image: company.company.main_image,
+        company_id: request.company.company_id,
+        company_name: request.company.company_name,
+        address_tinh: request.company.address_tinh,
+        main_image: request.company.main_image,
       },
     }));
 

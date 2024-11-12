@@ -59,12 +59,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
           </p>
 
           <div className="time-picker-section">
-            <div className="label">Thời gian làm:</div>
-            <div className="time-pick">
-              <div className="time">{item.hours || "00"}</div>
-              <div className="separator">:</div>
-              <div className="time">{item.minutes || "00"}</div>
-            </div>
+            <div className="label">Thời gian bắt đầu: {item.timejob}</div>
           </div>
 
           <div className="status-section">
@@ -73,7 +68,7 @@ export const RequestDetails = ({ item, onClose, onCloseandUpdate }) => {
               {formatCurrency(
                 Math.round(
                   (parseInt(item.hours) + parseInt(item.minutes) / 60) *
-                    item.price
+                  item.price
                 )
               )}
             </div>
