@@ -16,19 +16,14 @@ import { Link, NavLink } from "react-router-dom";
 import LoadingOverlay from "../components/loading_overlay";
 const History = () => {
     
-    const day_now = () => {
-        const now_date = new Date();
-        const day = now_date.getDate();
-        const month = now_date.getMonth()+1;
-        const year = now_date.getFullYear();
-        return `${year}-${month}-${day}`
-    }
-
-    const [dataSearch,setDataSearch] = useState({
-        name:"",date:day_now()
-    })
+    const previousNameRef = useRef("");
     
-    const [history,setHistory] = useState([])
+    const [flagSearch,setFlagSearch] = useState(1);
+    const [dataSearch,setDataSearch] = useState({
+        name:"",date:""
+    });
+    
+    const [history,setHistory] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -57,31 +52,38 @@ const History = () => {
            
         } catch (error) {
           console.error("Error fetching history:", error);
-          setSttRes(error.response.data.message);
+          setSttRes(error.response?.data.message || "Error Occurred");
         } finally {
           setLoading(false);
         }
       };
     useEffect(() => {
-        fetchHistory();
-    }, [currentPage,dataSearch.date]);
+        
+            fetchHistory();
+            setFlagSearch(false);
+       
+    }, [ currentPage, dataSearch.date, flagSearch ]);
 
     const clearInput = () =>{
         setDataSearch({
             ...dataSearch,name:""
         });
-        fetchHistory();
+        console.log(previousNameRef.current);
+        if (previousNameRef.current!==""){
+            setFlagSearch(-flagSearch);
+        }
         previousNameRef.current="";
     }
 
     
-    const previousNameRef = useRef("");
+    
 
     const handleSearchKeyPress = (event) => {
         if (event.key === "Enter") {
+            console.log("enter")
             // Kiểm tra xem dataSearch.name có thay đổi không
             if (dataSearch.name !== previousNameRef.current) {
-                fetchHistory(); // Gọi fetchHistory khi có thay đổi
+                setFlagSearch(-flagSearch); 
                 previousNameRef.current = dataSearch.name; // Cập nhật giá trị name trước đó
             }
         }
@@ -89,7 +91,8 @@ const History = () => {
     const handleSearchBlur = () =>{
         // Kiểm tra xem dataSearch.name có thay đổi không
         if (dataSearch.name !== previousNameRef.current) {
-            fetchHistory(); // Gọi fetchHistory khi có thay đổi
+            console.log("blur")
+            setFlagSearch(-flagSearch); 
             previousNameRef.current = dataSearch.name; // Cập nhật giá trị name trước đó
         }
         
@@ -113,7 +116,7 @@ const History = () => {
     };
 
 
-    console.log(dataSearch,user_id)
+    //console.log(dataSearch,user_id)
     return (
         <div>
             <LoadingOverlay loading={loading} />
@@ -132,14 +135,15 @@ const History = () => {
                         {dataSearch.name && (
                             <span
                                 className="clear-icon"
-                                onClick={clearInput}
+                                onMouseDown={clearInput}
                                 style={{
                                   position: "absolute",
                                   right: "10px",
                                   top: "50%",
+                                  padding:"2px",
                                   transform: "translateY(-50%)",
                                   cursor: "pointer",
-                                  fontSize:'10px',
+                                  fontSize:'12px',
                                   fontWeight:'bold',
                                   color: "#999"
                                   
