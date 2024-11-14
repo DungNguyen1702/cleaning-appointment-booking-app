@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getCompanyById, fetchAllCompanies } from '../services/company.service';
+import { getCompanyById, fetchAllCompanies, getCompanyProfileById, getCompanyThongKeService } from '../services/company.service';
 import { RequestService } from '../services/request.service';
 import { RequestStatusEnum } from '../enums/requestStatus.enum';
 
@@ -198,3 +198,79 @@ export const getCustomerRequestsForWeek = async (
       .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
   }
 };
+
+
+//thảo sprint 3
+export const getCompanyProfile = async (req: Request, res: Response) => {
+  const companyId = parseInt(req.params.companyId, 10);
+  const companyIdFromToken = req.userId; // Giả sử bạn đã xác thực và lấy companyId từ token
+
+  if (companyId !== companyIdFromToken) {
+    console.log(companyId, companyIdFromToken);
+    return res
+      .status(403)
+      .json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
+  }
+
+  try {
+    const companyProfile = await getCompanyProfileById(companyId);
+
+    if (!companyProfile) {
+      return res.status(404).json({ message: 'Công ty không tồn tại' });
+    }
+
+    return res.status(200).json(companyProfile);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: 'Đã xảy ra lỗi ở server', error: error.message });
+    }
+    return res.status(500).json({ message: 'Đã xảy ra lỗi không xác định ở server' });
+  }
+};
+
+export const getCompanyThongKe = async (req: Request, res: Response) => {
+  const companyId = parseInt(req.params.companyId, 10);
+  const companyIdFromToken = req.userId; // Giả sử bạn đã xác thực và lấy companyId từ token
+  const startDateStr = req.query.startDate as string;
+  const endDateStr = req.query.endDate as string;
+
+  // Kiểm tra dữ liệu đầu vào
+  if (!startDateStr || !endDateStr) {
+    return res
+      .status(400)
+      .json({ message: 'Tham số startDate và endDate là bắt buộc!' });
+  }
+
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    return res
+      .status(400)
+      .json({ message: 'Tham số startDate và endDate không hợp lệ!' });
+  }
+
+  if (companyId !== companyIdFromToken) {
+    console.log(companyId, companyIdFromToken);
+    return res
+      .status(403)
+      .json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
+  }
+
+  try {
+    const statistics = await getCompanyThongKeService(companyId, startDate, endDate);
+
+    if (!statistics || statistics.length === 0) {
+      return res.status(404).json({ message: 'Không có dữ liệu thống kê.' });
+    }
+
+    return res.status(200).json(statistics);
+  } catch (error) {
+    console.error('Lỗi trong quá trình lấy dữ liệu thống kê:', error);
+    return res
+      .status(500)
+      .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu. Hoặc bạn đã thiếu trường startDate và endDate' });
+  }
+};
+
+

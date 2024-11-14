@@ -39,4 +39,8 @@ router.get(
   companyController.getCustomerRequestsForWeek
 );
 
+router.get('/profile/:companyId', verifyToken, companyController.getCompanyProfile);
+
+router.get('/statistical/:companyId', verifyToken, companyController.getCompanyThongKe);
+
 export default router;

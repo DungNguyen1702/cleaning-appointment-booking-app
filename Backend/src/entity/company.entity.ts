@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Account } from '../entity/account.entity';
 import { RatingStatistic } from '../entity/ratingStatistic.entity';
+import { Request } from '../entity/request.entity';
 
 @Entity()
 export class Company extends BaseEntity {
@@ -62,6 +63,9 @@ export class Company extends BaseEntity {
 
   @OneToMany(() => RatingStatistic, ratingStatistic => ratingStatistic.company)
   ratingStatistics: RatingStatistic[];
+
+  @OneToMany(() => Request, (request) => request.company)
+  requests: Request[];
 
   @CreateDateColumn()
   createdAt: Date;

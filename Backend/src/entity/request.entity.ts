@@ -11,6 +11,7 @@ import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
 import { RequestStatusEnum } from '../enums/requestStatus.enum';
 
+
 @Entity()
 export class Request {
   @PrimaryGeneratedColumn()
