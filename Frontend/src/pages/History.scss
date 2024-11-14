@@ -27,6 +27,7 @@
         }
         .input-name{
             width: 212px;
+            padding-right: 24px;
            
         }
         .input-date{
@@ -213,4 +214,12 @@
         background: none;
         padding:0 !important;
     }
+}
+.clear-icon{
+    display: none;
+}
+.input-wrapper:hover .clear-icon,
+.input-wrapper:focus .clear-icon{
+    display: block;
+    
 }

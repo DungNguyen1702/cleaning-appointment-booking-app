@@ -5,7 +5,7 @@ import { Button, Typography } from "@mui/material";
 import DetailRequest from "./DetailRequest"; 
 
 import "./History.scss"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import Pagination from "@mui/material/Pagination";
 import { FaArrowRight } from "react-icons/fa";
@@ -53,6 +53,7 @@ const History = () => {
             setHistory(response.data.companies);
             setTotalPages(response.data.totalPages);
             setSttRes("");
+            
            
         } catch (error) {
           console.error("Error fetching history:", error);
@@ -65,12 +66,36 @@ const History = () => {
         fetchHistory();
     }, [currentPage,dataSearch.date]);
 
+    const clearInput = () =>{
+        setDataSearch({
+            ...dataSearch,name:""
+        });
+        fetchHistory();
+        previousNameRef.current="";
+    }
+
+    
+    const previousNameRef = useRef("");
+
     const handleSearchKeyPress = (event) => {
         if (event.key === "Enter") {
-          fetchHistory();
-          
+            // Kiểm tra xem dataSearch.name có thay đổi không
+            if (dataSearch.name !== previousNameRef.current) {
+                fetchHistory(); // Gọi fetchHistory khi có thay đổi
+                previousNameRef.current = dataSearch.name; // Cập nhật giá trị name trước đó
+            }
         }
     };
+    const handleSearchBlur = () =>{
+        // Kiểm tra xem dataSearch.name có thay đổi không
+        if (dataSearch.name !== previousNameRef.current) {
+            fetchHistory(); // Gọi fetchHistory khi có thay đổi
+            previousNameRef.current = dataSearch.name; // Cập nhật giá trị name trước đó
+        }
+        
+    };
+
+    
 
 
       //của thanh 
@@ -86,11 +111,7 @@ const History = () => {
         setOpenModal(false); 
         setSelectedCompany(null); 
     };
-    const resetSearch = () =>{
-        setDataSearch({
-            name:"",date:day_now()
-        });
-    }
+
 
     console.log(dataSearch,user_id)
     return (
@@ -99,22 +120,52 @@ const History = () => {
             <h4 className="title-left">Lịch sử giao dịch</h4>
             <div className="abc">
                 <div className="nav-search">
-                    <input 
-                        type="text" className="input-name" name="name" 
-                        value={dataSearch.name} 
-                        id="" placeholder="Nhập vào tên công ty"
-                        onChange={handleSearchChange}
-                        onKeyDown={handleSearchKeyPress} 
+                    <div className="input-wrapper">
+                        <input 
+                            type="text" className="input-name" name="name" 
+                            value={dataSearch.name} 
+                            id="" placeholder="Nhập vào tên công ty"
+                            onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyPress}
+                            onBlur={handleSearchBlur}
                         />
+                        {dataSearch.name && (
+                            <span
+                                className="clear-icon"
+                                onClick={clearInput}
+                                style={{
+                                  position: "absolute",
+                                  right: "10px",
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  cursor: "pointer",
+                                  fontSize:'10px',
+                                  fontWeight:'bold',
+                                  color: "#999"
+                                  
+                                }}
+                            >
+                                &#x2715;
+                            </span>
+                        )}
+                    </div>
+                    
                     <div className="input-wrapper">   
-                    <input type="date" className="input-date"
-                    name="date" value={dataSearch.date} id="" 
-                    onChange={handleSearchChange}   />
-                    {!dataSearch.date && (
-                        <span className="placeholder">All ttime</span>
+                        <input 
+                            type="date" 
+                            className="input-date"
+                            name="date" 
+                            value={dataSearch.date} 
+                            id="" 
+                            onChange={handleSearchChange}   
+                        />
+                        {!dataSearch.date && (
+                            <span className="placeholder">
+                                All Days
+                            </span>
                     )}
                     </div> 
-                    <Button variant="contained" onClick={resetSearch}>Reset</Button>
+                    
                 </div>
                 {sttRes!==""? 
                 (
