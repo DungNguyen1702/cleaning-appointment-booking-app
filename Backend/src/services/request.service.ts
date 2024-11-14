@@ -396,4 +396,88 @@ export class RequestService {
     return request; // Trả về yêu cầu hoặc null nếu không tìm thấy
   }
 
+
+  // thảo - sprint 3
+  async getUserRequestsForWeekService(
+    userId: number,
+    startDate: Date,
+    endDate: Date
+  ) {
+    const query: SelectQueryBuilder<Request> = this.requestRepo
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.user', 'user')
+      .leftJoinAndSelect('request.company', 'company')
+      .where('DATE(request.timejob) BETWEEN :startDate AND :endDate', {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+      })
+      .andWhere('request.user_id = :userId', { userId })
+      .select([
+        'request.request_id',
+        'request.timejob',
+        'request.status',
+        'request.name',
+        'request.notes',
+        'request.request',
+        'request.workingHours',
+        'user.user_id',
+        'user.full_name',
+      ]);
+
+    const requests = await query.getMany();
+
+    // Tổ chức dữ liệu theo ngày trong tuần
+    const weekData: { [key in DayOfWeekEnum]?: Request[] } = {};
+
+    Object.values(DayOfWeekEnum).forEach(day => {
+      weekData[day] = [];
+    });
+
+    requests.forEach(request => {
+      const dayOfWeek = new Date(request.timejob).getDay();
+      const dayKey = dayOfWeekMap[dayOfWeek];
+      if (dayKey && weekData[dayKey]) {
+        // Tính toán timeWorking
+        const startTime = new Date(request.timejob);
+        const workingHours = request.workingHours;
+        const endTime = new Date(startTime.getTime() + workingHours * 60 * 60 * 1000);
+
+        const formatTime = (date: Date) => {
+          const hours = date.getHours().toString().padStart(2, '0');
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          return `${hours}:${minutes}`;
+        };
+
+        // const timeWorking = `${formatTime(startTime)}-${formatTime(endTime)}`;
+        const timeWorking = `${formatTime(startTime)}`;
+        // Thêm timeWorking vào request
+        (request as any).timeWorking = timeWorking;
+
+        // Định dạng timejob
+        const formatDate = (date: Date) => {
+          const day = date.getDate().toString().padStart(2, '0');
+          const month = (date.getMonth() + 1).toString().padStart(2, '0'); // tháng bắt đầu từ 0
+          const year = date.getFullYear();
+          return `${formatTime(date)} ${day}/${month}/${year}`;
+        };
+
+        (request as any).timejob = formatDate(new Date(request.timejob)); // cập nhật timejob
+
+        weekData[dayKey]?.push(request);
+      }
+    });
+
+    // Sắp xếp các công việc theo thời gian bắt đầu và request_id
+    Object.keys(weekData).forEach(day => {
+      weekData[day as DayOfWeekEnum]?.sort((a, b) => {
+        if (a.timejob === b.timejob) {
+          return a.request_id - b.request_id;
+        }
+        return new Date(a.timejob).getTime() - new Date(b.timejob).getTime();
+      });
+    });
+
+    return weekData;
+  }
+
 }

@@ -12,7 +12,7 @@ export async function seedRequests() {
   const users = await userRepository.find();
   const companies = await companyRepository.find();
 
-  for (let i = 22; i <= 30; i++) {
+  for (let i = 161; i <= 170; i++) {
     const request = new Request();
     request.user = users[i % users.length]; // Chọn ngẫu nhiên người dùng
     request.company = companies[i % companies.length]; // Chọn ngẫu nhiên công ty
@@ -24,7 +24,7 @@ export async function seedRequests() {
     request.notes = `Ghi chú cho yêu cầu ${i}`;
     request.request = `Yêu cầu từ khách hàng ${i}`;
     request.request_date = new Date();
-    request.timejob = new Date(`2024-11-06 14:00:00`);
+    request.timejob = new Date(`2024-11-17 14:00:00`);
     request.request_date = new Date();
     request.workingHours = parseFloat((Math.random() + 1).toFixed(1));
 
