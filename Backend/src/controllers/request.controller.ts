@@ -89,7 +89,9 @@ export class RequestController {
 
     // Kiểm tra quyền truy cập của user
     if (userId !== userIdFromToken) {
-      return res.status(403).json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
+      return res
+        .status(403)
+        .json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
     }
 
     try {

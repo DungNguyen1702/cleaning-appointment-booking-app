@@ -1,7 +1,14 @@
 import { Request, Response } from 'express';
-import { getCompanyById, fetchAllCompanies, getCompanyProfileById, getCompanyThongKeService } from '../services/company.service';
+import {
+  getCompanyById,
+  fetchAllCompanies,
+  getCompanyProfileById,
+  getCompanyThongKeService,
+  updateCompanyProfile,
+} from '../services/company.service';
 import { RequestService } from '../services/request.service';
 import { RequestStatusEnum } from '../enums/requestStatus.enum';
+import uploadImageToCloudinary from '../utils/cloudinaryUpload';
 
 const requestService = new RequestService();
 
@@ -199,7 +206,6 @@ export const getCustomerRequestsForWeek = async (
   }
 };
 
-
 //thảo sprint 3
 export const getCompanyProfile = async (req: Request, res: Response) => {
   const companyId = parseInt(req.params.companyId, 10);
@@ -222,9 +228,13 @@ export const getCompanyProfile = async (req: Request, res: Response) => {
     return res.status(200).json(companyProfile);
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: 'Đã xảy ra lỗi ở server', error: error.message });
+      return res
+        .status(500)
+        .json({ message: 'Đã xảy ra lỗi ở server', error: error.message });
     }
-    return res.status(500).json({ message: 'Đã xảy ra lỗi không xác định ở server' });
+    return res
+      .status(500)
+      .json({ message: 'Đã xảy ra lỗi không xác định ở server' });
   }
 };
 
@@ -258,7 +268,11 @@ export const getCompanyThongKe = async (req: Request, res: Response) => {
   }
 
   try {
-    const statistics = await getCompanyThongKeService(companyId, startDate, endDate);
+    const statistics = await getCompanyThongKeService(
+      companyId,
+      startDate,
+      endDate
+    );
 
     if (!statistics || statistics.length === 0) {
       return res.status(404).json({ message: 'Không có dữ liệu thống kê.' });
@@ -267,10 +281,88 @@ export const getCompanyThongKe = async (req: Request, res: Response) => {
     return res.status(200).json(statistics);
   } catch (error) {
     console.error('Lỗi trong quá trình lấy dữ liệu thống kê:', error);
-    return res
-      .status(500)
-      .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu. Hoặc bạn đã thiếu trường startDate và endDate' });
+    return res.status(500).json({
+      message:
+        'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu. Hoặc bạn đã thiếu trường startDate và endDate',
+    });
   }
 };
 
+export const editCompanyProfile = async (req: Request, res: Response) => {
+  const companyId = parseInt(req.params.companyId); // Lấy companyId từ params
+  const {
+    company_name,
+    address,
+    address_tinh,
+    phone,
+    email,
+    service_cost,
+    description,
+    service,
+    worktime,
+  } = req.body;
 
+  const imageFiles = req.files as Express.Multer.File[]; // Lấy tất cả các tệp ảnh từ req.files
+
+  try {
+    const company = await getCompanyById(companyId);
+    if (!company) {
+      return res.status(404).json({ message: 'Công ty không tồn tại' });
+    }
+
+    let imageUrls: string[] = []; // Mảng lưu các URL ảnh
+
+    // Nếu có ảnh được gửi lên, upload lên Cloudinary
+    if (imageFiles && imageFiles.length > 0) {
+      for (const imageFile of imageFiles) {
+        const result = await uploadImageToCloudinary(imageFile); // Upload ảnh lên Cloudinary
+        imageUrls.push(result.secure_url); // Thêm URL vào mảng imageUrls
+      }
+    }
+
+    // Cập nhật thông tin công ty trong cơ sở dữ liệu
+    const updatedCompany = await updateCompanyProfile(companyId, {
+      company_name: company_name || company.company_name, // Cập nhật nếu có, nếu không giữ nguyên
+      address: address || company.address,
+      address_tinh: address_tinh || company.address_tinh,
+      phone: phone || company.phone,
+      email: email || company.account?.email, // Cập nhật email nếu có
+      service_cost: service_cost || company.service_cost,
+      description: description || company.description,
+      service: service || company.service,
+      worktime: worktime || company.worktime,
+      main_image: imageUrls[0] ?? company.main_image,
+      image2: imageUrls[1] ?? company.image2,
+      image3: imageUrls[2] ?? company.image3,
+      image4: imageUrls[3] ?? company.image4,
+      image5: imageUrls[4] ?? company.image5,
+    });
+
+    return res.status(200).json({
+      message: 'Cập nhật thông tin công ty thành công',
+      companyId,
+      company_name: updatedCompany.company_name,
+      address: updatedCompany.address,
+      address_tinh: updatedCompany.address_tinh,
+      phone: updatedCompany.phone,
+      description: updatedCompany.description,
+      service: updatedCompany.service,
+      service_cost: updatedCompany.service_cost,
+      worktime: updatedCompany.worktime,
+      main_image: updatedCompany.main_image,
+      image2: updatedCompany.image2,
+      image3: updatedCompany.image3,
+      image4: updatedCompany.image4,
+      image5: updatedCompany.image5,
+      account: {
+        email: updatedCompany.account?.email, // Trả về email từ bảng Account
+      },
+    });
+  } catch (error: unknown) {
+    console.error(error);
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(500).json({ message: 'Đã xảy ra lỗi' });
+  }
+};

@@ -64,7 +64,7 @@ export class Company extends BaseEntity {
   @OneToMany(() => RatingStatistic, ratingStatistic => ratingStatistic.company)
   ratingStatistics: RatingStatistic[];
 
-  @OneToMany(() => Request, (request) => request.company)
+  @OneToMany(() => Request, request => request.company)
   requests: Request[];
 
   @CreateDateColumn()

@@ -30,6 +30,4 @@ export async function seedRequests() {
 
     await requestRepository.save(request);
   }
-
-
 }

@@ -114,7 +114,8 @@ export class RequestService {
         'company.company_name',
         'company.address_tinh',
         'company.main_image',
-      ]).orderBy('request.timejob', 'DESC');
+      ])
+      .orderBy('request.timejob', 'DESC');
 
     if (startDate) {
       const parsedStartDate = new Date(startDate);
@@ -206,7 +207,9 @@ export class RequestService {
         // Tính toán timeWorking
         const startTime = new Date(request.timejob);
         const workingHours = request.workingHours;
-        const endTime = new Date(startTime.getTime() + workingHours * 60 * 60 * 1000);
+        const endTime = new Date(
+          startTime.getTime() + workingHours * 60 * 60 * 1000
+        );
 
         const formatTime = (date: Date) => {
           const hours = date.getHours().toString().padStart(2, '0');
@@ -246,7 +249,6 @@ export class RequestService {
     return weekData;
   }
 
-
   async getRequestDetailsById(id: number) {
     try {
       const requestDetails = await this.requestRepo
@@ -274,22 +276,28 @@ export class RequestService {
       }
 
       // Định dạng lại timejob
-      const formattedTimejob = new Date(requestDetails.timejob).toLocaleString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false // Nếu muốn định dạng 24 giờ
-      });
+      const formattedTimejob = new Date(requestDetails.timejob).toLocaleString(
+        'vi-VN',
+        {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false, // Nếu muốn định dạng 24 giờ
+        }
+      );
 
       return {
         ...requestDetails,
-        timejob: formattedTimejob // Trả về timejob đã định dạng
+        timejob: formattedTimejob, // Trả về timejob đã định dạng
       };
     } catch (error) {
       // Xử lý lỗi liên quan đến cơ sở dữ liệu hoặc truy vấn
-      throw new Error('Lỗi khi truy vấn yêu cầu: ' + (error instanceof Error ? error.message : 'lỗi không xác định'));
+      throw new Error(
+        'Lỗi khi truy vấn yêu cầu: ' +
+          (error instanceof Error ? error.message : 'lỗi không xác định')
+      );
     }
   }
 
@@ -330,7 +338,7 @@ export class RequestService {
     // Cập nhật lại `timejob` cho từng request
     const formattedRequests = requests.map(request => ({
       ...request,
-      timejob: formatTimejob(new Date(request.timejob))
+      timejob: formatTimejob(new Date(request.timejob)),
     }));
 
     return {
@@ -396,7 +404,6 @@ export class RequestService {
     return request; // Trả về yêu cầu hoặc null nếu không tìm thấy
   }
 
-
   // thảo - sprint 3
   async getUserRequestsForWeekService(
     userId: number,
@@ -440,7 +447,9 @@ export class RequestService {
         // Tính toán timeWorking
         const startTime = new Date(request.timejob);
         const workingHours = request.workingHours;
-        const endTime = new Date(startTime.getTime() + workingHours * 60 * 60 * 1000);
+        const endTime = new Date(
+          startTime.getTime() + workingHours * 60 * 60 * 1000
+        );
 
         const formatTime = (date: Date) => {
           const hours = date.getHours().toString().padStart(2, '0');
@@ -479,5 +488,4 @@ export class RequestService {
 
     return weekData;
   }
-
 }
