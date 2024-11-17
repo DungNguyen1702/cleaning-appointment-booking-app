@@ -1,0 +1,241 @@
+.company-profile {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #fff8f8;
+  width: 100%;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 75%;
+}
+
+.profile-section {
+//   background-color: #fff;
+//   padding: 20px;
+//   border-radius: 8px;
+//   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+  font-size: 28px;
+  color: #1e293b;
+}
+.profile-picture-title {
+    display: flex;
+    align-items: center;
+}
+.company-name-title{
+    margin-bottom: 18px;
+    margin-left: 14px;
+}
+.profile-picture-section {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+
+}
+
+.choose-image-button {
+  background-color: #4182f9;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 10%;
+}
+.company-details{
+    display: flex;
+    flex-direction: row;
+}
+.company-info {
+  margin-top: 20px;
+  width: 50%;
+}
+
+.company-info label {
+  font-size: 18px;
+    color: #1e293b;
+}
+
+.company-info input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 12px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    background-color: transparent;
+    border: solid 1px #ccc;
+}
+
+.save-button-section {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.save-button {
+  background-color: #102c57;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.description-section {
+  margin-top: 20px;
+}
+
+.introduction h2,
+.services h2 {
+  font-size: 18px;
+  color: #1e293b;
+    margin-bottom: 10px;
+}
+
+
+
+.introduction{
+    textarea{
+        width: 100%;
+        background-color: transparent;
+        border: solid 1.5px #989898;
+        border-radius: 12px;
+        padding: 0 12px;
+    }
+}
+
+.services ul {
+  list-style-type: none;
+padding-left: 13px;
+}
+
+.services ul li {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.services ul li::before {
+  content: "•";
+  color: #e88080;
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.hours-section {
+  margin-top: 20px;
+    background-color: #fff;
+    padding: 12px 18px;
+    width: 43%;
+    border-radius: 8px;
+}
+
+.hours-section h2 {
+  font-size: 18px;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+.hours-form {
+  margin-top: 10px;
+}
+
+.hours-form .day {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  span{
+    margin-left: 40px;
+  }
+}
+
+.hours-form .day label {
+  width: 100px;
+  font-size: 18px;
+  color: #475569;
+}
+
+.hours-form .day input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.hours-form .day input[type="time"] {
+  margin-left: 10px;
+  padding: 5px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+/* Toggle.css */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin-left: -32px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

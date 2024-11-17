@@ -24,6 +24,7 @@ import {
 } from "./pages";
 import { ListRequest } from "./pages/ListRequest";
 import useAuth from "./hooks/useAuth";
+import { CompanyDetails } from "./pages/CompanyDetails";
 
 export const AdminRoute = () => {
   const { account } = useAuth();
@@ -124,6 +125,10 @@ const router = createBrowserRouter([
             path: "company",
             element: <DashboardLayout />,
             children: [
+              {
+                path: "details",
+                element: <CompanyDetails />,
+              },
               {
                 path: "history",
                 element: <ListRequest />,
