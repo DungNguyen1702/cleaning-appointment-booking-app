@@ -38,7 +38,7 @@ const links = [
 
   {
     text: "Thông tin công ty",
-    path: "company",
+    path: "details",
     icon: <MdQueryStats />,
     roles: "COMPANY",
   },
