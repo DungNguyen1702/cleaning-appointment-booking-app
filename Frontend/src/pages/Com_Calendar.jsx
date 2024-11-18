@@ -8,6 +8,8 @@ import "./Com_Calendar.scss";
 import companyAPI from "../api/companyAPI";
 import useAuth from "../hooks/useAuth";
 import LoadingOverlay from "../components/loading_overlay";
+import DatePicker from 'react-datepicker'; // Add this import at the top of your file
+import 'react-datepicker/dist/react-datepicker.css'; // Add this import for the DatePicker styles
 
 const Com_Calendar = () => {
   const [days, setDays] = useState([]);
@@ -15,6 +17,13 @@ const Com_Calendar = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const timeSlots = [
+    { id: 'accepted', label: 'Đã Chấp Nhận', color: '#FFF3C4', textColor: '#FFC107' },
+    { id: 'rejected', label: 'Hủy', color: '#F5C3C8', textColor: '#DC3545' },
+    { id: 'done', label: 'Hoàn Thành', color: '#BADBCC', textColor: '#198754' },
+    { id: 'pending', label: 'Chờ Xử Lý', color: '#D0C9FF', textColor: '#624BFF' }
+  ];
   const { account } = useAuth();
   const fetchData = async (startDate, endDate) => {
     try {
@@ -75,6 +84,7 @@ const Com_Calendar = () => {
   const handleNextWeekClick = () => {
     const nextStartDate = new Date(startDate);
     nextStartDate.setDate(nextStartDate.getDate() + 7);
+    setSelectedDate(nextStartDate);
     const nextEndDate = new Date(endDate);
     nextEndDate.setDate(nextEndDate.getDate() + 7);
 
@@ -90,6 +100,7 @@ const Com_Calendar = () => {
   const handlePrevWeekClick = () => {
     const prevStartDate = new Date(startDate);
     prevStartDate.setDate(prevStartDate.getDate() - 7);
+    setSelectedDate(prevStartDate);
     const prevEndDate = new Date(endDate);
     prevEndDate.setDate(prevEndDate.getDate() - 7);
 
@@ -101,6 +112,29 @@ const Com_Calendar = () => {
       formatDateToYYYYMMDD(prevEndDate)
     );
   };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    // Calculate the start of the week containing the selected date
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay() + 1); // Monday
+    
+    // Calculate the end of the week
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+    
+    // Update the startDate and endDate states
+    setStartDate(formatDateToYYYYMMDD(startOfWeek));
+    setEndDate(formatDateToYYYYMMDD(endOfWeek));
+    
+    // Fetch data for the new week
+    fetchData(formatDateToYYYYMMDD(startOfWeek), formatDateToYYYYMMDD(endOfWeek));
+  };
+
+  useEffect(() => {
+    const today = new Date();
+    handleDateChange(today); // This will set up the initial week and fetch data
+  }, []);
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -140,11 +174,13 @@ const Com_Calendar = () => {
         </header>
 
         <div className="calendar-header">
-          <div className="search-bar">
-            <span className="search-icon">
-              <MdOutlineSearch />
-            </span>
-            <input type="text" placeholder="Search" />
+          <div className="date-picker-container">
+            <DatePicker
+               selected={selectedDate}
+               onChange={handleDateChange}
+               dateFormat="dd/MM/yyyy"
+               className="date-picker-input"
+            />
           </div>
           <div className="calendar-actions">
             <button className="nav-button" onClick={handlePrevWeekClick}>
@@ -158,6 +194,24 @@ const Com_Calendar = () => {
             </button>
           </div>
         </div>
+
+        <div className="calendar-body">
+          <div className="time-slots">
+            <div className="time-slots-header">
+              {timeSlots.map(slot => (
+                <div 
+                  key={slot.id} 
+                  className="time-slot"
+                  style={{ 
+                    backgroundColor: slot.color,
+                    color: slot.textColor
+                  }}
+                >
+                {slot.label}
+                </div>
+              ))}
+            </div>
+          </div>
 
         {loading ? (
           <LoadingOverlay loading={loading} />
@@ -193,6 +247,7 @@ const Com_Calendar = () => {
             ))}
           </div>
         )}
+      </div>
       </main>
     </div>
   );

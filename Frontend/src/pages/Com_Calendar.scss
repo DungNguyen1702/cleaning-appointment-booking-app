@@ -155,34 +155,19 @@
     }
   }
 
-  .search-bar {
+  .date-picker-container {
     position: relative;
-    width: 300px;
+    width: 200px; // Adjust the width as needed
 
-    .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #a0aec0;
-    }
-
-    input {
+    .date-picker-input {
       width: 100%;
-      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      padding: 0.5rem 0.75rem;
       border: 1px solid #e2e8f0;
       border-radius: 0.375rem;
       outline: none;
       background-color: #f5f5f5;
       color: #000;
-      /* Màu chữ khi nhập */
-      caret-color: #000;
-      /* Màu dấu nháy khi nhập */
-
-      &::placeholder {
-        color: #a0aec0;
-        /* Màu của placeholder */
-      }
+      font-size: 14px;
 
       &:focus {
         border-color: #000000;
@@ -223,12 +208,51 @@
   }
 }
 
+.calendar-body {
+  display: flex; // Changed to flex to allow horizontal layout
+  flex-direction: row; // Added to ensure horizontal layout
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  width: 100%; // Added to ensure full width
+  overflow: hidden; // Added to prevent scrolling issues
+}
+
+.time-slots {
+  width: 200px;
+  min-width: 200px;
+  padding: 16px;
+  background-color: rgb(253, 247, 247);
+  border: 1px solid #e2e8f0;
+  
+  .time-slots-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    .time-slot {
+      padding: 15px;
+      border-radius: 6px;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-weight: 500;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+  }
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   flex: 1;
   min-height: 0;
   background-color: #ffe2e2;
+  border-left: 1px solid #e2e8f0;
 
   .day-column {
     border-right: 1px solid #102c57;
@@ -273,19 +297,19 @@
         border: 1px solid #e98080;
         text-align: center;
 
-        &.pending {
+        &.accepted {
           background-color: #fefcbf;
         }
 
-        &.pink {
+        &.rejected {
           background-color: #f5c3c8
         }
 
-        &.success {
+        &.completed {
           background-color: #c6f6d5;
         }
 
-        &.purple {
+        &.pending {
           background-color: #e9d8fd;
         }
 
