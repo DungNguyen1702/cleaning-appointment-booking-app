@@ -11,10 +11,10 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullname, email, password, birthday, role } = req.body;
+  const { email, password, birthday, role } = req.body;
 
   try {
-    await registerAccount(fullname, email, password, birthday, role);
+    await registerAccount(email, password, birthday, role);
     return res.status(201).json({ message: 'Đăng ký thành công' });
   } catch (error: unknown) {
     if (error instanceof Error) {

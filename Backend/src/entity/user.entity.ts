@@ -34,6 +34,9 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string | null;
 
+  @Column({ type: 'tinyint', nullable: true })
+  gender: 0 | 1 | null; // 0: Nam, 1: Nữ, null: Không xác định
+
   @CreateDateColumn()
   createdAt: Date;
 
