@@ -68,10 +68,11 @@ const AddEvent = ({ onClose, open }) => {
             onChange={(e) => setTitle(e.target.value)}
             margin="normal"
           />
+          <br/>
 
           {/* Ngày và Giờ */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <TextField
                 fullWidth
                 label="Ngày"
@@ -84,7 +85,7 @@ const AddEvent = ({ onClose, open }) => {
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={4}>
               <TextField
                 fullWidth
                 label="Giờ bắt đầu"
@@ -97,7 +98,7 @@ const AddEvent = ({ onClose, open }) => {
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={4}>
               <TextField
                 fullWidth
                 label="Giờ kết thúc"
@@ -111,7 +112,7 @@ const AddEvent = ({ onClose, open }) => {
               />
             </Grid>
           </Grid>
-
+                <br/>
           {/* Lặp lại */}
           <FormControl fullWidth margin="normal">
             <InputLabel>Lặp lại</InputLabel>
@@ -167,7 +168,7 @@ const AddEvent = ({ onClose, open }) => {
               </Grid>
             </>
           )}
-
+             <br/>
           {/* Nội dung công việc */}
           <TextField
             fullWidth
@@ -179,7 +180,7 @@ const AddEvent = ({ onClose, open }) => {
             rows={4}
             margin="normal"
           />
-
+             <br/>       
           {/* Địa điểm */}
           <TextField
             fullWidth
