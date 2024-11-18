@@ -25,6 +25,7 @@ import {
 import { ListRequest } from "./pages/ListRequest";
 import useAuth from "./hooks/useAuth";
 import { CompanyDetails } from "./pages/CompanyDetails";
+import { OverviewStats } from "./pages/OverviewStats";
 
 export const AdminRoute = () => {
   const { account } = useAuth();
@@ -128,6 +129,10 @@ const router = createBrowserRouter([
               {
                 path: "details",
                 element: <CompanyDetails />,
+              },
+              {
+                path: "overview-stats",
+                element: <OverviewStats />,
               },
               {
                 path: "history",

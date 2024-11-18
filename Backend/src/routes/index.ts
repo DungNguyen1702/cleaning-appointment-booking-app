@@ -11,6 +11,6 @@ routerAPI.use('/auth', authRoute);
 routerAPI.use('/company', companyRoute);
 routerAPI.use('/requests', requestRoute);
 routerAPI.use('/user', userRoute);
-routerAPI.use('/todos', todoRoute);
+routerAPI.use('/todo', todoRoute);
 
 export default routerAPI;

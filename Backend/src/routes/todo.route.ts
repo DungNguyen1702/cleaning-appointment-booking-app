@@ -11,5 +11,11 @@ router.get(
 );
 
 router.post('/', verifyToken, todoController.createTodoController);
+router.put(
+  '/:id',
+  verifyToken,
+  todoController.updateTodoController
+);
+
 
 export default router;

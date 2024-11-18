@@ -3,17 +3,15 @@ import { Todo } from '../entity/todo.entity';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
-import { RequestStatusEnum } from '../enums/requestStatus.enum';
 import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
 import { TodoRepeat } from '../entity/todoRepeat.entity';
 import { RepeatOptionEnum } from '../enums/repeatOption.enum';
-import { tuanThang } from '../enums/tuanThang.enum';
 import { CreateTodoOptions } from '../dtos/todo.dto';
 
 const todoRepo: Repository<Todo> = AppDataSource.getRepository(Todo);
 const userRepo: Repository<User> = AppDataSource.getRepository(User);
 const companyRepo: Repository<Company> = AppDataSource.getRepository(Company);
-const TodoRepeatRepository: Repository<TodoRepeat> =
+const todoRepeatRepo: Repository<TodoRepeat> =
   AppDataSource.getRepository(TodoRepeat);
 
 export const getCustomerRequestsForWeek = async (
@@ -135,9 +133,46 @@ export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
     }
 
     // Lưu TodoRepeat vào cơ sở dữ liệu
-    await TodoRepeatRepository.save(todoRepeat);
+    await todoRepeatRepo.save(todoRepeat);
   }
 
   // Trả về Todo đã được lưu vào cơ sở dữ liệu
   return savedTodo;
+};
+
+export const updateTodo = async (
+  todoId: number,
+  updatedTodo: Partial<Todo>,
+  updatedTodoRepeat?: Partial<TodoRepeat>
+) => {
+  // Cập nhật thông tin của Todo
+  await todoRepo.update(todoId, updatedTodo);
+
+  // Nếu có thông tin về việc lặp lại, cập nhật thông tin của TodoRepeat
+  if (updatedTodoRepeat) {
+    const existingTodoRepeat = await todoRepeatRepo.findOne({
+      where: { todo: { todo_id: todoId } },
+    });
+
+    if (updatedTodoRepeat.repeat_option === RepeatOptionEnum.KHONG_LAP_LAI) {
+      // Nếu repeat_option là KHONG_LAP_LAI, xóa dữ liệu trong bảng todo_repeat
+      if (existingTodoRepeat) {
+        await todoRepeatRepo.remove(existingTodoRepeat);
+      }
+    } else {
+      // Nếu repeat_option không phải là KHONG_LAP_LAI, cập nhật hoặc tạo mới dữ liệu trong bảng todo_repeat
+      if (existingTodoRepeat) {
+        await todoRepeatRepo.update(
+          existingTodoRepeat.repeat_id,
+          updatedTodoRepeat
+        );
+      } else {
+        const newTodoRepeat = todoRepeatRepo.create({
+          ...updatedTodoRepeat,
+          todo: { todo_id: todoId },
+        });
+        await todoRepeatRepo.save(newTodoRepeat);
+      }
+    }
+  }
 };

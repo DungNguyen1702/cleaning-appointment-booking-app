@@ -3,6 +3,7 @@ import React from "react";
 import { IoBarChartSharp } from "react-icons/io5";
 import { MdQueryStats } from "react-icons/md";
 import { FaWpforms } from "react-icons/fa";
+import { FaChartPie } from "react-icons/fa"; 
 import { ImProfile } from "react-icons/im";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
@@ -40,6 +41,12 @@ const links = [
     text: "Thông tin công ty",
     path: "details",
     icon: <MdQueryStats />,
+    roles: "COMPANY",
+  },
+  {
+    text: "Thống kê tổng quan",
+    path: "overview-stats",
+    icon: <FaChartPie  />, 
     roles: "COMPANY",
   },
   {
