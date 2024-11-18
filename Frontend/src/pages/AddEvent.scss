@@ -1,0 +1,31 @@
+.add-event-container {
+    .MuiDialogTitle-root {
+      font-weight: bold;
+      font-size: 18px;
+    }
+  
+    .MuiFormControl-root,
+    .MuiTextField-root {
+      margin-bottom: 16px;
+    }
+  
+    .MuiButton-root {
+      font-weight: bold;
+    }
+  
+    .repeat-toggle-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+  
+      .MuiToggleButton-root {
+        border: 1px solid #ccc;
+      }
+  
+      .MuiToggleButton-root.Mui-selected {
+        background-color: #1976d2;
+        color: white;
+      }
+    }
+  }
+  
