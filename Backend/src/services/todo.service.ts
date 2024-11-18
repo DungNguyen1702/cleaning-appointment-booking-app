@@ -79,34 +79,6 @@ export const getCustomerRequestsForWeek = async (
   return weekData;
 };
 
-
-
-// export const updateTodo = async (
-//   todoId: number,
-//   updatedTodo: Partial<Todo>,
-//   updatedTodoRepeat?: Partial<TodoRepeat>
-// ) => {
-
-//   await todoRepo.update(todoId, updatedTodo);
-
-
-//   if (updatedTodoRepeat) {
-//     const existingTodoRepeat = await todoRepeatRepo.findOne({ where: { todo: { todo_id: todoId } } });
-
-//     if (existingTodoRepeat) {
-//       await todoRepeatRepo.update(existingTodoRepeat.repeat_id, updatedTodoRepeat);
-//     } else {
-//       const newTodoRepeat = todoRepeatRepo.create({
-//         ...updatedTodoRepeat,
-//         todo: { todo_id: todoId },
-//       });
-//       await todoRepeatRepo.save(newTodoRepeat);
-//     }
-//   }
-// };
-
-
-
 export const updateTodo = async (
   todoId: number,
   updatedTodo: Partial<Todo>,
