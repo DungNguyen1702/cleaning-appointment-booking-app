@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { Todo } from '../entity/todo.entity';
 import { RepeatOptionEnum } from '../enums/repeatOption.enum';
+import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
+import { tuanThang } from '../enums/tuanThang.enum';
 
 @Entity()
 export class TodoRepeat {
@@ -22,8 +24,12 @@ export class TodoRepeat {
   @Column({ type: 'enum', enum: RepeatOptionEnum })
   repeat_option: RepeatOptionEnum;
 
-  @Column()
-  repeat_days: string;
+
+  @Column({ type: 'enum', enum: DayOfWeekEnum })
+  repeat_days: DayOfWeekEnum;
+
+  @Column({ type: 'enum', enum: tuanThang })
+  repeat_weekMonth: tuanThang;
 
   @Column()
   repeat_interval: number;
