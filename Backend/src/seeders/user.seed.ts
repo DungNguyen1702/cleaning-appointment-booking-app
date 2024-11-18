@@ -5,8 +5,6 @@ import { UserStatusEnum } from '../enums/userStatus.enum';
 import { AppDataSource } from '../config/data-source';
 import bcrypt from 'bcrypt';
 
-
-
 const provinces = [
   'Hà Giang',
   'Cao Bằng',
@@ -62,7 +60,6 @@ const provinces = [
   'Bạc Liêu',
   'Thái Bình',
 ];
-
 
 export async function seedCustomers() {
   // Thêm từ khóa export ở đây

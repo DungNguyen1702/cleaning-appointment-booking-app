@@ -99,7 +99,6 @@ export const fetchAllCompanies = async (
   return { companies: companiesWithRequestCount, totalCompanies };
 };
 
-
 //thảo sprint 3
 export const getCompanyProfileById = async (companyId: number) => {
   const company = await Company.createQueryBuilder('company')
@@ -107,16 +106,17 @@ export const getCompanyProfileById = async (companyId: number) => {
     .where('company.company_id = :companyId', { companyId })
     .select([
       'company.company_id',
+      'company.company_name',
+      'company.phone',
       'company.address',
       'company.address_tinh',
+      'account.email',
       'company.service_cost',
       'company.main_image',
-      'company.company_name',
-      'account.account_id',
-      'account.fullname',
-      'account.email',
-      'account.birthday',
-      'company.phone',
+      'company.image2',
+      'company.image3',
+      'company.image4',
+      'company.image5',
       'company.description',
       'company.service',
       'company.worktime',
@@ -126,7 +126,11 @@ export const getCompanyProfileById = async (companyId: number) => {
   return company;
 };
 
-export const getCompanyThongKeService = async (companyId: number, startDate: Date, endDate: Date) => {
+export const getCompanyThongKeService = async (
+  companyId: number,
+  startDate: Date,
+  endDate: Date
+) => {
   // Lấy dữ liệu thống kê từ bảng Statistic
   const statistics = await AppDataSource.getRepository(Statistic)
     .createQueryBuilder('statistic')
@@ -155,36 +159,41 @@ export const getCompanyThongKeService = async (companyId: number, startDate: Dat
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
     })
-    .select([
-      'request.request_id',
-      'request.request_date'
-    ])
+    .select(['request.request_id', 'request.request_date'])
     .getMany();
 
   const weekData: { [key: string]: { soLuong: number }[] } = {
-    "THU_HAI": [],
-    "THU_BA": [],
-    "THU_TU": [],
-    "THU_NAM": [],
-    "THU_SAU": [],
-    "THU_BAY": [],
-    "CHU_NHAT": []
+    THU_HAI: [],
+    THU_BA: [],
+    THU_TU: [],
+    THU_NAM: [],
+    THU_SAU: [],
+    THU_BAY: [],
+    CHU_NHAT: [],
   };
 
   const dayCount: { [key: string]: number } = {
-    "THU_HAI": 0,
-    "THU_BA": 0,
-    "THU_TU": 0,
-    "THU_NAM": 0,
-    "THU_SAU": 0,
-    "THU_BAY": 0,
-    "CHU_NHAT": 0
+    THU_HAI: 0,
+    THU_BA: 0,
+    THU_TU: 0,
+    THU_NAM: 0,
+    THU_SAU: 0,
+    THU_BAY: 0,
+    CHU_NHAT: 0,
   };
 
   requests.forEach(request => {
     const requestDate = new Date(request.request_date);
     const dayOfWeek = requestDate.getDay();
-    const daysOfWeek = ["CHU_NHAT", "THU_HAI", "THU_BA", "THU_TU", "THU_NAM", "THU_SAU", "THU_BAY"];
+    const daysOfWeek = [
+      'CHU_NHAT',
+      'THU_HAI',
+      'THU_BA',
+      'THU_TU',
+      'THU_NAM',
+      'THU_SAU',
+      'THU_BAY',
+    ];
     const dayName = daysOfWeek[dayOfWeek];
 
     dayCount[dayName]++;
@@ -208,17 +217,86 @@ export const getCompanyThongKeService = async (companyId: number, startDate: Dat
       rating: company.ratingStatistics[0]?.rating || null,
       count: company.ratingStatistics[0]?.count || null,
       ratingStatisticID: company.ratingStatistics[0]?.statistic_id || null,
-      weekData: requests.length > 0 ? weekData : {
-        "THU_HAI": [{ soLuong: 0 }],
-        "THU_BA": [{ soLuong: 0 }],
-        "THU_TU": [{ soLuong: 0 }],
-        "THU_NAM": [{ soLuong: 0 }],
-        "THU_SAU": [{ soLuong: 0 }],
-        "THU_BAY": [{ soLuong: 0 }],
-        "CHU_NHAT": [{ soLuong: 0 }]
-      }
+      weekData:
+        requests.length > 0
+          ? weekData
+          : {
+              THU_HAI: [{ soLuong: 0 }],
+              THU_BA: [{ soLuong: 0 }],
+              THU_TU: [{ soLuong: 0 }],
+              THU_NAM: [{ soLuong: 0 }],
+              THU_SAU: [{ soLuong: 0 }],
+              THU_BAY: [{ soLuong: 0 }],
+              CHU_NHAT: [{ soLuong: 0 }],
+            },
     };
   });
 
   return result;
+};
+
+export const updateCompanyProfile = async (
+  companyId: number,
+  updateData: {
+    company_name?: string;
+    address?: string;
+    address_tinh?: string;
+    phone?: string;
+    email?: string;
+    service_cost?: number;
+    description?: string;
+    service?: string;
+    worktime?: string;
+    main_image?: string;
+    image2?: string;
+    image3?: string;
+    image4?: string;
+    image5?: string;
+  }
+) => {
+  // Lấy repository cho Company
+  const companyRepository = AppDataSource.getRepository(Company);
+
+  const company = await companyRepository.findOne({
+    where: { company_id: companyId },
+    relations: ['account'],
+  });
+
+  if (!company) {
+    throw new Error('Công ty không tồn tại');
+  }
+
+  // Cập nhật các thông tin của công ty
+  company.company_name = updateData.company_name || company.company_name;
+  company.address = updateData.address || company.address;
+  company.address_tinh = updateData.address_tinh || company.address_tinh;
+  company.phone = updateData.phone || company.phone;
+  company.service_cost = updateData.service_cost || company.service_cost;
+  company.description = updateData.description || company.description;
+  company.service = updateData.service || company.service;
+  company.worktime = updateData.worktime || company.worktime;
+  company.main_image = updateData.main_image || company.main_image;
+  company.image2 = updateData.image2 || company.image2;
+  company.image3 = updateData.image3 || company.image3;
+  company.image4 = updateData.image4 || company.image4;
+  company.image5 = updateData.image5 || company.image5;
+
+  // Cập nhật email trong bảng Account nếu có
+  if (updateData.email && company.account) {
+    company.account.email = updateData.email; // Cập nhật email
+    try {
+      await company.account.save(); // Lưu thay đổi vào bảng Account
+    } catch (error) {
+      throw new Error('Không thể lưu email mới vào bảng Account');
+    }
+  }
+
+  // Lưu thông tin công ty
+  try {
+    await company.save();
+  } catch (error) {
+    throw new Error('Không thể lưu thông tin công ty');
+  }
+
+  return company; // Trả về công ty đã cập nhật
 };
