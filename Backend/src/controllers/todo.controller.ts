@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { getCustomerRequestsForWeek } from '../services/todo.service';
+import { getCustomerRequestsForWeek, updateTodo } from '../services/todo.service';
+
 
 export const getCustomerRequestsForWeekController = async (
   req: Request,
@@ -35,3 +36,24 @@ export const getCustomerRequestsForWeekController = async (
       .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
   }
 };
+
+
+export const updateTodoController = async (req: Request, res: Response) => {
+  const todoId = parseInt(req.params.id, 10);
+  const updatedTodo = req.body.todo;
+  const updatedTodoRepeat = req.body.todoRepeat;
+
+  if (!updatedTodo) {
+    return res.status(400).json({ message: 'Thông tin công việc không hợp lệ.' });
+  }
+
+  try {
+    await updateTodo(todoId, updatedTodo, updatedTodoRepeat);
+    return res.status(200).json({ message: 'Cập nhật thông tin công việc thành công.' });
+  } catch (error) {
+    console.error('Lỗi trong quá trình cập nhật công việc:', error);
+    return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật công việc.' });
+  }
+};
+
+

@@ -3,12 +3,14 @@ import { Todo } from '../entity/todo.entity';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
-import { RequestStatusEnum } from '../enums/requestStatus.enum';
 import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
+import { TodoRepeat } from '../entity/todoRepeat.entity';
+
 
 const todoRepo: Repository<Todo> = AppDataSource.getRepository(Todo);
 const userRepo: Repository<User> = AppDataSource.getRepository(User);
 const companyRepo: Repository<Company> = AppDataSource.getRepository(Company);
+const todoRepeatRepo: Repository<TodoRepeat> = AppDataSource.getRepository(TodoRepeat);
 
 export const getCustomerRequestsForWeek = async (
   companyId: number,
@@ -75,3 +77,30 @@ export const getCustomerRequestsForWeek = async (
 
   return weekData;
 };
+
+
+
+export const updateTodo = async (
+  todoId: number,
+  updatedTodo: Partial<Todo>,
+  updatedTodoRepeat?: Partial<TodoRepeat>
+) => {
+
+  await todoRepo.update(todoId, updatedTodo);
+
+
+  if (updatedTodoRepeat) {
+    const existingTodoRepeat = await todoRepeatRepo.findOne({ where: { todo: { todo_id: todoId } } });
+
+    if (existingTodoRepeat) {
+      await todoRepeatRepo.update(existingTodoRepeat.repeat_id, updatedTodoRepeat);
+    } else {
+      const newTodoRepeat = todoRepeatRepo.create({
+        ...updatedTodoRepeat,
+        todo: { todo_id: todoId },
+      });
+      await todoRepeatRepo.save(newTodoRepeat);
+    }
+  }
+};
+
