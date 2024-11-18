@@ -10,4 +10,11 @@ router.get(
   todoController.getCustomerRequestsForWeekController
 );
 
+router.put(
+  '/:id',
+  verifyToken,
+  todoController.updateTodoController
+);
+
+
 export default router;
