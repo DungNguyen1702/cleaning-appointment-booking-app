@@ -3,6 +3,7 @@ import companylogo from "../assets/images/company-logo.png";
 import ReactQuill from "react-quill";
 import Parser from "html-react-parser";
 import "./CompanyDetails.scss";
+import logocompany from "../assets/images/imagelogin.png";
 
 const AutoResizeTextarea = ({ value, onChange }) => {
   const textareaRef = useRef(null);
@@ -31,6 +32,7 @@ const AutoResizeTextarea = ({ value, onChange }) => {
         overflow: "hidden",
         width: "100%",
         boxSizing: "border-box",
+        padding: "12px 24px",
       }}
     />
   );
@@ -55,12 +57,16 @@ const Toggle = ({ checked, onChange }) => {
 
 export const CompanyDetails = () => {
   const companyData = {
+    mainlogo: companylogo,
+    logo1: logocompany,
+    logo2: logocompany,
+    logo3: logocompany,
+    logo4: logocompany,
     name: "X Factor",
     email: "xfactor@gmail.com",
     phone: "0910102024",
-    introduction: `
-    Chuyên cung cấp các dịch vụ vệ sinh nhà cửa quanh khu vực Đà nẵng. Đảm bảo sạch sẽ, thơm tho mang lại cảm giác thoải mái cho người dùng.
-  `,
+    address: "1234 Main St, Da Nang, Vietnam",
+    introduction: `Chuyên cung cấp các dịch vụ vệ sinh nhà cửa quanh khu vực Đà nẵng. Đảm bảo sạch sẽ, thơm tho mang lại cảm giác thoải mái cho người dùng.`,
     services: [
       "Lau chùi nhà cửa bao gồm tất cả dịch vụ lau chùi các thiết bị trong nhà.",
       "Hỗ trợ bàn giặt ủi và phơi đồ tại nhà.",
@@ -101,7 +107,7 @@ export const CompanyDetails = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setCompany((prev) => ({ ...prev, logo: reader.result }));
+        setCompany((prev) => ({ ...prev, mainlogo: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -122,7 +128,7 @@ export const CompanyDetails = () => {
               <img
                 className="profile-picture"
                 alt="Company Logo"
-                src={company.logo || companylogo}
+                src={company.mainlogo || mainlogo}
               />
               <h4 className="company-name-title">{company.name}</h4>
             </div>
@@ -177,6 +183,18 @@ export const CompanyDetails = () => {
                   }
                 />
               </div>
+
+              <div className="address-info">
+                <label htmlFor="address">Địa chỉ</label>
+                <input
+                  id="address"
+                  type="text"
+                  value={company.address}
+                  onChange={(e) =>
+                    setCompany((prev) => ({ ...prev, address: e.target.value }))
+                  }
+                />
+              </div>
             </div>
 
             <div className="description-section">
@@ -202,10 +220,16 @@ export const CompanyDetails = () => {
                   style={{
                     resize: "none",
                     overflow: "hidden",
-                    width: "100%",
                     boxSizing: "border-box",
                   }}
                 />
+              </div>
+
+              <div className="list-image">
+                <img src={company.logo1} alt="thumbnails" />
+                <img src={company.logo2} alt="thumbnails" />
+                <img src={company.logo3} alt="thumbnails" />
+                <img src={company.logo4} alt="thumbnails" />
               </div>
             </div>
           </div>
