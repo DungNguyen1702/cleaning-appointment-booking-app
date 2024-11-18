@@ -10,6 +10,7 @@ router.get(
   todoController.getCustomerRequestsForWeekController
 );
 
+router.post('/', verifyToken, todoController.createTodoController);
 router.put(
   '/:id',
   verifyToken,

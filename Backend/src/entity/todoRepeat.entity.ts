@@ -6,6 +6,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { Todo } from '../entity/todo.entity';
 import { RepeatOptionEnum } from '../enums/repeatOption.enum';
@@ -17,22 +18,17 @@ export class TodoRepeat {
   @PrimaryGeneratedColumn()
   repeat_id: number;
 
-  @ManyToOne(() => Todo)
-  @JoinColumn({ name: 'todo_id' })
-  todo: Todo;
-
   @Column({ type: 'enum', enum: RepeatOptionEnum })
   repeat_option: RepeatOptionEnum;
 
+  @Column({ type: 'enum', enum: DayOfWeekEnum, nullable: true })
+  repeat_days: DayOfWeekEnum | null;
 
-  @Column({ type: 'enum', enum: DayOfWeekEnum })
-  repeat_days: DayOfWeekEnum;
+  @Column({ type: 'enum', enum: tuanThang, nullable: true })
+  repeat_weekMonth: tuanThang | null;
 
-  @Column({ type: 'enum', enum: tuanThang })
-  repeat_weekMonth: tuanThang;
-
-  @Column()
-  repeat_interval: number;
+  @OneToOne(() => Todo, todo => todo.todo_repeat)
+  todo: Todo;
 
   @CreateDateColumn()
   createdAt: Date;
