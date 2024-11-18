@@ -19,8 +19,8 @@ export class Account extends BaseEntity {
   @Column()
   password: string;
 
-  @Column()
-  fullname: string;
+  // @Column()
+  // fullname: string;
 
   @Column({ type: 'date' })
   birthday: Date;

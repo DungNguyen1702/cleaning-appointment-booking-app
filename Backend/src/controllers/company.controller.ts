@@ -302,7 +302,9 @@ export const editCompanyProfile = async (req: Request, res: Response) => {
     worktime,
   } = req.body;
 
-  const imageFiles = req.files as Express.Multer.File[]; // Lấy tất cả các tệp ảnh từ req.files
+  const files = req.files as {
+    [fieldname: string]: Express.Multer.File[];
+  };
 
   try {
     const company = await getCompanyById(companyId);
@@ -310,14 +312,12 @@ export const editCompanyProfile = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Công ty không tồn tại' });
     }
 
-    let imageUrls: string[] = []; // Mảng lưu các URL ảnh
+    const imageUrls: { [key: string]: string } = {};
 
-    // Nếu có ảnh được gửi lên, upload lên Cloudinary
-    if (imageFiles && imageFiles.length > 0) {
-      for (const imageFile of imageFiles) {
-        const result = await uploadImageToCloudinary(imageFile); // Upload ảnh lên Cloudinary
-        imageUrls.push(result.secure_url); // Thêm URL vào mảng imageUrls
-      }
+    // Upload từng ảnh dựa trên fieldName
+    for (const field in files) {
+      const uploadedImage = await uploadImageToCloudinary(files[field][0]);
+      imageUrls[field] = uploadedImage.secure_url;
     }
 
     // Cập nhật thông tin công ty trong cơ sở dữ liệu
@@ -331,11 +331,11 @@ export const editCompanyProfile = async (req: Request, res: Response) => {
       description: description || company.description,
       service: service || company.service,
       worktime: worktime || company.worktime,
-      main_image: imageUrls[0] ?? company.main_image,
-      image2: imageUrls[1] ?? company.image2,
-      image3: imageUrls[2] ?? company.image3,
-      image4: imageUrls[3] ?? company.image4,
-      image5: imageUrls[4] ?? company.image5,
+      main_image: imageUrls.main_image ?? company.main_image,
+      image2: imageUrls.image2 ?? company.image2,
+      image3: imageUrls.image3 ?? company.image3,
+      image4: imageUrls.image4 ?? company.image4,
+      image5: imageUrls.image5 ?? company.image5,
     });
 
     return res.status(200).json({

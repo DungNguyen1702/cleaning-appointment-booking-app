@@ -5,7 +5,7 @@ import { AccountRoleEnum } from '../enums/account.enum';
 import { UserStatusEnum } from '../enums/userStatus.enum';
 
 export const registerAccount = async (
-  fullname: string,
+  // fullname: string,
   email: string,
   password: string,
   birthday: string,
@@ -20,7 +20,7 @@ export const registerAccount = async (
 
   const hashedPassword = await hashPassword(password);
   const account = accountRepository.create({
-    fullname,
+    // fullname,
     email,
     password: hashedPassword,
     birthday,

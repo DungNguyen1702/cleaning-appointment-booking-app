@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as companyController from '../controllers/company.controller';
 import { verifyToken } from '../middleware/auth.middleware';
-import upload from '../config/multer-config';
+import { uploadFields } from '../config/multer-config';
 
 const router = Router();
 
@@ -49,7 +49,7 @@ router.get(
 router.put(
   '/profile/:companyId',
   verifyToken,
-  upload.array('imageFiles', 5),
+  uploadFields,
   companyController.editCompanyProfile
 );
 
