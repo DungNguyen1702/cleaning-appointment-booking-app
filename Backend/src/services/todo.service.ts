@@ -5,6 +5,7 @@ import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
 import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
 import { TodoRepeat } from '../entity/todoRepeat.entity';
+import { RepeatOptionEnum } from '../enums/repeatOption.enum';
 
 
 const todoRepo: Repository<Todo> = AppDataSource.getRepository(Todo);
@@ -78,29 +79,34 @@ export const getCustomerRequestsForWeek = async (
   return weekData;
 };
 
-
-
 export const updateTodo = async (
   todoId: number,
   updatedTodo: Partial<Todo>,
   updatedTodoRepeat?: Partial<TodoRepeat>
 ) => {
-
+  // Cập nhật thông tin của Todo
   await todoRepo.update(todoId, updatedTodo);
 
-
+  // Nếu có thông tin về việc lặp lại, cập nhật thông tin của TodoRepeat
   if (updatedTodoRepeat) {
     const existingTodoRepeat = await todoRepeatRepo.findOne({ where: { todo: { todo_id: todoId } } });
 
-    if (existingTodoRepeat) {
-      await todoRepeatRepo.update(existingTodoRepeat.repeat_id, updatedTodoRepeat);
+    if (updatedTodoRepeat.repeat_option === RepeatOptionEnum.KHONG_LAP_LAI) {
+      // Nếu repeat_option là KHONG_LAP_LAI, xóa dữ liệu trong bảng todo_repeat
+      if (existingTodoRepeat) {
+        await todoRepeatRepo.remove(existingTodoRepeat);
+      }
     } else {
-      const newTodoRepeat = todoRepeatRepo.create({
-        ...updatedTodoRepeat,
-        todo: { todo_id: todoId },
-      });
-      await todoRepeatRepo.save(newTodoRepeat);
+      // Nếu repeat_option không phải là KHONG_LAP_LAI, cập nhật hoặc tạo mới dữ liệu trong bảng todo_repeat
+      if (existingTodoRepeat) {
+        await todoRepeatRepo.update(existingTodoRepeat.repeat_id, updatedTodoRepeat);
+      } else {
+        const newTodoRepeat = todoRepeatRepo.create({
+          ...updatedTodoRepeat,
+          todo: { todo_id: todoId },
+        });
+        await todoRepeatRepo.save(newTodoRepeat);
+      }
     }
   }
 };
-
