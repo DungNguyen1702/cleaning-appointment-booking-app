@@ -5,10 +5,16 @@ import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
 import { RequestStatusEnum } from '../enums/requestStatus.enum';
 import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
+import { TodoRepeat } from '../entity/todoRepeat.entity';
+import { RepeatOptionEnum } from '../enums/repeatOption.enum';
+import { tuanThang } from '../enums/tuanThang.enum';
+import { CreateTodoOptions } from '../dtos/todo.dto';
 
 const todoRepo: Repository<Todo> = AppDataSource.getRepository(Todo);
 const userRepo: Repository<User> = AppDataSource.getRepository(User);
 const companyRepo: Repository<Company> = AppDataSource.getRepository(Company);
+const TodoRepeatRepository: Repository<TodoRepeat> =
+  AppDataSource.getRepository(TodoRepeat);
 
 export const getCustomerRequestsForWeek = async (
   companyId: number,
@@ -74,4 +80,64 @@ export const getCustomerRequestsForWeek = async (
   });
 
   return weekData;
+};
+
+export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
+  const {
+    userId,
+    title,
+    due_date,
+    start_time,
+    end_time,
+    task_content,
+    location,
+    status,
+    repeatOption,
+    repeatDays,
+    repeatWeekMonth,
+  } = options;
+
+  // Truy vấn đối tượng User từ userId
+  const user = await userRepo.findOne({ where: { user_id: userId } });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Tạo Todo
+  const todo = new Todo();
+  todo.user = user;
+  todo.title = title;
+  todo.due_date = due_date;
+  todo.start_time = start_time;
+  todo.end_time = end_time;
+  todo.task_content = task_content;
+  todo.location = location;
+  todo.status = status;
+
+  // Lưu Todo vào cơ sở dữ liệu
+  const savedTodo = await todoRepo.save(todo);
+
+  // Kiểm tra nếu có tùy chọn lặp lại (repeatOption)
+  if (repeatOption) {
+    const todoRepeat = new TodoRepeat();
+    todoRepeat.todo = savedTodo; // Liên kết với Todo vừa tạo
+    todoRepeat.repeat_option = repeatOption;
+
+    // Nếu repeatOption là KHONG_LAP_LAI, các trường lặp lại sẽ là null
+    if (repeatOption === RepeatOptionEnum.KHONG_LAP_LAI) {
+      todoRepeat.repeat_days = null;
+      todoRepeat.repeat_weekMonth = null;
+    } else {
+      // Nếu có lặp lại, gán các giá trị từ request
+      todoRepeat.repeat_days = repeatDays ?? null;
+      todoRepeat.repeat_weekMonth = repeatWeekMonth ?? null;
+    }
+
+    // Lưu TodoRepeat vào cơ sở dữ liệu
+    await TodoRepeatRepository.save(todoRepeat);
+  }
+
+  // Trả về Todo đã được lưu vào cơ sở dữ liệu
+  return savedTodo;
 };

@@ -10,4 +10,6 @@ router.get(
   todoController.getCustomerRequestsForWeekController
 );
 
+router.post('/', verifyToken, todoController.createTodoController);
+
 export default router;

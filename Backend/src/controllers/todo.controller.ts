@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { getCustomerRequestsForWeek } from '../services/todo.service';
+import {
+  getCustomerRequestsForWeek,
+  createTodo,
+} from '../services/todo.service';
+import { CreateTodoOptions } from '../dtos/todo.dto';
 
 export const getCustomerRequestsForWeekController = async (
   req: Request,
@@ -33,5 +37,54 @@ export const getCustomerRequestsForWeekController = async (
     return res
       .status(500)
       .json({ message: 'Đã xảy ra lỗi trong quá trình truy vấn dữ liệu.' });
+  }
+};
+
+export const createTodoController = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const {
+      title,
+      due_date,
+      start_time,
+      end_time,
+      task_content,
+      location,
+      status,
+      repeatOption,
+      repeatDays,
+      repeatWeekMonth,
+      repeatInterval,
+    }: CreateTodoOptions = req.body;
+
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng không hợp lệ' });
+    }
+
+    // Gọi service để tạo Todo
+    const todo = await createTodo({
+      userId,
+      title,
+      due_date,
+      start_time,
+      end_time,
+      task_content,
+      location,
+      status,
+      repeatOption,
+      repeatDays,
+      repeatWeekMonth,
+      repeatInterval,
+    });
+
+    return res.status(201).json(todo); // Trả về Todo vừa tạo
+  } catch (error: any) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: error.message || 'Internal Server Error' }); // Xử lý lỗi
   }
 };

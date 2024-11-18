@@ -6,9 +6,11 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { RequestStatusEnum } from '../enums/requestStatus.enum';
+import { TodoRepeat } from '../entity/todoRepeat.entity';
 
 @Entity()
 export class Todo {
@@ -21,9 +23,6 @@ export class Todo {
 
   @Column()
   title: string;
-
-  @Column({ type: 'text' })
-  description: string;
 
   @Column({ type: 'date' })
   due_date: Date;
@@ -48,4 +47,8 @@ export class Todo {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => TodoRepeat)
+  @JoinColumn({ name: 'repeat_id' })
+  todo_repeat: TodoRepeat;
 }
