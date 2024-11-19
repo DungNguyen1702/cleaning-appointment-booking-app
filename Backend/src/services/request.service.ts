@@ -296,7 +296,7 @@ export class RequestService {
       // Xử lý lỗi liên quan đến cơ sở dữ liệu hoặc truy vấn
       throw new Error(
         'Lỗi khi truy vấn yêu cầu: ' +
-          (error instanceof Error ? error.message : 'lỗi không xác định')
+        (error instanceof Error ? error.message : 'lỗi không xác định')
       );
     }
   }
