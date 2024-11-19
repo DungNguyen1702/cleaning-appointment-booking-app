@@ -214,21 +214,22 @@ export const getCompanyThongKeService = async (
       successful_jobs: statistic.successful_jobs,
       failed_jobs: statistic.failed_jobs,
       statistic_date: statistic.statistic_date,
-      rating: company.ratingStatistics[0]?.rating || null,
-      count: company.ratingStatistics[0]?.count || null,
-      ratingStatisticID: company.ratingStatistics[0]?.statistic_id || null,
+      ratingStatistics: company.ratingStatistics.map((ratingStat: any) => ({
+        rating: ratingStat.rating,
+        count: ratingStat.count,
+      })),
       weekData:
         requests.length > 0
           ? weekData
           : {
-              THU_HAI: [{ soLuong: 0 }],
-              THU_BA: [{ soLuong: 0 }],
-              THU_TU: [{ soLuong: 0 }],
-              THU_NAM: [{ soLuong: 0 }],
-              THU_SAU: [{ soLuong: 0 }],
-              THU_BAY: [{ soLuong: 0 }],
-              CHU_NHAT: [{ soLuong: 0 }],
-            },
+            THU_HAI: [{ soLuong: 0 }],
+            THU_BA: [{ soLuong: 0 }],
+            THU_TU: [{ soLuong: 0 }],
+            THU_NAM: [{ soLuong: 0 }],
+            THU_SAU: [{ soLuong: 0 }],
+            THU_BAY: [{ soLuong: 0 }],
+            CHU_NHAT: [{ soLuong: 0 }],
+          },
     };
   });
 
