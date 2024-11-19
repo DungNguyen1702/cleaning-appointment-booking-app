@@ -41,7 +41,6 @@ export const OverviewStats = () => {
   const [ratings, setRatings] = useState({});
   const [chartData, setChartData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [avatar, setAvatar] = useState("");
 
   const { account } = useAuth();
 
@@ -54,11 +53,13 @@ export const OverviewStats = () => {
         endDate
       );
       const data = response.data[0];
+
       setCompanyData({
         name: data.company_name,
         email: data.company_email,
         avatar: data.company_avatar,
       });
+
       setStats({
         orders: data.total_jobs,
         completedTasks: data.successful_jobs,
@@ -128,7 +129,12 @@ export const OverviewStats = () => {
       setLoading(true);
       const response = await companyAPI.getCompanyDetails(account.company_id);
       const data = response.data;
-      setAvatar(data.main_image);
+
+      setCompanyData({
+        name: data.company_name,
+        email: data.account.email,
+        avatar: data.main_image,
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
