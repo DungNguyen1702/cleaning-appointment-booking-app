@@ -27,6 +27,9 @@ export class TodoRepeat {
   @Column({ type: 'enum', enum: tuanThang, nullable: true })
   repeat_weekMonth: tuanThang | null;
 
+  @Column({ type: 'int', nullable: true })
+  repeat_interval: number | null;
+
   @OneToOne(() => Todo, todo => todo.todo_repeat)
   todo: Todo;
 

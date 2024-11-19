@@ -79,11 +79,10 @@ export const getCustomerRequestsForWeek = async (
 
   return weekData;
 };
-
-export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
+export const createTodo = async (options: CreateTodoOptions): Promise<any> => {
   const {
     userId,
-    title,
+    description,
     due_date,
     start_time,
     end_time,
@@ -93,6 +92,7 @@ export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
     repeatOption,
     repeatDays,
     repeatWeekMonth,
+    repeatInterval,
   } = options;
 
   // Truy vấn đối tượng User từ userId
@@ -105,7 +105,7 @@ export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
   // Tạo Todo
   const todo = new Todo();
   todo.user = user;
-  todo.title = title;
+  todo.description = description;
   todo.due_date = due_date;
   todo.start_time = start_time;
   todo.end_time = end_time;
@@ -117,8 +117,9 @@ export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
   const savedTodo = await todoRepo.save(todo);
 
   // Kiểm tra nếu có tùy chọn lặp lại (repeatOption)
+  let todoRepeat = null;
   if (repeatOption) {
-    const todoRepeat = new TodoRepeat();
+    todoRepeat = new TodoRepeat();
     todoRepeat.todo = savedTodo; // Liên kết với Todo vừa tạo
     todoRepeat.repeat_option = repeatOption;
 
@@ -126,18 +127,23 @@ export const createTodo = async (options: CreateTodoOptions): Promise<Todo> => {
     if (repeatOption === RepeatOptionEnum.KHONG_LAP_LAI) {
       todoRepeat.repeat_days = null;
       todoRepeat.repeat_weekMonth = null;
+      todoRepeat.repeat_interval = null;
     } else {
       // Nếu có lặp lại, gán các giá trị từ request
       todoRepeat.repeat_days = repeatDays ?? null;
       todoRepeat.repeat_weekMonth = repeatWeekMonth ?? null;
+      todoRepeat.repeat_interval = repeatInterval ?? null;
     }
 
     // Lưu TodoRepeat vào cơ sở dữ liệu
     await todoRepeatRepo.save(todoRepeat);
   }
 
-  // Trả về Todo đã được lưu vào cơ sở dữ liệu
-  return savedTodo;
+  // Trả về thông tin Todo và Repeat (nếu có)
+  return {
+    todo: savedTodo,
+    repeat: todoRepeat,
+  };
 };
 
 export const updateTodo = async (
