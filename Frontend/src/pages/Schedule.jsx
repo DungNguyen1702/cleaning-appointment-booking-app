@@ -1,106 +1,272 @@
-import React from 'react';
-import './Schedule.scss';
+import React, { useState, useEffect } from "react";
+import "./Schedule.scss";
+import userAPI from "../api/userAPI"; // Import your API module
+import LoadingOverlay from "../components/loading_overlay";
+import useAuth from "../hooks/useAuth";
 
 const Schedule = () => {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [days, setDays] = useState([]);
+  const [appointments, setAppointments] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [timeSlotStates, setTimeSlotStates] = useState({
+    morning: true,
+    afternoon: true,
+    evening: true,
+    night: true,
+  });
+
   const timeSlots = [
-    { id: 'morning', label: 'Sáng', color: '#FFF3C4', textColor: '#FFC107' },
-    { id: 'afternoon', label: 'Chiều', color: '#F5C3C8', textColor: '#DC3545' },
-    { id: 'evening', label: 'Tối', color: '#BADBCC', textColor: '#198754' },
-    { id: 'night', label: 'Khuya', color: '#D0C9FF', textColor: '#624BFF' }
+    { id: "morning", label: "Sáng", color: "#FFF3C4", textColor: "#FFC107" },
+    { id: "afternoon", label: "Chiều", color: "#F5C3C8", textColor: "#DC3545" },
+    { id: "evening", label: "Tối", color: "#BADBCC", textColor: "#198754" },
+    { id: "night", label: "Khuya", color: "#D0C9FF", textColor: "#624BFF" },
   ];
 
-  const days = [
-    { name: 'Thứ 2', date: '9/9/2024' },
-    { name: 'Thứ 3', date: '10/9/2024' },
-    { name: 'Thứ 4', date: '11/9/2024' },
-    { name: 'Thứ 5', date: '12/9/2024' },
-    { name: 'Thứ 6', date: '13/9/2024' },
-    { name: 'Thứ 7', date: '14/9/2024' },
-    { name: 'Chủ nhật', date: '15/9/2024' }
-  ];
+  const { account } = useAuth();
 
-  const events = [
-    { day: 0, time: '10:30-11:30 AM', title: 'Quét nhà, lau nhà', color: '#FFF3C4' },
-    { day: 0, time: '12:30-13:30 PM', title: 'Giặt đồ, lau nhà', color: '#F5C3C8' },
-    { day: 0, time: '15:30-16:30 PM', title: 'Đi chợ, mua rau, mua cá về bỏ tủ lạnh', color: '#F5C3C8' },
-    { day: 1, time: '17:30-18:30 PM', title: 'Nấu ăn cho cả tuần bỏ tủ lạnh', color: '#BADBCC' },
-    { day: 2, time: '10:30-11:30 AM', title: 'Quét nhà, lau nhà', color: '#FFF3C4' },
-    { day: 2, time: '21:30-22:30 PM', title: 'Đi chợ, mau rau, mua cá về bỏ tủ lạnh', color: '#BADBCC' },
-    { day: 3, time: '23:30-0:30 AM', title: 'Tập thể dục, đạp xe đạp quanh công viên', color: '#D0C9FF' },
-    { day: 6, time: '10:30-11:30 AM', title: 'Quét nhà, lau nhà', color: '#FFF3C4' },
-    { day: 6, time: '12:30-13:30 PM', title: 'Giặt đồ, lau nhà', color: '#F5C3C8' },
-    { day: 6, time: '21:30-22:30 PM', title: 'Đi chợ, mau rau, mua cá về bỏ tủ lạnh', color: '#FFF3C4' }
-  ];
+  const fetchData = async (startDate, endDate) => {
+    try {
+      setLoading(true);
+      const response = await userAPI.getListTodo(
+        account.user_id,
+        startDate,
+        endDate
+      );
+      console.log(response.data);
+      setAppointments(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDateToYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  useEffect(() => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Thứ 2
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() - today.getDay() + 7); // Chủ nhật
+
+    setStartDate(formatDateToYYYYMMDD(startOfWeek));
+    setEndDate(formatDateToYYYYMMDD(endOfWeek));
+
+    fetchData(
+      formatDateToYYYYMMDD(startOfWeek),
+      formatDateToYYYYMMDD(endOfWeek)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const daysArray = [];
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dayName = new Intl.DateTimeFormat("vi-VN", {
+          weekday: "long",
+        }).format(d);
+        const dayDate = d.toLocaleDateString("vi-VN");
+        daysArray.push({ name: dayName, date: dayDate });
+      }
+
+      setDays(daysArray);
+    }
+  }, [startDate, endDate]);
+
+  const handleTodayClick = () => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Thứ 2
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() - today.getDay() + 7); // Chủ nhật
+
+    setStartDate(formatDateToYYYYMMDD(startOfWeek));
+    setEndDate(formatDateToYYYYMMDD(endOfWeek));
+
+    fetchData(
+      formatDateToYYYYMMDD(startOfWeek),
+      formatDateToYYYYMMDD(endOfWeek)
+    );
+  };
+
+  const handleNextWeekClick = () => {
+    const nextStartDate = new Date(startDate);
+    nextStartDate.setDate(nextStartDate.getDate() + 7);
+    const nextEndDate = new Date(endDate);
+    nextEndDate.setDate(nextEndDate.getDate() + 7);
+
+    setStartDate(formatDateToYYYYMMDD(nextStartDate));
+    setEndDate(formatDateToYYYYMMDD(nextEndDate));
+
+    fetchData(
+      formatDateToYYYYMMDD(nextStartDate),
+      formatDateToYYYYMMDD(nextEndDate)
+    );
+  };
+
+  const handlePrevWeekClick = () => {
+    const prevStartDate = new Date(startDate);
+    prevStartDate.setDate(prevStartDate.getDate() - 7);
+    const prevEndDate = new Date(endDate);
+    prevEndDate.setDate(prevEndDate.getDate() - 7);
+
+    setStartDate(formatDateToYYYYMMDD(prevStartDate));
+    setEndDate(formatDateToYYYYMMDD(prevEndDate));
+
+    fetchData(
+      formatDateToYYYYMMDD(prevStartDate),
+      formatDateToYYYYMMDD(prevEndDate)
+    );
+  };
+
+  const calculateEndTime = (timeWorking, workingHours) => {
+    const [hours, minutes] = timeWorking.split(":").map(Number);
+    const totalMinutes = hours * 60 + minutes + workingHours * 60;
+    const endHours = Math.floor(totalMinutes / 60) % 24;
+    const endMinutes = totalMinutes % 60;
+    return `${String(endHours).padStart(2, "0")}:${String(endMinutes).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
+  const getTimeSlot = (timeWorking) => {
+    console.log(timeWorking);
+    const [hours] = timeWorking.split(":").map(Number);
+    if (hours >= 4 && hours < 12) return "morning";
+    if (hours >= 12 && hours < 18) return "afternoon";
+    if (hours >= 18 && hours < 23) return "evening";
+    if (hours >= 23 && hours < 4) return "night";
+    return "night"; // Default to night for hours >= 23 or < 4
+  };
+
+  const handleTimeSlotClick = (slotId) => {
+    setTimeSlotStates((prevState) => ({
+      ...prevState,
+      [slotId]: !prevState[slotId],
+    }));
+  };
 
   return (
-    <><div className='h5-header'>
-          <h5>Lịch trình trong tuần</h5>
+    <div className="calendar-container">
+      <div className="h5-header">
+        <h5>Lịch trình trong tuần</h5>
       </div>
-       <div className="calendar-container">
-        <div className="calendar-header">
-            <div className="header-controls">
-                <div className="nav-and-date-wrapper">
-                    <div className="navigation">
-                        <div className="nav-buttons">
-                            <button className="nav-button">&lt;</button>
-                            <button className="nav-button">&gt;</button>
-                            <button className="today-button">hôm nay</button>
-                        </div>
-                    </div>
-                    <div className="date-range">
-                        Ngày 9 -15 tháng 9 năm 2024
-                    </div>
-                </div>    
+      <div className="calendar-header">
+        <div className="header-controls">
+          <div className="nav-and-date-wrapper">
+            <div className="navigation">
+              <div className="nav-buttons">
+                <button className="nav-button" onClick={handlePrevWeekClick}>
+                  &lt;
+                </button>
+                <button className="nav-button" onClick={handleNextWeekClick}>
+                  &gt;
+                </button>
+                <button className="today-button" onClick={handleTodayClick}>
+                  hôm nay
+                </button>
+              </div>
             </div>
-        </div> 
-
-        <div className="calendar-body">
-            <div className="time-slots">
-                <div className="time-slots-header">
-                    <button className="create-event">+ Tạo sự kiện</button>
-                    <p>danh sách sự kiện</p>
-                    <p className="subtitle">Bạn có thể kéo thả hoặc click vào sự kiện</p>
-                </div>
-                {timeSlots.map(slot => (
-                    <div
-                        key={slot.id}
-                        className="time-slot"
-                        style={{
-                            backgroundColor: slot.color,
-                            color: slot.textColor
-                        }}
-                    >
-                        {slot.label}
-                    </div>
-                ))}
+            <div className="date-range">
+              Ngày {startDate} - {endDate}
             </div>
-
-            <div className="calendar-grid">
-                {days.map((day, index) => (
-                    <div key={index} className="day-column">
-                        <div className="day-header">
-                            <span className="day-name">{day.name}</span>
-                            <span className="day-date">{day.date}</span>
-                        </div>
-                        <div className="events">
-                            {events
-                                .filter(event => event.day === index)
-                                .map((event, eventIndex) => (
-                                    <div
-                                        key={eventIndex}
-                                        className="event"
-                                        style={{ backgroundColor: event.color }}
-                                    >
-                                        <div className="event-title">{event.title}</div>
-                                        <div className="event-time">{event.time}</div>
-                                    </div>
-                                ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
+          </div>
         </div>
-    </div></>
+      </div>
+
+      <div className="calendar-body">
+        <div className="time-slots">
+          <div className="time-slots-header">
+            <button className="create-event">+ Tạo sự kiện</button>
+            <p>danh sách sự kiện</p>
+            <p className="subtitle">
+              Bạn có thể kéo thả hoặc click vào sự kiện
+            </p>
+          </div>
+          {timeSlots.map((slot) => (
+            <div
+              key={slot.id}
+              className="time-slot"
+              style={{
+                backgroundColor: timeSlotStates[slot.id] ? slot.color : "#ccc",
+                color: timeSlotStates[slot.id] ? slot.textColor : "#666",
+                cursor: "pointer",
+              }}
+              onClick={() => handleTimeSlotClick(slot.id)}
+            >
+              {slot.label}
+            </div>
+          ))}
+        </div>
+
+        {loading ? (
+          <LoadingOverlay loading={loading} />
+        ) : (
+          <div className="calendar-grid">
+            {days.map((day, index) => {
+              const dayKey = day.name
+                .toUpperCase()
+                .replace(/\s+/g, "_")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+              const dayAppointments = (appointments[dayKey] || []).filter(
+                (event) => timeSlotStates[getTimeSlot(event.timeWorking)]
+              );
+
+              return (
+                <div key={index} className="day-column">
+                  <div className="day-header">
+                    <span className="day-name">{day.name}</span>
+                    <span className="day-date">{day.date}</span>
+                  </div>
+                  <div className="events">
+                    {dayAppointments.map((event, eventIndex) => {
+                      const endTime = calculateEndTime(
+                        event.timeWorking,
+                        event.workingHours
+                      );
+                      return (
+                        <div
+                          key={eventIndex}
+                          className={`event`}
+                          style={{
+                            backgroundColor: timeSlots.find(
+                              (slot) =>
+                                slot.id === getTimeSlot(event.timeWorking)
+                            ).color,
+                            color: timeSlots.find(
+                              (slot) =>
+                                slot.id === getTimeSlot(event.timeWorking)
+                            ).textColor,
+                          }}
+                        >
+                          <div className="event-title">{event.name}</div>
+                          <div className="event-time">
+                            {event.timeWorking} - {endTime}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

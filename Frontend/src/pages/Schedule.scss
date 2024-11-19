@@ -191,6 +191,21 @@
               font-size: 12px;
               color: #666;
             }
+            &.accepted {
+              background-color: #fefcbf;
+            }
+
+            &.rejected {
+              background-color: #f5c3c8
+            }
+
+            &.completed {
+              background-color: #c6f6d5;
+            }
+
+            &.pending {
+              background-color: #e9d8fd;
+            }
           }
         }
       }
