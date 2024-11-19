@@ -12,7 +12,11 @@ const companyAPI = {
       getRequestCustomer: (comapnyId, startDate, endDate) => {
         const url = `/company/requests/${comapnyId}/customerrequestsforweek?startDate=${startDate}&endDate=${endDate}`; // Đường dẫn tới API lịch làm việc
         return axiosClient.application.get(url);
-      }
+      },
+      getStatificCompany: (companyId, startDate, endDate) => {
+        const url = `/company/statistical/${companyId}?startDate=${startDate}&endDate=${endDate}`; 
+        return axiosClient.application.get(url);
+      },
 };
 
 export default companyAPI;

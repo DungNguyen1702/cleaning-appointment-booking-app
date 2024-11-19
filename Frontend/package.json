@@ -26,7 +26,11 @@
     "my-app-thao": "file:",
     "query-string": "^9.1.1",
     "react": "^18.2.0",
+<<<<<<< HEAD
     "react-chartjs-2": "^4.0.0",
+=======
+    "react-chartjs-2": "^4.3.1",
+>>>>>>> 0561be6 (Map api sprint task 5 - 7)
     "react-datepicker": "^7.5.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
