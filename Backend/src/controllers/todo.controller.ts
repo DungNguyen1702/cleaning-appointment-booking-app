@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import {
   getCustomerRequestsForWeek,
-  createTodo, updateTodo
+  createTodo,
+  updateTodo,
 } from '../services/todo.service';
 import { CreateTodoOptions } from '../dtos/todo.dto';
 
@@ -46,7 +47,7 @@ export const createTodoController = async (
 ): Promise<Response> => {
   try {
     const {
-      title,
+      description,
       due_date,
       start_time,
       end_time,
@@ -65,9 +66,10 @@ export const createTodoController = async (
     }
 
     // Gọi service để tạo Todo
-    const todo = await createTodo({
+    // Gọi service để tạo Todo
+    const { todo, repeat } = await createTodo({
       userId,
-      title,
+      description,
       due_date,
       start_time,
       end_time,
@@ -80,7 +82,33 @@ export const createTodoController = async (
       repeatInterval,
     });
 
-    return res.status(201).json(todo); // Trả về Todo vừa tạo
+    const response = {
+      todo: {
+        todo_id: todo.todo_id,
+        description: todo.description,
+        due_date: todo.due_date,
+        start_time: todo.start_time,
+        end_time: todo.end_time,
+        task_content: todo.task_content,
+        location: todo.location,
+        status: todo.status,
+        createdAt: todo.createdAt,
+        updatedAt: todo.updatedAt,
+      },
+      repeat: repeat
+        ? {
+            repeat_id: repeat.repeat_id,
+            repeat_option: repeat.repeat_option,
+            repeat_days: repeat.repeat_days,
+            repeat_weekMonth: repeat.repeat_weekMonth,
+            repeat_interval: repeat.repeat_interval,
+            createdAt: repeat.createdAt,
+            updatedAt: repeat.updatedAt,
+          }
+        : null,
+    };
+
+    return res.status(201).json(response);
   } catch (error: any) {
     console.error(error);
     return res
@@ -95,16 +123,20 @@ export const updateTodoController = async (req: Request, res: Response) => {
   const updatedTodoRepeat = req.body.todoRepeat;
 
   if (!updatedTodo) {
-    return res.status(400).json({ message: 'Thông tin công việc không hợp lệ.' });
+    return res
+      .status(400)
+      .json({ message: 'Thông tin công việc không hợp lệ.' });
   }
 
   try {
     await updateTodo(todoId, updatedTodo, updatedTodoRepeat);
-    return res.status(200).json({ message: 'Cập nhật thông tin công việc thành công.' });
+    return res
+      .status(200)
+      .json({ message: 'Cập nhật thông tin công việc thành công.' });
   } catch (error) {
     console.error('Lỗi trong quá trình cập nhật công việc:', error);
-    return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật công việc.' });
+    return res
+      .status(500)
+      .json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật công việc.' });
   }
 };
-
-

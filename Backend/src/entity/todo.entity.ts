@@ -22,7 +22,7 @@ export class Todo {
   user: User;
 
   @Column()
-  title: string;
+  description: string;
 
   @Column({ type: 'date' })
   due_date: Date;
