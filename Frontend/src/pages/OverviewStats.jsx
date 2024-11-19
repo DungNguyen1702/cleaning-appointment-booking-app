@@ -53,13 +53,6 @@ export const OverviewStats = () => {
         endDate
       );
       const data = response.data[0];
-
-      setCompanyData({
-        name: data.company_name,
-        email: data.company_email,
-        avatar: data.company_avatar,
-      });
-
       setStats({
         orders: data.total_jobs,
         completedTasks: data.successful_jobs,
@@ -221,7 +214,7 @@ export const OverviewStats = () => {
       <div className="company-info">
         <div className="company-avatar-one">
           <div className="company-avatar">
-            <img src={avatar} alt="Avatar" />
+            <img src={companyData.avatar} alt="Avatar" />
           </div>
           <div className="company-details-chart">
             <h2>{companyData.name}</h2>
