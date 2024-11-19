@@ -21,7 +21,10 @@ const RequestAPI = {
   updateStatusRQByCompany: (requestId, workingHours, status) => {
     const url = `/company/requests/${requestId}`;
     return axiosClient.application.put(url, { workingHours: workingHours, status: status });
-  }
+  },
+  getProfile :(userId) =>{
+    const url = `/user/profile/${userId}`;
+    return axiosClient.application.get(url);
+},
 };
-
 export default RequestAPI;

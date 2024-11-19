@@ -1,16 +1,52 @@
-import React, { useState } from "react";
-import "./Profile.scss"; 
+import React, { useState, useEffect } from "react";
+import "./Profile.scss";
+import RequestAPI from "../api/requestAPI";
+import Select from 'react-select';
 
 const Profile = () => {
     const [formData, setFormData] = useState({
-        name: "X Factor",
-        gender: "Binary",
-        birthDay: "3",
-        birthMonth: "10",
-        birthYear: "2024",
-        email: "xfactor@gmail.com",
-        phone: "0910102024",
+        full_name: "",
+        gender: "Male",
+        birthDay: "",
+        birthMonth: "",
+        birthYear: "",
+        email: "",
+        phone: "",
     });
+
+    // Lấy userId từ localStorage
+    const storedUserInfo = localStorage.getItem("user_info");
+    const userId = storedUserInfo ? JSON.parse(storedUserInfo)?.user_id : "";  // Default to 2 if not found
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const response = await RequestAPI.getProfile(userId);
+                const data = response.data;
+                console.log("Fetched user profile:", data);
+
+
+                const birthDate = data.birthDay || "1990-01-01";
+
+
+                const [birthYear, birthMonth, birthDay] = birthDate.split("-");
+
+                setFormData({
+                    full_name: data.user.full_name || "",
+                    gender: data.gender || "Male",
+                    birthDay: birthDay || "",
+                    birthMonth: birthMonth || "",
+                    birthYear: birthYear || "",
+                    email: data.user.account.email || "",
+                    phone: data.user.phone_number || "",
+                });
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+            }
+        };
+
+        if (userId) fetchUserProfile();
+    }, [userId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,11 +58,14 @@ const Profile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Form data:", formData);
+        console.log("Form data submitted:", formData);
     };
 
+
+
+
     return (
-        <>
+        <div className="profile-container">
             <h1 style={{ fontSize: "25px", marginTop: "-5px", textAlign: "left" }}>
                 <b>Thông tin cá nhân</b>
             </h1>
@@ -48,14 +87,14 @@ const Profile = () => {
                         marginTop: "22px",
                         marginRight: "1022px",
                     }}
-                    src="https://via.placeholder.com/100"
+                    src="https://static.vecteezy.com/system/resources/previews/011/490/381/original/happy-smiling-young-man-avatar-3d-portrait-of-a-man-cartoon-character-people-illustration-isolated-on-white-background-vector.jpg"
                     alt="Avatar"
                 />
                 <button
                     className="choose-image-button"
                     style={{
-                        backgroundColor: "#0045b5",
-                        color: "white",
+                        backgroundColor: "#b7bacc",
+                        color: "blue",
                         border: "none",
                         padding: "5px 15px",
                         borderRadius: "5px",
@@ -75,22 +114,23 @@ const Profile = () => {
                         <input
                             type="text"
                             name="name"
-                            placeholder={formData.name || "Nhập họ và tên"}
+                            placeholder={formData.full_name || "khách hàng 1"}
                             onChange={handleChange}
+                            style={{ width: "105%", padding: "8px", borderRadius: "4px", fontSize: "14px" }} 
                         />
                     </div>
                     <div className="form-group">
-                        <label style={{ marginLeft: "-70px" }}>Giới tính</label>
+                        <label style={{ marginLeft: "20px" }}>Giới tính</label>
                         <select
                             name="gender"
                             value={formData.gender}
                             onChange={handleChange}
                             style={{
-                                marginLeft: "-70px",
+                                marginLeft: "20px",
                                 color: "#808080",
-                                padding: "8px", 
-                                borderRadius: "4px", 
-                                fontSize: "14px", 
+                                padding: "8px",
+                                borderRadius: "4px",
+                                fontSize: "14px",
                             }}
                         >
                             <option value="Male" style={{ color: "#808080" }}>
@@ -104,76 +144,30 @@ const Profile = () => {
                             </option>
                         </select>
                     </div>
-                    <div className="form-group date-group" style={{ marginLeft: "-415px", marginTop: "10px" }}>
-                        <label style={{ marginTop: "-14px" }}>Ngày sinh</label>
-                        <div
-                            style={{
-                                display: "flex",
-                                gap: "10px",
-                                width: "50%",
-                                marginTop: "10px",
-                                position: "relative"
-                            }}
-                        >
-                            <select
-                                name="birthDay"
-                                value={formData.birthDay}
-                                onChange={handleChange}
-                                style={{
-                                    flex: 1,
-                                    marginLeft: "-85px",
-                                    color: "#808080",
-                                    padding: "8px",
-                                    borderRadius: "4px",
-                                    fontSize: "14px",
-                                    maxHeight: "50px", 
-                                    overflowY: "auto",  
-                                    
-                                    
-                                }}
-                            >
-                                {Array.from({ length: 31 }, (_, i) => (
-                                    <option key={i + 1} value={i + 1}>
-                                        {i + 1}
-                                    </option>
-                                ))}
-                            </select>
-                            <select
-                                name="birthMonth"
-                                value={formData.birthMonth}
-                                onChange={handleChange}
-                                style={{
-                                    flex: 1,
-                                    color: "#808080",
-                                    padding: "8px", 
-                                    borderRadius: "4px",
-                                    fontSize: "14px", 
-                                }}
-                            >
-                                {Array.from({ length: 12 }, (_, i) => (
-                                    <option key={i + 1} value={i + 1}>
-                                        {i + 1}
-                                    </option>
-                                ))}
-                            </select>
-                            <select
-                                name="birthYear"
-                                value={formData.birthYear}
-                                onChange={handleChange}
-                                style={{
-                                    flex: 1,
-                                    color: "#808080",
-                                    padding: "8px", 
-                                    borderRadius: "4px", 
-                                    fontSize: "14px",
-                                }}
-                            >
-                                {Array.from({ length: 100 }, (_, i) => (
-                                    <option key={2024 - i} value={2024 - i}>
-                                        {2024 - i}
-                                    </option>
-                                ))}
-                            </select>
+                    <div className="form-group">
+                        <label style={{marginLeft:"-135px",}}>Ngày sinh</label>
+                        <div style={{ display: "flex", gap: "10px" ,width:"90% ",marginLeft:"-135px",marginTop:"8px",color: "#808080"}}>
+                            <Select
+                                options={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: i + 1 }))}
+                                value={{  value: formData.birthDay, label: formData.birthDay  }}
+                                onChange={(selectedOption) =>
+                                    setFormData((prevData) => ({ ...prevData, birthDay: selectedOption.value }))
+                                }
+                            />
+                            <Select
+                                options={Array.from({ length: 12 }, (_, i) => ({ value: i + 1, label: i + 1 }))}
+                                value={{ value: formData.birthMonth, label: formData.birthMonth }}
+                                onChange={(selectedOption) =>
+                                    setFormData((prevData) => ({ ...prevData, birthMonth: selectedOption.value }))
+                                }
+                            />
+                            <Select
+                                options={Array.from({ length: 100 }, (_, i) => ({ value: 2024 - i, label: 2024 - i }))}
+                                value={{ value: formData.birthYear, label: formData.birthYear }}
+                                onChange={(selectedOption) =>
+                                    setFormData((prevData) => ({ ...prevData, birthYear: selectedOption.value }))
+                                }
+                            />
                         </div>
                     </div>
                 </div>
@@ -183,8 +177,8 @@ const Profile = () => {
                         type="email"
                         name="email"
                         onChange={handleChange}
-                        placeholder={formData.email || "Nhập email"}
-                        style={{ width: "97.5%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
+                        placeholder={formData.email || "customer1@gmail.com"}
+                        style={{ width: "86.5%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
                     />
                 </div>
                 <div className="form-group" style={{ marginRight: "185px" }}>
@@ -192,9 +186,9 @@ const Profile = () => {
                     <input
                         type="tel"
                         name="phone"
-                        placeholder={formData.phone || "Nhập số điện thoại"}
+                        placeholder={formData.phone || "03582911315"}
                         onChange={handleChange}
-                        style={{ width: "63%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
+                        style={{ width: "55%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
                     />
                 </div>
                 <div className="form-group">
@@ -204,7 +198,7 @@ const Profile = () => {
                         style={{
                             marginTop: "115px",
                             marginLeft: "400px",
-                            backgroundColor: "#0045b5",
+                            backgroundColor: "#1a1a5e",
                             color: "white",
                             padding: "10px 20px",
                             border: "none",
@@ -217,7 +211,7 @@ const Profile = () => {
                     </button>
                 </div>
             </form>
-        </>
+        </div>
     );
 };
 
