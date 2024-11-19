@@ -1,4 +1,4 @@
-
+/* Global Styles */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -6,7 +6,7 @@ body {
     color: #1c1c1c;
 }
 
-
+/* Header Style */
 h1 {
     font-size: 20px; 
     margin-bottom: 20px;
@@ -14,7 +14,7 @@ h1 {
     text-align: left; 
 }
 
-
+/* Profile Avatar Section */
 .profile-avatar {
     display: flex;
     align-items: center;
@@ -29,9 +29,10 @@ h1 {
     object-fit: cover;
 }
 
+/* Choose Image Button */
 .choose-image-button {
-    background-color: #0045b5;
-    color: white;
+    background-color: #1a1a5e;
+    color: rgb(25, 34, 140);
     border: none;
     padding: 5px 15px;
     border-radius: 5px;
@@ -40,6 +41,7 @@ h1 {
     margin-top: 28px;
 }
 
+/* Profile Form Container */
 .profile-form {
     display: flex;
     flex-wrap: wrap;
@@ -49,8 +51,9 @@ h1 {
     margin-top: 30px;
 }
 
+/* Form Group for Input Fields */
 .form-group {
-    flex: 1 1 calc(33% - 20px); 
+    flex: 1 1 calc(33% - 20px); /* Ensures three columns layout, with a gap of 20px */
     min-width: 250px;
     margin-bottom: 20px;
 }
@@ -61,15 +64,17 @@ h1 {
     margin-bottom: 5px;
 }
 
+/* Input and Select Styling */
 .form-group input,
 .form-group select {
-    width: 80%;
+    width: 80%; /* Limits the width of inputs/selects */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-top: 5px;
 }
 
+/* Row Group for Input Sections */
 .row-group {
     display: flex;
     gap: 20px;
@@ -77,13 +82,15 @@ h1 {
     align-items: center;
 }
 
+/* Date Group (for date input fields) */
 .date-group {
     display: flex;
     gap: 10px;
     width: 100%;
-    margin-left: 100px; 
+    margin-left: 100px; /* Adjust this as needed */
 }
 
+/* Save Button */
 .save-button {
     background-color: #0045b5;
     color: white;
@@ -92,14 +99,11 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-   
- 
 }
 
-
+/* Gender Select Field Styling */
 .form-group select[name="gender"] {
-    width: auto; 
+    width: auto;  /* Allows select to adjust width based on content */
     max-width: 150px;
-    margin-right: 200px; 
+    margin-right: 200px; /* Adjust as needed to align with other form fields */
 }
-
