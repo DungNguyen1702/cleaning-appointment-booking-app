@@ -1,9 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-import companylogo from "../assets/images/company-logo.png";
 import ReactQuill from "react-quill";
-import Parser from "html-react-parser";
 import "./CompanyDetails.scss";
-import logocompany from "../assets/images/imagelogin.png";
+import companyAPI from "../api/companyAPI";
 
 const AutoResizeTextarea = ({ value, onChange }) => {
   const textareaRef = useRef(null);
@@ -38,84 +36,156 @@ const AutoResizeTextarea = ({ value, onChange }) => {
   );
 };
 
-const Toggle = ({ checked, onChange }) => {
-  const [isChecked, setIsChecked] = useState(checked);
-
-  const handleChange = () => {
-    const newChecked = !isChecked;
-    setIsChecked(newChecked);
-    onChange(newChecked);
-  };
-
-  return (
-    <label className="switch">
-      <input type="checkbox" checked={isChecked} onChange={handleChange} />
-      <span className="slider round"></span>
-    </label>
-  );
-};
 
 export const CompanyDetails = () => {
-  const companyData = {
-    mainlogo: companylogo,
-    logo1: logocompany,
-    logo2: logocompany,
-    logo3: logocompany,
-    logo4: logocompany,
-    name: "X Factor",
-    email: "xfactor@gmail.com",
-    phone: "0910102024",
-    address: "1234 Main St, Da Nang, Vietnam",
-    introduction: `Chuyên cung cấp các dịch vụ vệ sinh nhà cửa quanh khu vực Đà nẵng. Đảm bảo sạch sẽ, thơm tho mang lại cảm giác thoải mái cho người dùng.`,
-    services: [
-      "Lau chùi nhà cửa bao gồm tất cả dịch vụ lau chùi các thiết bị trong nhà.",
-      "Hỗ trợ bàn giặt ủi và phơi đồ tại nhà.",
-      "Hỗ trợ đi chợ giúp gia chủ.",
-    ],
-    hours: {
-      sunday: { isOpen: false, start: "", end: "" },
-      monday: { isOpen: true, start: "09:00", end: "17:00" },
-      tuesday: { isOpen: true, start: "09:00", end: "17:00" },
-      wednesday: { isOpen: true, start: "09:00", end: "17:00" },
-      thursday: { isOpen: true, start: "09:00", end: "17:00" },
-      friday: { isOpen: true, start: "09:00", end: "17:00" },
-      saturday: { isOpen: false, start: "", end: "" },
-    },
-  };
-  const [company, setCompany] = useState(companyData);
+  // const companyData = {
+  //   mainlogo: companylogo,
+  //   logo1: logocompany,
+  //   logo2: logocompany,
+  //   logo3: logocompany,
+  //   logo4: logocompany,
+  //   name: "X Factor",
+  //   email: "xfactor@gmail.com",
+  //   phone: "0910102024",
+  //   address: "1234 Main St, Da Nang, Vietnam",
+  //   introduction: `Chuyên cung cấp các dịch vụ vệ sinh nhà cửa quanh khu vực Đà nẵng. Đảm bảo sạch sẽ, thơm tho mang lại cảm giác thoải mái cho người dùng.`,
+  //   services: [
+  //     "Lau chùi nhà cửa bao gồm tất cả dịch vụ lau chùi các thiết bị trong nhà.",
+  //     "Hỗ trợ bàn giặt ủi và phơi đồ tại nhà.",
+  //     "Hỗ trợ đi chợ giúp gia chủ.",
+  //   ],
+  //   hours: {
+  //     sunday: { isOpen: false, start: "", end: "" },
+  //     monday: { isOpen: true, start: "09:00", end: "17:00" },
+  //     tuesday: { isOpen: true, start: "09:00", end: "17:00" },
+  //     wednesday: { isOpen: true, start: "09:00", end: "17:00" },
+  //     thursday: { isOpen: true, start: "09:00", end: "17:00" },
+  //     friday: { isOpen: true, start: "09:00", end: "17:00" },
+  //     saturday: { isOpen: false, start: "", end: "" },
+  //   },
+  // };
+  const storedUserInfo = localStorage.getItem("user_info");
+  const companyId = storedUserInfo ? JSON.parse(storedUserInfo)?.company_id : "";
+  const [company, setCompany] = useState(null);
   const [quillValue, setQuillValue] = useState("");
   const quillRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [originalCompany, setOriginalCompany] = useState(null);
 
   useEffect(() => {
-    // Convert the services array into a formatted <ul> list
-    const updatedQuillValue = `<ul>${company.services
-      .map((service) => `<li>${service.trim()}</li>`)
-      .join("")}</ul>`;
-    setQuillValue(updatedQuillValue);
-  }, [company.services]);
+    // Kiểm tra xem companyId có hợp lệ không
+    if (!companyId) {
+      console.error("Company ID is missing or invalid");
+      return;
+    }
 
-  const handleSave = () => {
-    const newServices = quillValue
-      .match(/<li>(.*?)<\/li>/g)
-      .map((item) => item.replace(/<\/?li>/g, ""));
-    setCompany((prev) => ({ ...prev, services: newServices }));
-    console.log("Saved:", newServices);
+    const fetchCompanyDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await companyAPI.getCompanyDetailsByRole(companyId);
+        const companyData = response.data;
+    
+        // Lưu dữ liệu gốc
+        setOriginalCompany(companyData);
+    
+        // Đặt dữ liệu vào state để hiển thị
+        setCompany({
+          ...companyData,
+          account: companyData.account || {}, // Đảm bảo account không undefined
+        });
+    
+        // Xử lý dịch vụ từ chuỗi sang mảng (như trước đây)
+        const servicesArray = companyData.service
+          ? companyData.service.split(";").map((s) => s.trim())
+          : [];
+        const updatedQuillValue = `<ul>${servicesArray
+          .map((service) => `<li>${service}</li>`)
+          .join("")}</ul>`;
+        setQuillValue(updatedQuillValue);
+      } catch (error) {
+        console.error("Error fetching company details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };    
+
+    fetchCompanyDetails();
+  }, [companyId]);  // Thêm companyId vào dependencies để re-fetch khi companyId thay đổi
+
+
+  const getChangedData = (original, updated) => {
+    const changedData = {};
+  
+    Object.keys(original).forEach((key) => {
+      if (original[key] !== updated[key]) {
+        changedData[key] = updated[key];
+      }
+    });
+  
+    return changedData;
   };
+  
+  const handleSave = async () => {
+    if (!company || !originalCompany) return;
+  
+    const newServices = quillValue
+    .match(/<li>(.*?)<\/li>/g)
+    ?.map((item) => item.replace(/<\/?li>/g, "")) || [];
+    const updatedData = { ...company, services: newServices };
+  
+  
+    // So sánh với dữ liệu gốc
+    const changedData = getChangedData(originalCompany, updatedData);
+  
+    console.log("Dữ liệu thay đổi gửi lên:", changedData);
+  
+    try {
+      setLoading(true);
+      const response = await companyAPI.updateCompanyDetails(companyId, changedData);
+      setCompany(response.data);
+      setOriginalCompany(response.data); // Cập nhật lại dữ liệu gốc sau khi lưu
+      alert("Lưu thay đổi thành công!");
+    } catch (error) {
+      console.error("Error updating company details:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        alert(`Lỗi: ${error.response.data.message || "Có lỗi xảy ra khi lưu!"}`);
+      } else {
+        alert("Có lỗi xảy ra khi lưu!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+  
+  
+
+  // Xử lý thay đổi ảnh
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setCompany((prev) => ({ ...prev, mainlogo: reader.result }));
+        setCompany((prev) => ({ ...prev, main_image: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
-  const modules = {
-    toolbar: false, // Ẩn toolbar để người dùng không thể thêm các định dạng khác
-  };
 
+  const modules = {
+    toolbar: [
+      ["bold", "italic", "underline"], // Chỉ cần định dạng cơ bản
+      [{ list: "ordered" }, { list: "bullet" }], // Cho phép chỉnh sửa danh sách
+    ],
+  };
+  
+  // Nếu dữ liệu chưa tải xong
+  if (!company || loading) {
+    return <div>Đang tải...</div>;
+  }
   return (
     <div className="company-profile">
       <div className="main-content">
@@ -128,9 +198,9 @@ export const CompanyDetails = () => {
               <img
                 className="profile-picture"
                 alt="Company Logo"
-                src={company.mainlogo || mainlogo}
+                src={company.main_image || main_image}
               />
-              <h4 className="company-name-title">{company.name}</h4>
+              <h4 className="company-name-title">{company.company_name}</h4>
             </div>
             <button
               className="choose-image-button"
@@ -153,10 +223,10 @@ export const CompanyDetails = () => {
                 <input
                   id="company-name"
                   type="text"
-                  value={company.name}
+                  value={company.company_name}
                   onChange={(e) =>
-                    setCompany((prev) => ({ ...prev, name: e.target.value }))
-                  }
+                    setCompany((prev) => ({ ...prev, company_name: e.target.value }))
+                  }                  
                 />
               </div>
 
@@ -165,10 +235,13 @@ export const CompanyDetails = () => {
                 <input
                   id="email"
                   type="email"
-                  value={company.email}
+                  value={company.account.email}
                   onChange={(e) =>
-                    setCompany((prev) => ({ ...prev, email: e.target.value }))
-                  }
+                    setCompany((prev) => ({
+                      ...prev,
+                      account: { ...prev.account, email: e.target.value },
+                    }))
+                  }                  
                 />
               </div>
 
@@ -195,17 +268,29 @@ export const CompanyDetails = () => {
                   }
                 />
               </div>
+
+              <div className="worktime-info">
+                <label htmlFor="worktime">Giờ làm việc</label>
+                <input
+                  id="worktime"
+                  type="text"
+                  value={company.worktime}
+                  onChange={(e) =>
+                    setCompany((prev) => ({ ...prev, worktime: e.target.value }))
+                  }
+                />
+              </div>
             </div>
 
             <div className="description-section">
               <div className="introduction">
                 <h2>Giới thiệu:</h2>
                 <AutoResizeTextarea
-                  value={company.introduction}
+                  value={company.description}
                   onChange={(e) =>
                     setCompany((prev) => ({
                       ...prev,
-                      introduction: e.target.value,
+                      description: e.target.value,
                     }))
                   }
                 />
@@ -217,6 +302,7 @@ export const CompanyDetails = () => {
                   ref={quillRef}
                   value={quillValue}
                   modules={modules}
+                  onChange={setQuillValue}
                   style={{
                     resize: "none",
                     overflow: "hidden",
@@ -226,68 +312,12 @@ export const CompanyDetails = () => {
               </div>
 
               <div className="list-image">
-                <img src={company.logo1} alt="thumbnails" />
-                <img src={company.logo2} alt="thumbnails" />
-                <img src={company.logo3} alt="thumbnails" />
-                <img src={company.logo4} alt="thumbnails" />
+                <img src={company.main_image} alt="thumbnails" />
+                <img src={company.image2} alt="thumbnails" />
+                <img src={company.image3} alt="thumbnails" />
+                <img src={company.image4} alt="thumbnails" />
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="hours-section">
-          <h2>Set Standard Hours</h2>
-          <div className="hours-form">
-            {Object.keys(company.hours).map((day) => (
-              <div className="day" key={day}>
-                <label>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
-                <Toggle
-                  checked={company.hours[day].isOpen}
-                  onChange={(isOpen) =>
-                    setCompany((prev) => ({
-                      ...prev,
-                      hours: {
-                        ...prev.hours,
-                        [day]: { ...prev.hours[day], isOpen },
-                      },
-                    }))
-                  }
-                />
-                {company.hours[day].isOpen && (
-                  <>
-                    <input
-                      type="time"
-                      value={company.hours[day].start}
-                      onChange={(e) =>
-                        setCompany((prev) => ({
-                          ...prev,
-                          hours: {
-                            ...prev.hours,
-                            [day]: {
-                              ...prev.hours[day],
-                              start: e.target.value,
-                            },
-                          },
-                        }))
-                      }
-                    />
-                    <input
-                      type="time"
-                      value={company.hours[day].end}
-                      onChange={(e) =>
-                        setCompany((prev) => ({
-                          ...prev,
-                          hours: {
-                            ...prev.hours,
-                            [day]: { ...prev.hours[day], end: e.target.value },
-                          },
-                        }))
-                      }
-                    />
-                  </>
-                )}
-              </div>
-            ))}
           </div>
         </div>
 
