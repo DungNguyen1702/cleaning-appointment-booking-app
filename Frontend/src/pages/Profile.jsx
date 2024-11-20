@@ -254,6 +254,7 @@ const Profile = () => {
                         <input
                             type="text"
                             name="full_name"
+                            value={formData.full_name}
                             placeholder={formData.full_name}
                             onChange={handleChange}
                             style={{ width: "105%", padding: "8px", borderRadius: "4px", fontSize: "14px" }} 
@@ -342,21 +343,22 @@ const Profile = () => {
                         readOnly
                         // onChange={handleChange}
                         // placeholder={formData.email || "customer1@gmail.com"}
-                        style={{ width: "84%", padding: "8px", borderRadius: "4px", fontSize: "14px", 
-                       
+                        style={{ width: "75%", padding: "8px", borderRadius: "4px", fontSize: "14px", 
+                            backgroundColor: "#f0f0f0",
                             border: "1px solid #ccc",
                             color: "#666",
                             cursor: "not-allowed" }}
                     />
                 </div>
-                <div className="form-group" style={{ marginRight: "182px" }}>
+                <div className="form-group" style={{ marginRight: "170px" }}>
                     <label>Số điện thoại</label>
                     <input
                         type="tel"
                         name="phone"
+                        value={formData.phone}
                         placeholder={formData.phone || "03582911315"}
                         onChange={handleChange}
-                        style={{ width: "54%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
+                        style={{ width: "40%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
                     />
                 </div>
                 <div className="form-group">
@@ -365,7 +367,7 @@ const Profile = () => {
                         className="save-button"
                         style={{
                             marginTop: "115px",
-                            marginLeft: "400px",
+                            marginLeft: "550px",
                             backgroundColor: "#1a1a5e",
                             color: "white",
                             padding: "10px 20px",
