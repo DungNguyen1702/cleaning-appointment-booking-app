@@ -1,8 +1,13 @@
+
 import React, { useState, useEffect } from "react";
 import "./Schedule.scss";
 import userAPI from "../api/userAPI"; // Import your API module
 import LoadingOverlay from "../components/loading_overlay";
 import useAuth from "../hooks/useAuth";
+
+import AddEvent from './AddEvent';
+import { toast, ToastContainer } from "react-toastify";
+
 
 const Schedule = () => {
   const [startDate, setStartDate] = useState(null);
@@ -142,7 +147,7 @@ const Schedule = () => {
   };
 
   const getTimeSlot = (timeWorking) => {
-    console.log(timeWorking);
+    //console.log(timeWorking);
     const [hours] = timeWorking.split(":").map(Number);
     if (hours >= 4 && hours < 12) return "morning";
     if (hours >= 12 && hours < 18) return "afternoon";
@@ -158,10 +163,56 @@ const Schedule = () => {
     }));
   };
 
+
+
+  //code của NHCon
+  const [openModal, setOpenModal] = useState(false); 
+  const handleOpenModal = () => {
+        
+        setOpenModal(true); 
+  };
+
+  const handleCloseModal = () => {
+        setOpenModal(false); 
+        
+  };
+
+  const createEvent = async (postData) => {
+    try {
+      
+      //console.log("I come here")
+      await userAPI.createToDo(postData);
+      toast.success("Tạo sự kiện thành công",{
+        position : "top-right"
+      });
+      
+      
+      
+    } catch (error) {
+      console.error("Failed to update request status:", error);
+      toast.error(error.response?.data.message || "Tạo sự kiện không thành công",{
+        position : "top-right"
+      })
+    } finally {
+      
+      
+      if (postData?.due_date>= startDate &&postData?.due_date<= endDate){
+        fetchData(
+          startDate,
+          endDate
+        );
+      }
+      setOpenModal(false);
+    }
+  };
+  //
+
   return (
     <div className="calendar-container">
+      <ToastContainer />
       <div className="h5-header">
         <h5>Lịch trình trong tuần</h5>
+
       </div>
       <div className="calendar-header">
         <div className="header-controls">
@@ -179,17 +230,21 @@ const Schedule = () => {
                 </button>
               </div>
             </div>
+
             <div className="date-range">
               Ngày {startDate} - {endDate}
+
+
             </div>
           </div>
         </div>
+
       </div>
 
       <div className="calendar-body">
         <div className="time-slots">
           <div className="time-slots-header">
-            <button className="create-event">+ Tạo sự kiện</button>
+            <button className="create-event" onClick={handleOpenModal}>+ Tạo sự kiện</button>
             <p>danh sách sự kiện</p>
             <p className="subtitle">
               Bạn có thể kéo thả hoặc click vào sự kiện
@@ -266,6 +321,15 @@ const Schedule = () => {
           </div>
         )}
       </div>
+
+    {openModal&&(<AddEvent
+        open={openModal}
+        onClose={handleCloseModal}
+        func_CreateEvent={createEvent}
+    />  )}
+              
+
+
     </div>
   );
 };

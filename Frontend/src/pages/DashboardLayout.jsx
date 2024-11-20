@@ -37,7 +37,7 @@ const DashboardLayout = () => {
           <BigSidebar />
           <div>
             <Navbar />
-            <div className="dashboard-page">
+            <div style={{ position: 'relative' }} className="dashboard-page">
               <Outlet />
             </div>
           </div>

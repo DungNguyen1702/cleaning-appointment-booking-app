@@ -1,31 +1,268 @@
-.add-event-container {
-    .MuiDialogTitle-root {
-      font-weight: bold;
-      font-size: 18px;
-    }
+
+.event-modal-hon {
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.55);
+
+}
+
+.modal-container {
+  background-color: #fff;
+  width: 747px;
+  height: 530px;
+  position: relative;
+  padding:20px;
+  padding-right:34px;
+  padding-top:0;
+}
+.modal-container > .delete-icon{
+  position: absolute;
+  top:10px;
+  right:10px;
+}
+.header-left{
+  padding-left:10px;
+  margin-bottom: 10px;
+}
+.title-header{
   
-    .MuiFormControl-root,
-    .MuiTextField-root {
-      margin-bottom: 16px;
-    }
+  line-height: 21px;
+  color:#102C57;
+  padding-bottom: 6px;
+  font: bold;
+  font-family: 'Inter';
+  font-size: 20px;
+}
+
+
+.content{
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+.row-input{
+  display:flex;
+  gap:10px;
   
-    .MuiButton-root {
-      font-weight: bold;
-    }
+}
+.image-icon{
+  width: 39px;
+  height: 38px;
   
-    .repeat-toggle-buttons {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-  
-      .MuiToggleButton-root {
-        border: 1px solid #ccc;
-      }
-  
-      .MuiToggleButton-root.Mui-selected {
-        background-color: #1976d2;
-        color: white;
-      }
-    }
-  }
-  
+}
+
+.input-title{
+  padding-left: 10px;
+  border:none;
+  border-bottom: 3px solid #4426EC;
+  font-size: 25px;
+  width: 422px;
+}
+.input-title:focus{
+  border:none !important;
+  border-bottom: 3px solid #4426EC !important;
+}
+
+
+.label-input{
+  display: flex;
+  flex-direction: column;
+  gap:5px;
+  width: calc(100% - 50px);
+}
+.label-input label{
+  font-size: 18px;
+  font-weight: 500;
+}
+.label-input input,textarea{
+  font-size: 16px;
+  height: 34px;
+  border-radius: 10px;
+  border:1px solid #E98080;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.label-input textarea{
+  height: 188px;
+  padding:8px;
+}
+.time-loop{
+  display:flex;
+  flex-direction: column;
+  gap:6px;
+  width: 100%;
+}
+.input-time{
+  display:flex;
+  gap:30px;
+  height: 34px;
+}
+.input-date{
+  position: relative;
+  width: 220px;
+}
+.input-date span{
+  position: absolute;
+  top:5px;
+  left:5px;
+  bottom:5px;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: white;
+}
+.data-picker{
+  width: 220px;
+  height: 34px;
+  font-size: 16px;
+  padding:8px;
+  border: none;
+  border-bottom: 2px solid #334155;
+}
+.input-hour{
+  display: flex;
+  gap:8px;
+  justify-content: center;
+  align-items: center;
+}
+.react-time-picker {
+  font-size: 16px; /* Cỡ chữ */
+}
+.react-time-picker__inputGroup__input {
+  text-align: center;
+  height: 34px; /* Chiều cao của các input */
+  width: 36px !important;
+  padding-left: 5px;
+  border: none;
+  border-bottom: 2px solid #334155;
+  font-weight: 600;
+}
+.input-hour span{
+  font-size: 16px;
+  font-weight: 600;
+}
+.input-hour >div{
+  position: relative;
+}
+
+.loop{
+  display: flex;
+  gap:40px;
+}
+.loop-left{
+  padding-top:10px;
+  width: 28%;
+}
+.loop-left select.select-repeat {
+  background-color:#D9D9D9;
+  width: 138px;
+  height: 28px;
+  font-size: 18px;
+  font-weight: 500;
+  border: none;
+
+}
+.loop-right{
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+.days-loop{
+  display: flex;
+  gap:20px;
+}
+.frep-loop{
+  display: flex;
+  gap:15px;
+}
+.frep-loop input{
+  width: 67px;
+  height: 36px;
+  border-radius: 20px;
+  border:2px solid #E98080;
+  font-size: 14px;
+  text-align: center;
+}
+select.select-repeat-interval {
+  font-size: 14px;
+  color:#102C57;
+  width: 80px;
+  height: 36px;
+  border-radius: 20px;
+  border:2px solid #E98080;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.loop-right label{
+  line-height: 36px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.start-time-picker:hover::after {
+  content: "Giờ - Phút Bắt Đầu"; /* Text hiển thị */
+  position: absolute;
+  top: -30px; /* Điều chỉnh vị trí */
+  left: -10px;
+  background-color: #000;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.start-time-picker:hover::after {
+  opacity: 1; /* Hiển thị khi hover */
+}
+.end-time-picker:hover::after {
+  content: "Giờ - Phút Kết Thúc"; /* Text hiển thị */
+  position: absolute;
+  top: -30px; /* Điều chỉnh vị trí */
+  left: -10px;
+  background-color: #000;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.end-time-picker:hover::after {
+  opacity: 1; /* Hiển thị khi hover */
+}
+
+.add-event-icon {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  top:60px;
+  right: 30px;
+  cursor: pointer;
+}
+
+.select-repeatWeekMonth{
+  position: relative;
+}
+.select-repeatWeekMonth span{
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  right: 7px;
+  bottom: 7px;
+  background-color: white;
+}
+.react-time-picker__inputGroup__leadingZero{
+  display: none;
+}
