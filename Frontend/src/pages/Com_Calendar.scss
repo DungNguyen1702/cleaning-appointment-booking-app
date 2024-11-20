@@ -60,8 +60,9 @@
   flex-direction: column;
   // height: 100%; // Đảm bảo phần tử chiếm đủ chiều cao màn hình
   // box-sizing: border-box; // Đảm bảo padding không làm tràn phần tử
-  width: 100%; // Changed from min-width: 105% to width: 100%
-  overflow-x: hidden; // Added to prevent horizontal scrolling
+  min-width: 100%; // Changed from min-width: 105% to width: 100%
+  min-height: 0;
+  // overflow-x: hidden; // Added to prevent horizontal scrolling
 
 
 
