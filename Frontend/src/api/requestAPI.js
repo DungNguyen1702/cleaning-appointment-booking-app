@@ -26,5 +26,13 @@ const RequestAPI = {
     const url = `/user/profile/${userId}`;
     return axiosClient.application.get(url);
 },
+  updateProfile:(userId, formData) =>{
+    const url = `/user/profile/${userId}`;
+    return axiosClient.application.put(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+    });
+  },
 };
 export default RequestAPI;
