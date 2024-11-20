@@ -91,7 +91,7 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
     task_content:taskContent,
     location:location,
     status:"PENDING",
-    repeatOtion:repeat,
+    repeatOption:repeat,
     repeatDays:selectedDays,
     repeatWeekMonth:repeatInterval,
     repeatInterval:repeatFrequency,

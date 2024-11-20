@@ -7,7 +7,7 @@ import LoadingOverlay from "../components/loading_overlay";
 const AutoResizeTextarea = ({ value, onChange }) => {
   const textareaRef = useRef(null);
   const [height, setHeight] = useState("auto");
-  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -32,6 +32,10 @@ const AutoResizeTextarea = ({ value, onChange }) => {
         width: "100%",
         boxSizing: "border-box",
         padding: "12px 24px",
+        border: "1px solid #ccc",
+        fontFamily: "Arial, sans-serif",
+        color: "#333",
+        fontSize: "16px",
       }}
     />
   );
@@ -39,7 +43,12 @@ const AutoResizeTextarea = ({ value, onChange }) => {
 
 export const CompanyDetails = () => {
   const storedUserInfo = localStorage.getItem("user_info");
-  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState({
+    main_image: null,
+    image2: null,
+    image3: null,
+    image4: null,
+  });
   const companyId = storedUserInfo
     ? JSON.parse(storedUserInfo)?.company_id
     : "";
@@ -113,6 +122,7 @@ export const CompanyDetails = () => {
       ...company,
       service: newServices.join(";"), // Chuyển mảng dịch vụ thành chuỗi ngăn cách bằng dấu ";"
     };
+
     const formData = new FormData();
     formData.append("company_name", updatedData.company_name);
     formData.append("phone", updatedData.phone);
@@ -121,10 +131,14 @@ export const CompanyDetails = () => {
     formData.append("description", updatedData.description);
     formData.append("service", updatedData.service);
 
-    if (selectedImageFile) {
-      console.log("Selected image file:", selectedImageFile);
-      formData.append("main_image", selectedImageFile);
-    }
+    // Thêm các ảnh vào FormData
+    const imageFields = ["main_image", "image2", "image3", "image4"];
+    imageFields.forEach((field) => {
+      if (imageFiles[field]) {
+        formData.append(field, imageFiles[field]);
+      }
+    });
+
     try {
       setLoading(true);
       const response = await companyAPI.updateCompanyDetails(
@@ -133,6 +147,12 @@ export const CompanyDetails = () => {
       );
       setCompany(response.data);
       setOriginalCompany(response.data); // Cập nhật lại dữ liệu gốc sau khi lưu
+      setImageFiles({
+        main_image: null,
+        image2: null,
+        image3: null,
+        image4: null,
+      }); // Reset các file ảnh sau khi lưu
       alert("Lưu thay đổi thành công!");
     } catch (error) {
       console.error("Error updating company details:", error);
@@ -151,16 +171,43 @@ export const CompanyDetails = () => {
 
   // Xử lý thay đổi ảnh
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log("Selected file:", file);
-      setSelectedImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        console.log("File:", reader.result);
-        setCompany((prev) => ({ ...prev, main_image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (files.length > 0) {
+      const selectedFiles = Array.from(files);
+      if (selectedFiles.length > 4) {
+        alert("Chỉ được chọn tối đa 4 ảnh!");
+        return;
+      }
+      setImageFiles((prev) => ({
+        ...prev,
+        main_image: selectedFiles[0] || prev.main_image,
+        image2: selectedFiles[1] || prev.image2,
+        image3: selectedFiles[2] || prev.image3,
+        image4: selectedFiles[3] || prev.image4,
+      }));
+
+      const readerPromises = selectedFiles.map((file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(readerPromises)
+        .then((results) => {
+          setCompany((prev) => ({
+            ...prev,
+            main_image: results[0] || prev.main_image,
+            image2: results[1] || prev.image2,
+            image3: results[2] || prev.image3,
+            image4: results[3] || prev.image4,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error reading files:", error);
+        });
     }
   };
 
@@ -199,6 +246,7 @@ export const CompanyDetails = () => {
               type="file"
               style={{ display: "none" }}
               onChange={handleImageChange}
+              multiple
             />
           </div>
 
