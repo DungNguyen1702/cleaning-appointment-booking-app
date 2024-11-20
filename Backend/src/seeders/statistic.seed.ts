@@ -26,19 +26,26 @@ export async function seedStatistics() {
       continue; // Bỏ qua nếu không có yêu cầu
     }
 
-    // Tính toán
-    const total_revenue = Math.round(requests
-      .filter((request) => request.status === RequestStatusEnum.COMPLETED)
-      .reduce((sum, request) => sum + request.price * (request.workingHours || 0), 0));
+    const total_revenue = Math.round(
+      requests
+        .filter(request => request.status === RequestStatusEnum.COMPLETED)
+        .reduce((sum, request) => {
+          // Kiểm tra nếu price và workingHours đều hợp lệ
+          if (request.price && request.workingHours) {
+            return sum + request.price * request.workingHours;
+          }
+          return sum; // Nếu không có giá trị hợp lệ thì bỏ qua yêu cầu này
+        }, 0)
+    );
 
     const total_jobs = requests.length;
 
     const successful_jobs = requests.filter(
-      (request) => request.status === RequestStatusEnum.COMPLETED
+      request => request.status === RequestStatusEnum.COMPLETED
     ).length;
 
     const failed_jobs = requests.filter(
-      (request) => request.status === RequestStatusEnum.REJECTED
+      request => request.status === RequestStatusEnum.REJECTED
     ).length;
 
     // Tạo bản ghi thống kê
