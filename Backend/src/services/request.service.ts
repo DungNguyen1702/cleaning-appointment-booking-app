@@ -49,6 +49,14 @@ export class RequestService {
       throw new Error('Company not found');
     }
 
+    // Lấy service_cost từ company
+    const serviceCost = companyExists.service_cost;
+
+    // Nếu không có service_cost, có thể throw lỗi hoặc set giá trị mặc định
+    if (serviceCost === undefined || serviceCost <= 0) {
+      throw new Error('Invalid service cost for the company');
+    }
+
     const newRequest = this.requestRepo.create({
       user: { user_id: data.user_id },
       company: { company_id: data.company_id },
@@ -58,7 +66,7 @@ export class RequestService {
       request_date: new Date(data.request_date),
       timejob: data.timejob,
       status: data.status,
-      price: data.price,
+      price: serviceCost,
       notes: data.notes,
       request: data.request,
     });

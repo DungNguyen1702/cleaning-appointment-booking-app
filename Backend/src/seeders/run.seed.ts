@@ -6,7 +6,10 @@ import {
   updateCompanyImage,
 } from '../seeders/company.seed';
 import { seedRatingStatistics } from '../seeders/ratingStatistic.seed';
-import { seedRequests } from '../seeders/request.seed';
+import { updateRequestPrices } from '../seeders/request.seed';
+
+
+// import { seedRequests } from '../seeders/request.seed';
 import { seedReviews } from '../seeders/review.seed';
 import { seedStatistics } from '../seeders/statistic.seed';
 import { seedTodos } from '../seeders/todo.seed';
@@ -22,6 +25,7 @@ async function runSeed() {
   // await seedRatingStatistics();
   // await seedRequests();
   // await seedReviews();
+  await updateRequestPrices();
   await seedStatistics();
   // await seedTodos();
   // await seedTodoRepeats();
