@@ -6,6 +6,7 @@ import LoadingOverlay from "../components/loading_overlay";
 import useAuth from "../hooks/useAuth";
 
 import AddEvent from './AddEvent';
+import EditEvent from "./EditEvent";
 import { toast, ToastContainer } from "react-toastify";
 
 
@@ -35,7 +36,7 @@ const Schedule = () => {
     try {
       setLoading(true);
       const response = await userAPI.getListTodo(
-        account.user_id,
+        
         startDate,
         endDate
       );
@@ -166,7 +167,10 @@ const Schedule = () => {
 
 
   //code của NHCon
+  
+  const [prop,setProp] = useState("");
   const [openModal, setOpenModal] = useState(false); 
+  const [openEditModal, setOpenEditModal] = useState(false); 
   const handleOpenModal = () => {
         
         setOpenModal(true); 
@@ -176,6 +180,19 @@ const Schedule = () => {
         setOpenModal(false); 
         
   };
+  const handleOpenEditnModal = () => {
+        
+        setOpenEditModal(true); 
+  };
+
+  const handleCloseEditModal = () => {
+        setOpenEditModal(false); 
+        
+  };
+  const handleClickOpenEditModal = (event) =>{
+    setProp(event);
+    setOpenEditModal(true);
+  }
 
   const createEvent = async (postData) => {
     try {
@@ -189,7 +206,7 @@ const Schedule = () => {
       
       
     } catch (error) {
-      console.error("Failed to update request status:", error);
+      console.error("Failed to create todo status:", error);
       toast.error(error.response?.data.message || "Tạo sự kiện không thành công",{
         position : "top-right"
       })
@@ -203,6 +220,34 @@ const Schedule = () => {
         );
       }
       setOpenModal(false);
+    }
+  };
+  const editEvent = async (postData,id) => {
+    try {
+      
+      //console.log("I come here")
+      await userAPI.editToDo(postData,id);
+      toast.success("Chỉnh sửa sự kiện thành công",{
+        position : "top-right"
+      });
+      
+      
+      
+    } catch (error) {
+      console.error("Failed to update event status:", error);
+      toast.error(error.response?.data.message || "Chỉnh sửa sự kiện không thành công",{
+        position : "top-right"
+      })
+    } finally {
+      
+      
+      
+        fetchData(
+          startDate,
+          endDate
+        );
+      
+      setOpenEditModal(false);
     }
   };
   //
@@ -288,12 +333,10 @@ const Schedule = () => {
                   </div>
                   <div className="events">
                     {dayAppointments.map((event, eventIndex) => {
-                      const endTime = calculateEndTime(
-                        event.timeWorking,
-                        event.workingHours
-                      );
+                      
                       return (
                         <div
+                        onClick={()=>handleClickOpenEditModal(event)}
                           key={eventIndex}
                           className={`event`}
                           style={{
@@ -307,9 +350,9 @@ const Schedule = () => {
                             ).textColor,
                           }}
                         >
-                          <div className="event-title">{event.name}</div>
+                          <div className="event-title">{event.description}</div>
                           <div className="event-time">
-                            {event.timeWorking} - {endTime}
+                            {event.timeWorking} 
                           </div>
                         </div>
                       );
@@ -326,6 +369,12 @@ const Schedule = () => {
         open={openModal}
         onClose={handleCloseModal}
         func_CreateEvent={createEvent}
+    />  )}
+    {openEditModal&&(<EditEvent
+        open={openEditModal}
+        onClose={handleCloseEditModal}
+        func={editEvent}
+        props = {prop}
     />  )}
               
 
