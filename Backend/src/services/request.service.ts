@@ -4,6 +4,7 @@ import { CreateRequestDto } from '../dtos/request.dto';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/user.entity';
 import { Company } from '../entity/company.entity';
+import { Statistic } from '../entity/statistic.entity';
 import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
 import { RequestStatusEnum } from '../enums/requestStatus.enum';
 
@@ -22,11 +23,13 @@ export class RequestService {
   private requestRepo: Repository<Request>;
   private userRepo: Repository<User>;
   private companyRepo: Repository<Company>;
+  private statisticRepo: Repository<Statistic>;
 
   constructor() {
     this.requestRepo = AppDataSource.getRepository(Request);
     this.userRepo = AppDataSource.getRepository(User);
     this.companyRepo = AppDataSource.getRepository(Company);
+    this.statisticRepo = AppDataSource.getRepository(Statistic);
   }
 
   async createRequest(data: CreateRequestDto) {
@@ -61,7 +64,23 @@ export class RequestService {
     });
 
     console.log('New Request before save:', newRequest);
-    return await this.requestRepo.save(newRequest);
+    const savedRequest = await this.requestRepo.save(newRequest);
+    // Tìm statistic của công ty liên quan
+    const statistic = await this.statisticRepo.findOne({
+      where: { company: { company_id: data.company_id } },
+    });
+
+    if (!statistic) {
+      console.warn('Statistic record not found for the company');
+      return savedRequest;
+    }
+
+    // Cập nhật total_jobs trong bảng Statistic
+    statistic.total_jobs += 1;
+
+    // Lưu lại bản ghi Statistic đã cập nhật
+    await this.statisticRepo.save(statistic);
+    return savedRequest;
   }
 
   async getRequests() {
@@ -71,13 +90,60 @@ export class RequestService {
   async updateRequest(id: number, data: Partial<CreateRequestDto>) {
     const existingRequest = await this.requestRepo.findOne({
       where: { request_id: id },
+      relations: ['company'], // Load thông tin công ty liên quan
     });
 
     if (!existingRequest) {
       throw new Error('Request not found');
     }
+
+    const previousStatus = existingRequest.status;
+
+    // Cập nhật thông tin trong request
     Object.assign(existingRequest, data);
     await this.requestRepo.save(existingRequest);
+
+    // Tìm statistic của công ty liên quan
+    const statistic = await this.statisticRepo.findOne({
+      where: { company: { company_id: existingRequest.company.company_id } },
+    });
+
+    if (!statistic) {
+      console.warn('Statistic record not found for the company');
+      return existingRequest;
+    }
+
+    // Nếu trạng thái mới là COMPLETED và trạng thái cũ không phải là COMPLETED
+    if (data.status === 'COMPLETED' && previousStatus !== 'COMPLETED') {
+      if (!existingRequest.price || existingRequest.price <= 0) {
+        console.error('Invalid price value:', existingRequest.price);
+        throw new Error('Invalid price value');
+      }
+      if (!existingRequest.workingHours || existingRequest.workingHours <= 0) {
+        console.error(
+          'Invalid working hours value:',
+          existingRequest.workingHours
+        );
+        throw new Error('Invalid working hours value');
+      }
+
+      const additionalRevenue = Math.round(
+        existingRequest.price * existingRequest.workingHours
+      );
+      console.log(`Additional revenue: ${additionalRevenue}`);
+      statistic.total_revenue += Math.round(additionalRevenue);
+      console.log(`Updated total revenue: ${statistic.total_revenue}`);
+      statistic.successful_jobs += 1;
+    }
+
+    // Nếu trạng thái mới là REJECTED và trạng thái cũ không phải là REJECTED
+    if (data.status === 'REJECTED' && previousStatus !== 'REJECTED') {
+      statistic.failed_jobs += 1;
+    }
+
+    // Lưu lại statistic với các thay đổi
+    await this.statisticRepo.save(statistic);
+
     return existingRequest;
   }
 
@@ -296,7 +362,7 @@ export class RequestService {
       // Xử lý lỗi liên quan đến cơ sở dữ liệu hoặc truy vấn
       throw new Error(
         'Lỗi khi truy vấn yêu cầu: ' +
-        (error instanceof Error ? error.message : 'lỗi không xác định')
+          (error instanceof Error ? error.message : 'lỗi không xác định')
       );
     }
   }
