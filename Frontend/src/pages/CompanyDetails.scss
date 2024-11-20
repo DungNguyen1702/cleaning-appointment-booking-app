@@ -111,8 +111,16 @@
 .quill {
     margin-top: 12px;
 }
-
-
+.ql-container.ql-snow {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.ql-editor ul {
+    padding-left: 1.5em;
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+}
 .introduction{
     textarea{
         width: 100%;
@@ -154,5 +162,7 @@ padding-left: 13px;
     border-radius: 8px;
     min-height: 100px;
     min-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
   }
 }
