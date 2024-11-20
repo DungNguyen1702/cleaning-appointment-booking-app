@@ -17,6 +17,10 @@ export const AuthProvider = ({ children }) => {
         "Authorization"
       ] = `Bearer ${token}`;
 
+      axiosClient.formData.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+
       LoginAPI.login()
         .then((response) => {
           setAccount(response.data);

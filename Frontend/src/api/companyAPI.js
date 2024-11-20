@@ -25,7 +25,7 @@ const companyAPI = {
     // Cập nhật chi tiết công ty theo ID
     updateCompanyDetails: (companyId, data) => {
         const url = `/company/profile/${companyId}`; // Đường dẫn tới API cập nhật chi tiết công ty
-        return axiosClient.application.put(url, data);
+        return axiosClient.formData.put(url, data);
     },
 };
 
