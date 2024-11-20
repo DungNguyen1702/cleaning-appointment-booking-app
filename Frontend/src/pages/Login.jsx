@@ -38,9 +38,9 @@ const Login = () => {
         localStorage.setItem("access_token", accessToken);
         login(userInfo, accessToken);
         if (role === "CUSTOMER") {
-          navigate("/user");
+          navigate("/user/calendar");
         } else if (role === "COMPANY") {
-          navigate("/company");
+          navigate("/company/overview-stats");
         }
       } else {
         setTextError("* Login failed, no access token received");
