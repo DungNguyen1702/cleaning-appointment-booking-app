@@ -161,7 +161,7 @@ const Profile = () => {
                 // Set a timeout to reload the page after 3 seconds
                 // setTimeout(() => {
                 //     window.location.reload();
-                // }, 0);
+                // }, 3000);
 
             } else {
                 setAlertMessage("Thay đổi không thành công");
@@ -381,7 +381,7 @@ const Profile = () => {
                     </button>
                 </div>
             </form>
-            {showDetails && updatedUserData && (
+            {/* {showDetails && updatedUserData && (
                 <div className="updated-details" style={{
                     marginTop: '20px',
                     padding: '20px',
@@ -398,7 +398,7 @@ const Profile = () => {
                         <p><strong>Ngày sinh:</strong> {updatedUserData.account.birthday}</p>
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };
