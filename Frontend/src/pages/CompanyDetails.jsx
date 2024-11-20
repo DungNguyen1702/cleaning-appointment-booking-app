@@ -132,7 +132,10 @@ export const CompanyDetails = () => {
     const newServices = quillValue
     .match(/<li>(.*?)<\/li>/g)
     ?.map((item) => item.replace(/<\/?li>/g, "")) || [];
-    const updatedData = { ...company, services: newServices };
+    const updatedData = {
+      ...company,
+      service: newServices.join(";"), // Chuyển mảng dịch vụ thành chuỗi ngăn cách bằng dấu ";"
+    };
   
   
     // So sánh với dữ liệu gốc
@@ -176,10 +179,7 @@ export const CompanyDetails = () => {
   };
 
   const modules = {
-    toolbar: [
-      ["bold", "italic", "underline"], // Chỉ cần định dạng cơ bản
-      [{ list: "ordered" }, { list: "bullet" }], // Cho phép chỉnh sửa danh sách
-    ],
+    toolbar: false, // Ẩn thanh công cụ
   };
   
   // Nếu dữ liệu chưa tải xong
@@ -236,12 +236,7 @@ export const CompanyDetails = () => {
                   id="email"
                   type="email"
                   value={company.account.email}
-                  onChange={(e) =>
-                    setCompany((prev) => ({
-                      ...prev,
-                      account: { ...prev.account, email: e.target.value },
-                    }))
-                  }                  
+                  readOnly
                 />
               </div>
 
@@ -296,18 +291,15 @@ export const CompanyDetails = () => {
                 />
               </div>
 
-              <div className="services">
-                <h2>Dịch vụ :</h2>
+              <div className="service-info">
+                <label htmlFor="services">Dịch vụ: </label>
                 <ReactQuill
-                  ref={quillRef}
                   value={quillValue}
-                  modules={modules}
                   onChange={setQuillValue}
-                  style={{
-                    resize: "none",
-                    overflow: "hidden",
-                    boxSizing: "border-box",
-                  }}
+                  modules={modules}
+                  ref={quillRef}
+                  theme="snow"
+                  placeholder="Nhập dịch vụ công ty"
                 />
               </div>
 

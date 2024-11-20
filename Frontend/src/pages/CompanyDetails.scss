@@ -13,12 +13,6 @@
   width: 75%;
 }
 
-.profile-section {
-//   background-color: #fff;
-//   padding: 20px;
-//   border-radius: 8px;
-//   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
 
 .header h1 {
   font-size: 28px;
@@ -98,8 +92,14 @@
   min-width: 50%;
 }
 
-.introduction h2,
-.services h2 {
+.introduction h2 {
+  font-size: 18px;
+  color: #1e293b;
+    margin-bottom: 10px;
+}
+
+/* Trong file CSS hoặc SCSS của bạn */
+.service-info label {
   font-size: 18px;
   color: #1e293b;
     margin-bottom: 10px;
