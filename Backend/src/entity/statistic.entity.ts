@@ -18,7 +18,7 @@ export class Statistic {
   @JoinColumn({ name: 'company_id' })
   company: Company;
 
-  @Column({ type: 'decimal', precision: 15 })
+  @Column({ type: 'bigint' })
   total_revenue: number;
 
   @Column()
