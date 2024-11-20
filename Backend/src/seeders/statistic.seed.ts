@@ -31,13 +31,26 @@ export async function seedStatistics() {
         .filter(request => request.status === RequestStatusEnum.COMPLETED)
         .reduce((sum, request) => {
           // Kiểm tra nếu price và workingHours đều hợp lệ
-          if (request.price && request.workingHours) {
-            return sum + request.price * request.workingHours;
+          const price = Number(request.price);
+          const workingHours = Number(request.workingHours);
+
+          // Kiểm tra tính hợp lệ của price và workingHours
+          if (
+            isNaN(price) ||
+            isNaN(workingHours) ||
+            price <= 0 ||
+            workingHours <= 0
+          ) {
+            console.log(
+              `Yêu cầu với ID ${request.request_id} có giá trị không hợp lệ, bỏ qua.`
+            );
+            return sum; // Nếu không hợp lệ, bỏ qua yêu cầu này
           }
-          return sum; // Nếu không có giá trị hợp lệ thì bỏ qua yêu cầu này
+
+          // Tính doanh thu cho yêu cầu hợp lệ
+          return sum + price * workingHours;
         }, 0)
     );
-
     const total_jobs = requests.length;
 
     const successful_jobs = requests.filter(
