@@ -115,11 +115,14 @@ export class RequestService {
 
     // Nếu trạng thái mới là COMPLETED và trạng thái cũ không phải là COMPLETED
     if (data.status === 'COMPLETED' && previousStatus !== 'COMPLETED') {
+      // Kiểm tra giá trị hợp lệ của price và workingHours
       if (!existingRequest.price || existingRequest.price <= 0) {
-        console.error('Invalid price value:', existingRequest.price);
         throw new Error('Invalid price value');
       }
-      if (!existingRequest.workingHours || existingRequest.workingHours <= 0) {
+      if (
+        existingRequest.workingHours === null ||
+        existingRequest.workingHours <= 0
+      ) {
         console.error(
           'Invalid working hours value:',
           existingRequest.workingHours
@@ -127,12 +130,32 @@ export class RequestService {
         throw new Error('Invalid working hours value');
       }
 
-      const additionalRevenue = Math.round(
-        existingRequest.price * existingRequest.workingHours
-      );
-      console.log(`Additional revenue: ${additionalRevenue}`);
-      statistic.total_revenue += Math.round(additionalRevenue);
-      console.log(`Updated total revenue: ${statistic.total_revenue}`);
+      // Đảm bảo price và workingHours là kiểu số hợp lệ
+      const price = Number(existingRequest.price);
+      const workingHours = Number(existingRequest.workingHours);
+
+      // Kiểm tra nếu giá trị không phải là số hợp lệ
+      if (isNaN(price) || isNaN(workingHours)) {
+        throw new Error('Invalid price or working hours value');
+      }
+
+      // Tính doanh thu bổ sung
+      const additionalRevenue = price * workingHours;
+
+      // Kiểm tra giá trị ban đầu của total_revenue và ép kiểu sang số nếu cần
+      statistic.total_revenue = Number(statistic.total_revenue);
+      if (isNaN(statistic.total_revenue)) {
+        console.warn(`Invalid total_revenue value, resetting to 0.`);
+        statistic.total_revenue = 0; // Đảm bảo total_revenue là một số hợp lệ
+      }
+
+      // Cập nhật doanh thu tổng cộng của công ty
+      statistic.total_revenue += additionalRevenue;
+
+      // Làm tròn doanh thu tổng cộng trước khi lưu
+      statistic.total_revenue = Math.round(statistic.total_revenue);
+
+      // Cập nhật số công việc thành công
       statistic.successful_jobs += 1;
     }
 

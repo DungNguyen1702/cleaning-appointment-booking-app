@@ -39,7 +39,7 @@ export class Request {
   @Column({ type: 'enum', enum: RequestStatusEnum })
   status: RequestStatusEnum;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'int' })
   price: number;
 
   @Column({ type: 'text', nullable: true })
