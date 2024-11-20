@@ -158,46 +158,6 @@ export const createTodo = async (options: CreateTodoOptions): Promise<any> => {
   };
 };
 
-// export const updateTodo = async (
-//   todoId: number,
-//   updatedTodo: Partial<Todo>,
-//   updatedTodoRepeat?: Partial<TodoRepeat>
-// ) => {
-//   await todoRepo.update(todoId, updatedTodo);
-//   if (updatedTodoRepeat) {
-//     const existingTodoRepeat = await todoRepeatRepo.findOne({
-//       where: { todo: { todo_id: todoId } },
-//     });
-
-//     if (updatedTodoRepeat.repeat_option === RepeatOptionEnum.KHONG_LAP_LAI) {
-
-//       if (existingTodoRepeat) {
-//         await todoRepeatRepo.update(existingTodoRepeat.repeat_id, {
-//           repeat_days: null,
-//           repeat_weekMonth: null,
-//           repeat_interval: null,
-//         });
-//       }
-//     } else {
-
-//       if (existingTodoRepeat) {
-//         await todoRepeatRepo.update(
-//           existingTodoRepeat.repeat_id,
-//           updatedTodoRepeat
-//         );
-//       } else {
-//         const newTodoRepeat = todoRepeatRepo.create({
-//           ...updatedTodoRepeat,
-//           todo: { todo_id: todoId },
-//         });
-//         await todoRepeatRepo.save(newTodoRepeat);
-//         await todoRepo.update(todoId, { todo_repeat: newTodoRepeat });
-//       }
-//     }
-//   }
-// };
-
-
 export const updateTodo = async (
   todoId: number,
   updatedTodo: Partial<Todo>,
@@ -259,6 +219,7 @@ export const getUserTodosForWeekService = async (
   const query: SelectQueryBuilder<Todo> = todoRepo
     .createQueryBuilder('todo')
     .leftJoinAndSelect('todo.user', 'user')
+    .leftJoinAndSelect('todo.todo_repeat', 'todo_repeat')
     .where('DATE(todo.due_date) BETWEEN :startDate AND :endDate', {
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0],
@@ -273,8 +234,17 @@ export const getUserTodosForWeekService = async (
       'todo.task_content',
       'todo.location',
       'todo.status',
+      'todo.createdAt',
+      'todo.updatedAt',
       'user.user_id',
       'user.full_name',
+      'todo_repeat.repeat_id',
+      'todo_repeat.repeat_option',
+      'todo_repeat.repeat_days',
+      'todo_repeat.repeat_weekMonth',
+      'todo_repeat.repeat_interval',
+      'todo_repeat.createdAt',
+      'todo_repeat.updatedAt',
     ]);
 
   const todos = await query.getMany();
