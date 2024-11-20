@@ -97,14 +97,20 @@
   color: #1e293b;
     margin-bottom: 10px;
 }
+.service-info{
+  margin-top: 12px;
+}
 
-/* Trong file CSS hoặc SCSS của bạn */
 .service-info label {
   font-size: 18px;
+  margin-bottom: 8px;
   color: #1e293b;
     margin-bottom: 10px;
 }
 
+.quill {
+    margin-top: 12px;
+}
 
 
 .introduction{
@@ -146,5 +152,7 @@ padding-left: 13px;
     width: 24%;
     height: 100%;
     border-radius: 8px;
+    min-height: 100px;
+    min-width: 100px;
   }
 }
