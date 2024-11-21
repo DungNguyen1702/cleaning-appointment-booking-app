@@ -3,6 +3,7 @@ import ReactQuill from "react-quill";
 import "./CompanyDetails.scss";
 import companyAPI from "../api/companyAPI";
 import LoadingOverlay from "../components/loading_overlay";
+import ImageUploader from "./ImageUploader";
 
 const AutoResizeTextarea = ({ value, onChange }) => {
   const textareaRef = useRef(null);
@@ -41,14 +42,23 @@ const AutoResizeTextarea = ({ value, onChange }) => {
   );
 };
 
+const formatCurrency = (value) => {
+  const numericValue = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(numericValue)) return "";
+  return numericValue.toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+};
+
+const parseCurrency = (value) => {
+  const numericValue = value.replace(/[^0-9]/g, "");
+  return parseInt(numericValue, 10) || 0;
+};
+
 export const CompanyDetails = () => {
   const storedUserInfo = localStorage.getItem("user_info");
-  const [imageFiles, setImageFiles] = useState({
-    main_image: null,
-    image2: null,
-    image3: null,
-    image4: null,
-  });
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const companyId = storedUserInfo
     ? JSON.parse(storedUserInfo)?.company_id
     : "";
@@ -58,6 +68,13 @@ export const CompanyDetails = () => {
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [originalCompany, setOriginalCompany] = useState(null);
+  const [imageFiles, setImageFiles] = useState({
+    image2: null,
+    image3: null,
+    image4: null,
+    image5: null,
+  });
+  const [displayServiceCost, setDisplayServiceCost] = useState("");
 
   useEffect(() => {
     // Kiểm tra xem companyId có hợp lệ không
@@ -89,6 +106,9 @@ export const CompanyDetails = () => {
           .map((service) => `<li>${service}</li>`)
           .join("")}</ul>`;
         setQuillValue(updatedQuillValue);
+
+        // Định dạng giá dịch vụ
+        setDisplayServiceCost(formatCurrency(companyData.service_cost));
       } catch (error) {
         console.error("Error fetching company details:", error);
       } finally {
@@ -98,18 +118,6 @@ export const CompanyDetails = () => {
 
     fetchCompanyDetails();
   }, [companyId]); // Thêm companyId vào dependencies để re-fetch khi companyId thay đổi
-
-  const getChangedData = (original, updated) => {
-    const changedData = {};
-
-    Object.keys(original).forEach((key) => {
-      if (original[key] !== updated[key]) {
-        changedData[key] = updated[key];
-      }
-    });
-
-    return changedData;
-  };
 
   const handleSave = async () => {
     if (!company || !originalCompany) return;
@@ -130,14 +138,21 @@ export const CompanyDetails = () => {
     formData.append("worktime", updatedData.worktime);
     formData.append("description", updatedData.description);
     formData.append("service", updatedData.service);
+    formData.append("service_cost", updatedData.service_cost);
 
-    // Thêm các ảnh vào FormData
-    const imageFields = ["main_image", "image2", "image3", "image4"];
-    imageFields.forEach((field) => {
-      if (imageFiles[field]) {
-        formData.append(field, imageFiles[field]);
-      }
-    });
+    if (selectedImageFile) {
+      formData.append("main_image", selectedImageFile);
+    }
+    if (imageFiles) {
+      const imageFields = ["image2", "image3", "image4", "image5"];
+      console.log(imageFields);
+      imageFields.forEach((field) => {
+        if (imageFiles[field]) {
+          console.log(imageFields[field]);
+          formData.append(field, imageFiles[field]);
+        }
+      });
+    }
 
     try {
       setLoading(true);
@@ -146,13 +161,7 @@ export const CompanyDetails = () => {
         formData
       );
       setCompany(response.data);
-      setOriginalCompany(response.data); // Cập nhật lại dữ liệu gốc sau khi lưu
-      setImageFiles({
-        main_image: null,
-        image2: null,
-        image3: null,
-        image4: null,
-      }); // Reset các file ảnh sau khi lưu
+      setOriginalCompany(response.data);
       alert("Lưu thay đổi thành công!");
     } catch (error) {
       console.error("Error updating company details:", error);
@@ -169,46 +178,43 @@ export const CompanyDetails = () => {
     }
   };
 
-  // Xử lý thay đổi ảnh
-  const handleImageChange = (e) => {
-    const files = e.target.files;
-    if (files.length > 0) {
-      const selectedFiles = Array.from(files);
-      if (selectedFiles.length > 4) {
-        alert("Chỉ được chọn tối đa 4 ảnh!");
-        return;
-      }
-      setImageFiles((prev) => ({
-        ...prev,
-        main_image: selectedFiles[0] || prev.main_image,
-        image2: selectedFiles[1] || prev.image2,
-        image3: selectedFiles[2] || prev.image3,
-        image4: selectedFiles[3] || prev.image4,
-      }));
+  const handleImageMainChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImageFile(file);
 
-      const readerPromises = selectedFiles.map((file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      });
-
-      Promise.all(readerPromises)
-        .then((results) => {
-          setCompany((prev) => ({
-            ...prev,
-            main_image: results[0] || prev.main_image,
-            image2: results[1] || prev.image2,
-            image3: results[2] || prev.image3,
-            image4: results[3] || prev.image4,
-          }));
-        })
-        .catch((error) => {
-          console.error("Error reading files:", error);
-        });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        console.log(reader.result);
+        setCompany((prev) => ({ ...prev, main_image: reader.result }));
+      };
+      reader.readAsDataURL(file);
     }
+  };
+
+  const handleImageChange = (field, value) => {
+    setImageFiles((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCompany((prev) => ({
+        ...prev,
+        [field]: reader.result,
+      }));
+    };
+    reader.readAsDataURL(value);
+  };
+
+  const handleServiceCostChange = (e) => {
+    const inputValue = e.target.value;
+    const parsedValue = parseCurrency(inputValue);
+    setDisplayServiceCost(inputValue);
+    setCompany((prev) => ({
+      ...prev,
+      service_cost: parsedValue,
+    }));
   };
 
   const modules = {
@@ -245,8 +251,7 @@ export const CompanyDetails = () => {
               ref={fileInputRef}
               type="file"
               style={{ display: "none" }}
-              onChange={handleImageChange}
-              multiple
+              onChange={handleImageMainChange}
             />
           </div>
 
@@ -301,6 +306,16 @@ export const CompanyDetails = () => {
                 />
               </div>
 
+              <div className="address-info">
+                <label htmlFor="address">Giá dịch vụ</label>
+                <input
+                  id="address"
+                  type="text"
+                  value={displayServiceCost}
+                  onChange={handleServiceCostChange}
+                />
+              </div>
+
               <div className="worktime-info">
                 <label htmlFor="worktime">Giờ làm việc</label>
                 <input
@@ -344,10 +359,22 @@ export const CompanyDetails = () => {
               </div>
 
               <div className="list-image">
-                <img src={company.main_image} alt="thumbnails" />
-                <img src={company.image2} alt="thumbnails" />
-                <img src={company.image3} alt="thumbnails" />
-                <img src={company.image4} alt="thumbnails" />
+                <ImageUploader
+                  imageSrc={company.image2}
+                  onImageChange={(value) => handleImageChange("image2", value)}
+                />
+                <ImageUploader
+                  imageSrc={company.image3}
+                  onImageChange={(value) => handleImageChange("image3", value)}
+                />
+                <ImageUploader
+                  imageSrc={company.image4}
+                  onImageChange={(value) => handleImageChange("image4", value)}
+                />
+                <ImageUploader
+                  imageSrc={company.image5}
+                  onImageChange={(value) => handleImageChange("image5", value)}
+                />
               </div>
             </div>
           </div>

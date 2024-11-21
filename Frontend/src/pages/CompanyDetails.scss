@@ -157,12 +157,12 @@ padding-left: 13px;
   gap: 8px;
   margin-top: 12px;
   img{
-    width: 24%;
-    height: 100%;
     border-radius: 8px;
     min-height: 100px;
-    min-width: 100px;
+    min-width: 110px;
     max-height: 100px;
     object-fit: cover;
+    max-width: 200px;
+    border: solid 1px #ccc;
   }
 }

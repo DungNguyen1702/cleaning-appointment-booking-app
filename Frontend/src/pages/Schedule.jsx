@@ -1,14 +1,12 @@
-
 import React, { useState, useEffect } from "react";
 import "./Schedule.scss";
 import userAPI from "../api/userAPI"; // Import your API module
 import LoadingOverlay from "../components/loading_overlay";
 import useAuth from "../hooks/useAuth";
 
-import AddEvent from './AddEvent';
+import AddEvent from "./AddEvent";
 import EditEvent from "./EditEvent";
 import { toast, ToastContainer } from "react-toastify";
-
 
 const Schedule = () => {
   const [startDate, setStartDate] = useState(null);
@@ -35,11 +33,7 @@ const Schedule = () => {
   const fetchData = async (startDate, endDate) => {
     try {
       setLoading(true);
-      const response = await userAPI.getListTodo(
-        
-        startDate,
-        endDate
-      );
+      const response = await userAPI.getListTodo(startDate, endDate);
       console.log(response.data);
       setAppointments(response.data);
     } catch (error) {
@@ -164,89 +158,70 @@ const Schedule = () => {
     }));
   };
 
-
-
   //code của NHCon
-  
-  const [prop,setProp] = useState("");
-  const [openModal, setOpenModal] = useState(false); 
-  const [openEditModal, setOpenEditModal] = useState(false); 
+
+  const [prop, setProp] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
   const handleOpenModal = () => {
-        
-        setOpenModal(true); 
+    setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-        setOpenModal(false); 
-        
+    setOpenModal(false);
   };
   const handleOpenEditnModal = () => {
-        
-        setOpenEditModal(true); 
+    setOpenEditModal(true);
   };
 
   const handleCloseEditModal = () => {
-        setOpenEditModal(false); 
-        
+    setOpenEditModal(false);
   };
-  const handleClickOpenEditModal = (event) =>{
+  const handleClickOpenEditModal = (event) => {
     setProp(event);
     setOpenEditModal(true);
-  }
+  };
 
   const createEvent = async (postData) => {
     try {
-      
       //console.log("I come here")
       await userAPI.createToDo(postData);
-      toast.success("Tạo sự kiện thành công",{
-        position : "top-right"
+      toast.success("Tạo sự kiện thành công", {
+        position: "top-right",
       });
-      
-      
-      
     } catch (error) {
       console.error("Failed to create todo status:", error);
-      toast.error(error.response?.data.message || "Tạo sự kiện không thành công",{
-        position : "top-right"
-      })
+      toast.error(
+        error.response?.data.message || "Tạo sự kiện không thành công",
+        {
+          position: "top-right",
+        }
+      );
     } finally {
-      
-      
-      if (postData?.due_date>= startDate &&postData?.due_date<= endDate){
-        fetchData(
-          startDate,
-          endDate
-        );
+      if (postData?.due_date >= startDate && postData?.due_date <= endDate) {
+        fetchData(startDate, endDate);
       }
       setOpenModal(false);
     }
   };
-  const editEvent = async (postData,id) => {
+  const editEvent = async (postData, id) => {
     try {
-      
       //console.log("I come here")
-      await userAPI.editToDo(postData,id);
-      toast.success("Chỉnh sửa sự kiện thành công",{
-        position : "top-right"
+      await userAPI.editToDo(postData, id);
+      toast.success("Chỉnh sửa sự kiện thành công", {
+        position: "top-right",
       });
-      
-      
-      
     } catch (error) {
       console.error("Failed to update event status:", error);
-      toast.error(error.response?.data.message || "Chỉnh sửa sự kiện không thành công",{
-        position : "top-right"
-      })
+      toast.error(
+        error.response?.data.message || "Chỉnh sửa sự kiện không thành công",
+        {
+          position: "top-right",
+        }
+      );
     } finally {
-      
-      
-      
-        fetchData(
-          startDate,
-          endDate
-        );
-      
+      fetchData(startDate, endDate);
+
       setOpenEditModal(false);
     }
   };
@@ -257,7 +232,6 @@ const Schedule = () => {
       <ToastContainer />
       <div className="h5-header">
         <h5>Lịch trình trong tuần</h5>
-
       </div>
       <div className="calendar-header">
         <div className="header-controls">
@@ -278,18 +252,17 @@ const Schedule = () => {
 
             <div className="date-range">
               Ngày {startDate} - {endDate}
-
-
             </div>
           </div>
         </div>
-
       </div>
 
       <div className="calendar-body">
         <div className="time-slots">
           <div className="time-slots-header">
-            <button className="create-event" onClick={handleOpenModal}>+ Tạo sự kiện</button>
+            <button className="create-event" onClick={handleOpenModal}>
+              + Tạo sự kiện
+            </button>
             <p>danh sách sự kiện</p>
             <p className="subtitle">
               Bạn có thể kéo thả hoặc click vào sự kiện
@@ -333,10 +306,9 @@ const Schedule = () => {
                   </div>
                   <div className="events">
                     {dayAppointments.map((event, eventIndex) => {
-                      
                       return (
                         <div
-                        onClick={()=>handleClickOpenEditModal(event)}
+                          onClick={() => handleClickOpenEditModal(event)}
                           key={eventIndex}
                           className={`event`}
                           style={{
@@ -351,9 +323,7 @@ const Schedule = () => {
                           }}
                         >
                           <div className="event-title">{event.description}</div>
-                          <div className="event-time">
-                            {event.timeWorking} 
-                          </div>
+                          <div className="event-time">{event.timeWorking}</div>
                         </div>
                       );
                     })}
@@ -365,20 +335,21 @@ const Schedule = () => {
         )}
       </div>
 
-    {openModal&&(<AddEvent
-        open={openModal}
-        onClose={handleCloseModal}
-        func_CreateEvent={createEvent}
-    />  )}
-    {openEditModal&&(<EditEvent
-        open={openEditModal}
-        onClose={handleCloseEditModal}
-        func={editEvent}
-        props = {prop}
-    />  )}
-              
-
-
+      {openModal && (
+        <AddEvent
+          open={openModal}
+          onClose={handleCloseModal}
+          func_CreateEvent={createEvent}
+        />
+      )}
+      {openEditModal && (
+        <EditEvent
+          open={openEditModal}
+          onClose={handleCloseEditModal}
+          func={editEvent}
+          props={prop}
+        />
+      )}
     </div>
   );
 };
