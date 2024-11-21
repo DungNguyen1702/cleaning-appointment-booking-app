@@ -24,10 +24,10 @@ const Schedule = () => {
   });
 
   const timeSlots = [
-    { id: "morning", label: "Sáng", color: "#FFF3C4", textColor: "#FFC107" },
-    { id: "afternoon", label: "Chiều", color: "#F5C3C8", textColor: "#DC3545" },
-    { id: "evening", label: "Tối", color: "#BADBCC", textColor: "#198754" },
-    { id: "night", label: "Khuya", color: "#D0C9FF", textColor: "#624BFF" },
+    { id: "morning", label: "Sáng (4:00 - 11:59)", color: "#FFF3C4", textColor: "#FFC107" },
+    { id: "afternoon", label: "Chiều (12:00 - 17:59)", color: "#F5C3C8", textColor: "#DC3545" },
+    { id: "evening", label: "Tối (18:00 - 22:59)", color: "#BADBCC", textColor: "#198754" },
+    { id: "night", label: "Khuya (23:00 - 3:59)", color: "#D0C9FF", textColor: "#624BFF" },
   ];
 
   const { account } = useAuth();

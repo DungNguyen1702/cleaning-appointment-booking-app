@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.7",
     "html-react-parser": "^5.1.18",
+    "libphonenumber-js": "^1.11.15",
     "my-app-thao": "file:",
     "query-string": "^9.1.1",
     "react": "^18.2.0",

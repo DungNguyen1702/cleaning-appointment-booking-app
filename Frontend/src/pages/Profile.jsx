@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./Profile.scss";
 import RequestAPI from "../api/requestAPI";
 import Select from 'react-select';
+import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+
 
 const Profile = () => {
     const [formData, setFormData] = useState({
@@ -105,6 +107,18 @@ const Profile = () => {
             return;
         }
 
+        // Validate phone number
+        if (!isValidPhoneNumber(formData.phone, 'VN')) {
+            setAlertMessage("Số điện thoại không hợp lệ");
+            return;
+        }
+
+        // Additional check to ensure phone number starts with '0'
+        if (!formData.phone.startsWith('0')) {
+            setAlertMessage("Số điện thoại phải bắt đầu bằng số 0");
+            return;
+        }
+
         // if (formData.gender === '') {
         //     setAlertMessage("Bạn chưa chọn giới tính!");
         //     return;
@@ -189,7 +203,7 @@ const Profile = () => {
              {alertMessage && (
                 <div className="alert" style={{
                     padding: '10px',
-                    backgroundColor: alertMessage.includes('không thành công') ?  '#f44336' : '#4CAF50',
+                    backgroundColor: alertMessage.includes('không thành công') ?  '#f44336' : alertMessage.includes('Số điện thoại') ?  '#f44336' : '#4CAF50',
                     color: 'white',
                     marginBottom: '15px',
                     borderRadius: '5px'
@@ -356,7 +370,7 @@ const Profile = () => {
                         type="tel"
                         name="phone"
                         value={formData.phone}
-                        placeholder={formData.phone || "03582911315"}
+                        placeholder={formData.phone || "0123456789"}
                         onChange={handleChange}
                         style={{ width: "40%", padding: "8px", borderRadius: "4px", fontSize: "14px" }}
                     />
