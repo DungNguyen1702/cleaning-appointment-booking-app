@@ -8,8 +8,8 @@ import "./Com_Calendar.scss";
 import companyAPI from "../api/companyAPI";
 import useAuth from "../hooks/useAuth";
 import LoadingOverlay from "../components/loading_overlay";
-import DatePicker from 'react-datepicker'; // Add this import at the top of your file
-import 'react-datepicker/dist/react-datepicker.css'; // Add this import for the DatePicker styles
+import DatePicker from "react-datepicker"; // Add this import at the top of your file
+import "react-datepicker/dist/react-datepicker.css"; // Add this import for the DatePicker styles
 
 const Com_Calendar = () => {
   const [days, setDays] = useState([]);
@@ -19,10 +19,20 @@ const Com_Calendar = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const timeSlots = [
-    { id: 'accepted', label: 'Đã Chấp Nhận', color: '#FFF3C4', textColor: '#FFC107' },
-    { id: 'rejected', label: 'Hủy', color: '#F5C3C8', textColor: '#DC3545' },
-    { id: 'done', label: 'Hoàn Thành', color: '#BADBCC', textColor: '#198754' },
-    { id: 'pending', label: 'Chờ Xử Lý', color: '#D0C9FF', textColor: '#624BFF' }
+    {
+      id: "accepted",
+      label: "Đã Chấp Nhận",
+      color: "#FFF3C4",
+      textColor: "#FFC107",
+    },
+    { id: "rejected", label: "Hủy", color: "#F5C3C8", textColor: "#DC3545" },
+    { id: "done", label: "Hoàn Thành", color: "#BADBCC", textColor: "#198754" },
+    {
+      id: "pending",
+      label: "Chờ Xử Lý",
+      color: "#D0C9FF",
+      textColor: "#624BFF",
+    },
   ];
   const { account } = useAuth();
   const fetchData = async (startDate, endDate) => {
@@ -118,17 +128,20 @@ const Com_Calendar = () => {
     // Calculate the start of the week containing the selected date
     const startOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - date.getDay() + 1); // Monday
-    
+
     // Calculate the end of the week
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
-    
+
     // Update the startDate and endDate states
     setStartDate(formatDateToYYYYMMDD(startOfWeek));
     setEndDate(formatDateToYYYYMMDD(endOfWeek));
-    
+
     // Fetch data for the new week
-    fetchData(formatDateToYYYYMMDD(startOfWeek), formatDateToYYYYMMDD(endOfWeek));
+    fetchData(
+      formatDateToYYYYMMDD(startOfWeek),
+      formatDateToYYYYMMDD(endOfWeek)
+    );
   };
 
   useEffect(() => {
@@ -176,10 +189,10 @@ const Com_Calendar = () => {
         <div className="calendar-header">
           <div className="date-picker-container">
             <DatePicker
-               selected={selectedDate}
-               onChange={handleDateChange}
-               dateFormat="dd/MM/yyyy"
-               className="date-picker-input"
+              selected={selectedDate}
+              onChange={handleDateChange}
+              dateFormat="dd/MM/yyyy"
+              className="date-picker-input"
             />
           </div>
           <div className="calendar-actions">
@@ -198,56 +211,56 @@ const Com_Calendar = () => {
         <div className="calendar-body">
           <div className="time-slots">
             <div className="time-slots-header">
-              {timeSlots.map(slot => (
-                <div 
-                  key={slot.id} 
+              {timeSlots.map((slot) => (
+                <div
+                  key={slot.id}
                   className="time-slot"
-                  style={{ 
+                  style={{
                     backgroundColor: slot.color,
-                    color: slot.textColor
+                    color: slot.textColor,
                   }}
                 >
-                {slot.label}
+                  {slot.label}
                 </div>
               ))}
             </div>
           </div>
 
-        {loading ? (
-          <LoadingOverlay loading={loading} />
-        ) : (
-          <div className="calendar-grid">
-            {days.map((day, index) => (
-              <div key={index} className="day-column">
-                <div className="day-header">
-                  <span className="day-name">{day.name}</span>
-                  <span className="day-date">{day.date}</span>
-                </div>
-                <div className="day-separator"></div>
-                <div className="appointments">
-                  {appointments[
-                    day.name
-                      .toUpperCase()
-                      .replace(/\s+/g, "_")
-                      .normalize("NFD")
-                      .replace(/[\u0300-\u036f]/g, "")
-                  ]?.map((apt, aptIndex) => (
-                    <div
-                      key={aptIndex}
-                      className={`appointment ${apt.status.toLowerCase()}`}
-                    >
-                      <div className="appointment-name">
-                        {apt.name}
+          {loading ? (
+            <LoadingOverlay loading={loading} />
+          ) : (
+            <div className="calendar-grid">
+              {days.map((day, index) => (
+                <div key={index} className="day-column">
+                  <div className="day-header">
+                    <span className="day-name">{day.name}</span>
+                    <span className="day-date">{day.date}</span>
+                  </div>
+                  <div className="day-separator"></div>
+                  <div className="appointments">
+                    {appointments[
+                      day.name
+                        .toUpperCase()
+                        .replace(/\s+/g, "_")
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                    ]?.map((apt, aptIndex) => (
+                      <div
+                        key={aptIndex}
+                        className={`appointment ${apt.status.toLowerCase()}`}
+                      >
+                        <div className="appointment-name">{apt.name}</div>
+                        <div className="appointment-time">
+                          {apt.timeWorking}
+                        </div>
                       </div>
-                      <div className="appointment-time">{apt.timeWorking}</div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
