@@ -100,14 +100,14 @@ const EditEvent = ({ onClose, open, props,func }) => {
         location:location,
     },
     todoRepeat: repeat==="LAP_LAI" ? {
-        repeatOtion:repeat,
-        repeatDays:selectedDays,
-        repeatWeekMonth:repeatInterval,
-        repeatInterval:repeatFrequency,
+        repeat_option:repeat,
+        repeat_days:selectedDays,
+        repeat_weekMonth:repeatInterval,
+        repeat_interval:repeatFrequency,
       }
       :
       {
-        repeatOtion:repeat
+        repeat_option:repeat
       }
     
   }
