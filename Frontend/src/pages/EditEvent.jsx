@@ -17,14 +17,14 @@ import TimePicker from "react-time-picker"
 
 
 const EditEvent = ({ onClose, open, props,func }) => {
-  
+  console.log(props);
   const [noEdit,setNoEdit] = useState("1");  
   const [title, setTitle] = useState(props?.description);
   const [selectDate, setDate] = useState(parse(props?.due_date, "dd/MM/yyyy", new Date()));
   const [startTime, setStartTime] = useState(props?.start_time.substring(0, 5));
   const [endTime, setEndTime] = useState(props?.end_time.substring(0, 5));
   const [repeat, setRepeat] = useState(props?.todo_repeat?.repeat_option || "KHONG_LAP_LAI");
-  const [repeatFrequency, setRepeatFrequency] = useState(props?.todo_repeat?.repeat_interval || "");
+  const [repeatFrequency, setRepeatFrequency] = useState(props?.todo_repeat?.repeat_interval || ""); 
   const [repeatInterval, setRepeatInterval] = useState(props?.todo_repeat?.repeat_weekMonth||"TUAN");
   const [taskContent, setTaskContent] = useState(props?.task_content);
   const [location, setLocation] = useState(props?.location);
@@ -32,11 +32,13 @@ const EditEvent = ({ onClose, open, props,func }) => {
 
   const editEvent = (e) => {
     e.preventDefault();
-    console.log(postData);
+    // console.log(postData);
+    // console.log(props?.todo_repeat?.repeat_interval,
+    //   props?.todo_repeat?.repeat_weekMonth,repeatFrequency,repeatInterval)
     func(postData,props?.todo_id);
     // onClose();
   };
-  console.log(noEdit)
+  
 
   
   
@@ -62,24 +64,28 @@ const EditEvent = ({ onClose, open, props,func }) => {
   // }
   
   useEffect(()=>
-    {
-      if (repeat==="LAP_LAI"){
-        if (selectDate!==""){
-          const dayKey = daysArray[selectDate.getDay()]
-          const dayValue = daysMap[dayKey]
-          setSelectedDays(dayValue)
-          setRepeatFrequency(1);
-          setRepeatInterval("TUAN");
+    { 
+      if (noEdit==="0"){
+
+      
+        if (repeat==="LAP_LAI"){
+          if (selectDate!==""){
+            const dayKey = daysArray[selectDate.getDay()]
+            const dayValue = daysMap[dayKey]
+            setSelectedDays(dayValue)
+            setRepeatFrequency(1);
+            setRepeatInterval("TUAN");
+          }
         }
+        else{
+          setSelectedDays("");
+          setRepeatFrequency("");
+          setRepeatInterval("");
+        } 
       }
-      else{
-        setSelectedDays("");
-        setRepeatFrequency("");
-        setRepeatInterval("");
-      } 
     },
-    [repeat, selectDate]
-  );
+      [repeat, selectDate,noEdit]
+    );
   const formatDate = (date) => {
     if (!date) return "";
     const year = date.getFullYear();
