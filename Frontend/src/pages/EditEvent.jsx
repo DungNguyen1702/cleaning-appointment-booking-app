@@ -155,7 +155,7 @@ const EditEvent = ({ onClose, open, props,func }) => {
         
         <button></button>
         <div className="header-left">
-          <div className="title-header">Tạo sự kiện</div>
+          <div className="title-header">Chỉnh sửa sự kiện</div>
           <hr />
         </div>
         <div className="content">
