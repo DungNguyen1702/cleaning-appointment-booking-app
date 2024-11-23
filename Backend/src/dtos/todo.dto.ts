@@ -13,7 +13,7 @@ export interface CreateTodoOptions {
   location: string;
   status: RequestStatusEnum;
   repeatOption?: RepeatOptionEnum;
-  repeatDays?: DayOfWeekEnum;
+  repeatDays: DayOfWeekEnum[] | null;
   repeatWeekMonth?: tuanThang;
   repeatInterval?: number;
 }
