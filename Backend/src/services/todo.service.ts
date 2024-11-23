@@ -1,4 +1,4 @@
-import { Repository, SelectQueryBuilder, LessThan, MoreThan } from 'typeorm';
+import { Repository, SelectQueryBuilder, LessThan, MoreThan, Not } from 'typeorm';
 import { Todo } from '../entity/todo.entity';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/user.entity';
@@ -180,7 +180,37 @@ export const updateTodo = async (
   updatedTodo: Partial<Todo>,
   updatedTodoRepeat?: Partial<TodoRepeat>
 ) => {
+
+  // Lấy thông tin Todo hiện tại
+  const currentTodo = await todoRepo.findOne({
+    where: { todo_id: todoId },
+    relations: ['user'],
+  });
+
+  if (!currentTodo) {
+    throw new Error('Không tìm thấy công việc nào.');
+  }
+
+  // Kiểm tra xem có trùng lịch hay không
+  const overlappingTodos = await todoRepo.findOne({
+    where: {
+      user: { user_id: currentTodo.user.user_id },
+      due_date: updatedTodo.due_date || currentTodo.due_date, // Kiểm tra cùng ngày
+      start_time: LessThan(updatedTodo.end_time || currentTodo.end_time), // Bắt đầu trước khi công việc mới kết thúc
+      end_time: MoreThan(updatedTodo.start_time || currentTodo.start_time), // Kết thúc sau khi công việc mới bắt đầu
+      todo_id: Not(todoId), // Loại trừ công việc hiện tại
+    },
+  });
+
+  if (overlappingTodos) {
+    throw new Error('Khung giờ này đã có công việc.');
+  }
+
+  // Cập nhật thông tin cơ bản của Todo
   await todoRepo.update(todoId, updatedTodo);
+
+  await todoRepo.update(todoId, updatedTodo);
+
   if (updatedTodoRepeat) {
     const existingTodoRepeat = await todoRepeatRepo.findOne({
       where: { todo: { todo_id: todoId } },
