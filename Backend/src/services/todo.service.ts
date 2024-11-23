@@ -1,4 +1,4 @@
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder, LessThan, MoreThan } from 'typeorm';
 import { Todo } from '../entity/todo.entity';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/user.entity';
@@ -7,7 +7,6 @@ import { DayOfWeekEnum } from '../enums/dayOfWeek.enum';
 import { TodoRepeat } from '../entity/todoRepeat.entity';
 import { RepeatOptionEnum } from '../enums/repeatOption.enum';
 import { CreateTodoOptions } from '../dtos/todo.dto';
-
 
 // Tạo ánh xạ chỉ số ngày tới enum
 const dayOfWeekMap: { [key: number]: DayOfWeekEnum } = {
@@ -114,6 +113,20 @@ export const createTodo = async (options: CreateTodoOptions): Promise<any> => {
     throw new Error('User not found');
   }
 
+  // Kiểm tra xem có trùng lịch hay không
+  const overlappingTodos = await todoRepo.findOne({
+    where: {
+      user: { user_id: userId },
+      due_date: due_date, // Kiểm tra cùng ngày
+      start_time: LessThan(end_time), // Bắt đầu trước khi công việc mới kết thúc
+      end_time: MoreThan(start_time), // Kết thúc sau khi công việc mới bắt đầu
+    },
+  });
+
+  if (overlappingTodos) {
+    throw new Error('Khung giờ này đã có công việc.');
+  }
+
   // Tạo Todo
   const todo = new Todo();
   todo.user = user;
@@ -142,7 +155,11 @@ export const createTodo = async (options: CreateTodoOptions): Promise<any> => {
       todoRepeat.repeat_interval = null;
     } else {
       // Nếu có lặp lại, gán các giá trị từ request
-      todoRepeat.repeat_days = repeatDays ?? null;
+      todoRepeat.repeat_days = repeatDays
+        ? Array.isArray(repeatDays)
+          ? repeatDays
+          : [repeatDays]
+        : null;
       todoRepeat.repeat_weekMonth = repeatWeekMonth ?? null;
       todoRepeat.repeat_interval = repeatInterval ?? null;
     }
@@ -163,7 +180,6 @@ export const updateTodo = async (
   updatedTodo: Partial<Todo>,
   updatedTodoRepeat?: Partial<TodoRepeat>
 ) => {
-
   await todoRepo.update(todoId, updatedTodo);
   if (updatedTodoRepeat) {
     const existingTodoRepeat = await todoRepeatRepo.findOne({
@@ -171,7 +187,6 @@ export const updateTodo = async (
     });
 
     if (updatedTodoRepeat.repeat_option === RepeatOptionEnum.KHONG_LAP_LAI) {
-
       if (existingTodoRepeat) {
         await todoRepeatRepo.update(existingTodoRepeat.repeat_id, {
           repeat_days: null,
@@ -180,7 +195,6 @@ export const updateTodo = async (
         });
       }
     } else {
-
       if (existingTodoRepeat) {
         await todoRepeatRepo.update(
           existingTodoRepeat.repeat_id,

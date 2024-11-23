@@ -21,8 +21,8 @@ export class TodoRepeat {
   @Column({ type: 'enum', enum: RepeatOptionEnum })
   repeat_option: RepeatOptionEnum;
 
-  @Column({ type: 'enum', enum: DayOfWeekEnum, nullable: true })
-  repeat_days: DayOfWeekEnum | null;
+  @Column({ type: 'simple-array', nullable: true })
+  repeat_days: DayOfWeekEnum[] | null;
 
   @Column({ type: 'enum', enum: tuanThang, nullable: true })
   repeat_weekMonth: tuanThang | null;
