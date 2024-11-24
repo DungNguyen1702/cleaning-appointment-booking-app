@@ -25,6 +25,7 @@ const Login = () => {
           phone_number: User.phone_number,
           email: User.account.email,
           role: role,
+          avatar: User.avatar,
         };
       } else if (role === "COMPANY") {
         userInfo = {
@@ -32,6 +33,7 @@ const Login = () => {
           name: User.company_name,
           phone_number: User.phone,
           role: role,
+          avatar: User.main_image,
         };
       }
       if (accessToken) {

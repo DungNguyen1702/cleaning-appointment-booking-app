@@ -142,6 +142,10 @@ const router = createBrowserRouter([
                 path: "calendar",
                 element: <Com_Calendar />,
               },
+              {
+                path: "logout",
+                element: <Logout />,
+              },
             ],
           },
         ],

@@ -203,6 +203,7 @@ export const ListRequest = () => {
                 {loading ? (
                   <LoadingOverlay loading={loading} />
                 ) : (
+                  (console.log(filteredData),
                   filteredData.map((item) => (
                     <div
                       className="row"
@@ -371,7 +372,7 @@ export const ListRequest = () => {
                         )}
                       </div>
                     </div>
-                  ))
+                  )))
                 )}
               </div>
             </div>
