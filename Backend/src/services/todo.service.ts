@@ -25,33 +25,108 @@ const companyRepo: Repository<Company> = AppDataSource.getRepository(Company);
 const todoRepeatRepo: Repository<TodoRepeat> =
   AppDataSource.getRepository(TodoRepeat);
 
-export const getCustomerRequestsForWeek = async (
-  companyId: number,
-  startDate: Date,
-  endDate: Date
-) => {
+// export const getCustomerRequestsAll = async (
+//   userId: number
+// ) => {
+//   const query: SelectQueryBuilder<Todo> = todoRepo
+//     .createQueryBuilder('todo')
+//     .leftJoinAndSelect('todo.user', 'user')
+//     .leftJoinAndSelect('todo.todo_repeat', 'todo_repeat')
+//     .where('todo.user_id = :userId', { userId })
+//     .select([
+//       'todo.todo_id',
+//       'todo.due_date',
+//       'todo.start_time',
+//       'todo.end_time',
+//       'todo.description',
+//       'todo.task_content',
+//       'todo.location',
+//       'todo.status',
+//       'todo.createdAt',
+//       'todo.updatedAt',
+//       'user.user_id',
+//       'user.full_name',
+//       'todo_repeat.repeat_id',
+//       'todo_repeat.repeat_option',
+//       'todo_repeat.repeat_days',
+//       'todo_repeat.repeat_weekMonth',
+//       'todo_repeat.repeat_interval',
+//       'todo_repeat.createdAt',
+//       'todo_repeat.updatedAt',
+//     ]);
+
+//   const todos = await query.getMany();
+
+//   // Tổ chức dữ liệu theo ngày
+//   const todosByDate: { [key: string]: Todo[] } = {};
+
+//   todos.forEach(todo => {
+//     const dueDate = new Date(todo.due_date);
+//     const formattedDate = `${dueDate.getDate().toString().padStart(2, '0')}/${(dueDate.getMonth() + 1).toString().padStart(2, '0')}/${dueDate.getFullYear()}`;
+
+//     // Tính toán timeWorking
+//     const startTime = new Date(`${todo.due_date}T${todo.start_time}`);
+//     const endTime = new Date(`${todo.due_date}T${todo.end_time}`);
+
+//     const formatTime = (date: Date) => {
+//       const hours = date.getHours().toString().padStart(2, '0');
+//       const minutes = date.getMinutes().toString().padStart(2, '0');
+//       return `${hours}:${minutes}`;
+//     };
+
+//     const timeWorking = `${formatTime(startTime)}-${formatTime(endTime)}`;
+//     (todo as any).timeWorking = timeWorking;
+
+//     // Cập nhật due_date theo định dạng mới
+//     (todo as any).due_date = formattedDate;
+
+//     // Thêm todo vào đối tượng todosByDate theo ngày
+//     if (!todosByDate[formattedDate]) {
+//       todosByDate[formattedDate] = [];
+//     }
+//     todosByDate[formattedDate].push(todo);
+//   });
+
+//   // Sắp xếp các công việc theo thời gian bắt đầu và todo_id
+//   Object.keys(todosByDate).forEach(date => {
+//     todosByDate[date]?.sort((a, b) => {
+//       if (a.start_time === b.start_time) {
+//         return a.todo_id - b.todo_id;
+//       }
+//       return a.start_time.localeCompare(b.start_time);
+//     });
+//   });
+
+//   return todosByDate;
+// };
+
+
+export const getCustomerRequestsAll = async (userId: number) => {
   const query: SelectQueryBuilder<Todo> = todoRepo
     .createQueryBuilder('todo')
     .leftJoinAndSelect('todo.user', 'user')
-    .leftJoinAndSelect('todo.company', 'company')
-    .where('todo.due_date BETWEEN :startDate AND :endDate', {
-      startDate,
-      endDate,
-    })
-    .andWhere('todo.company_id = :companyId', { companyId })
+    .leftJoinAndSelect('todo.todo_repeat', 'todo_repeat')
+    .andWhere('todo.user_id = :userId', { userId })
     .select([
       'todo.todo_id',
-      'todo.title',
-      'todo.description',
       'todo.due_date',
       'todo.start_time',
       'todo.end_time',
+      'todo.description',
       'todo.task_content',
       'todo.location',
       'todo.status',
+      'todo.createdAt',
+      'todo.updatedAt',
       'user.user_id',
       'user.full_name',
-      'user.phone_number',
+      'todo_repeat.repeat_id',
+      'todo_repeat.repeat_option',
+      'todo_repeat.repeat_days',
+      'todo_repeat.repeat_weekMonth',
+      'todo_repeat.repeat_interval',
+      'todo_repeat.createdAt',
+      'todo_repeat.updatedAt',
     ]);
 
   const todos = await query.getMany();
@@ -59,26 +134,49 @@ export const getCustomerRequestsForWeek = async (
   // Tổ chức dữ liệu theo ngày trong tuần
   const weekData: { [key in DayOfWeekEnum]?: Todo[] } = {};
 
+  // Khởi tạo mảng cho các ngày trong tuần
   Object.values(DayOfWeekEnum).forEach(day => {
     weekData[day] = [];
   });
 
   todos.forEach(todo => {
-    const dayOfWeek = new Date(todo.due_date)
-      .toLocaleDateString('vi-VN', { weekday: 'long' })
-      .toUpperCase();
-    const dayKey = Object.keys(DayOfWeekEnum).find(
-      key => DayOfWeekEnum[key as keyof typeof DayOfWeekEnum] === dayOfWeek
-    );
-    if (
-      dayKey &&
-      weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]
-    ) {
-      weekData[DayOfWeekEnum[dayKey as keyof typeof DayOfWeekEnum]]?.push(todo);
+    const dueDate = new Date(todo.due_date);
+    const dayOfWeek = dueDate.getDay(); // Lấy thứ trong tuần (0 = Chủ Nhật, 1 = Thứ Hai, ...)
+
+    // Xử lý nếu ngày đó nằm trong khoảng từ Thứ Hai đến Chủ Nhật
+    const dayKey = dayOfWeekMap[dayOfWeek];
+
+    if (dayKey && weekData[dayKey]) {
+      // Tính toán timeWorking
+      const startTime = new Date(`${todo.due_date}T${todo.start_time}`);
+      const endTime = new Date(`${todo.due_date}T${todo.end_time}`);
+
+      const formatTime = (date: Date) => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+
+      const timeWorking = `${formatTime(startTime)}-${formatTime(endTime)}`;
+      // Thêm timeWorking vào todo
+      (todo as any).timeWorking = timeWorking;
+
+      // Định dạng lại due_date theo định dạng dd/mm/yyyy
+      const formatDate = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // tháng bắt đầu từ 0
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      (todo as any).due_date = formatDate(dueDate); // cập nhật due_date với định dạng mới
+
+      // Thêm todo vào ngày tương ứng trong tuần
+      weekData[dayKey]?.push(todo);
     }
   });
 
-  // Sắp xếp các công việc theo thời gian bắt đầu và todo_id
+  // Sắp xếp các công việc theo thời gian bắt đầu và todo_id trong từng ngày
   Object.keys(weekData).forEach(day => {
     weekData[day as DayOfWeekEnum]?.sort((a, b) => {
       if (a.start_time === b.start_time) {
@@ -90,6 +188,8 @@ export const getCustomerRequestsForWeek = async (
 
   return weekData;
 };
+
+
 export const createTodo = async (options: CreateTodoOptions): Promise<any> => {
   const {
     userId,
