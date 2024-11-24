@@ -255,6 +255,20 @@
     right: 30px;
     cursor: pointer;
   }
+  .delete-event-icon{
+    position: absolute ;
+    width: 30px ;
+    height: 30px ;
+    top:60px ;
+    right: 80px  ;
+    background-image: url('../assets/icons/delete-strap.png'); 
+    background-size: cover; 
+    background-repeat: no-repeat; /* Không lặp lại ảnh */
+    background-position: center;
+    border: none; 
+    padding: 0; 
+    cursor: pointer;
+  }
   
   .select-repeatWeekMonth{
     position: relative;

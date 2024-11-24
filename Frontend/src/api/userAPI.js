@@ -12,6 +12,10 @@ const userAPI = {
       editToDo: (formData,id) => {
         const url = `/todo/${id}`;
         return axiosClient.application.put(url, formData);
+      },
+      deleteToDo:(id)=>{
+        const url = `/todo/${id}`;
+        return axiosClient.application.delete(url);
       }
 };
 

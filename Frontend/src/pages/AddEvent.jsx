@@ -135,13 +135,10 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
   useEffect(()=>
     {
       if (repeat==="LAP_LAI"){
-        if (selectDate!==""){
-          // const dayKey = daysArray[selectDate.getDay()]
-          // const dayValue = daysMap[dayKey]
-          
+        
           setRepeatFrequency(1);
           setRepeatInterval("TUAN");
-        }
+        
       }
       else{
         setSelectedDays([])
@@ -149,7 +146,7 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
         setRepeatInterval("");
       } 
     },
-    [repeat, selectDate]
+    [repeat]
   );
   const formatDate = (date) => {
     if (!date) return "";
@@ -270,6 +267,9 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                     clockIcon={null} 
                     className="start-time-picker"
                     required
+                    format="HH:mm"
+                    minTime="00:00"
+                    maxTime="23:59"
                   />
                   {err.startTime &&(
                     <span className="error error-hour">{err.startTime}</span>
@@ -285,6 +285,9 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                     clockIcon={null} 
                     className="end-time-picker"
                     required
+                    format="HH:mm"
+                    minTime="00:00"
+                    maxTime="23:59"
                   />
                   {err.endTime  &&(
                     <span className="error error-hour">{err.endTime}</span>
