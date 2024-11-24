@@ -7,12 +7,14 @@ import useAuth from "../hooks/useAuth";
 import AddEvent from "./AddEvent";
 import EditEvent from "./EditEvent";
 import { toast, ToastContainer } from "react-toastify";
+import moment from "moment";
 
 const Schedule = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [days, setDays] = useState([]);
   const [appointments, setAppointments] = useState({});
+  const [repeatedTodos, setRepeatedTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeSlotStates, setTimeSlotStates] = useState({
     morning: true,
@@ -22,19 +24,138 @@ const Schedule = () => {
   });
 
   const timeSlots = [
-    { id: "morning", label: "Sáng (4:00 - 11:59)", color: "#FFF3C4", textColor: "#FFC107" },
-    { id: "afternoon", label: "Chiều (12:00 - 17:59)", color: "#F5C3C8", textColor: "#DC3545" },
-    { id: "evening", label: "Tối (18:00 - 22:59)", color: "#BADBCC", textColor: "#198754" },
-    { id: "night", label: "Khuya (23:00 - 3:59)", color: "#D0C9FF", textColor: "#624BFF" },
+    {
+      id: "morning",
+      label: "Sáng (4:00 - 11:59)",
+      color: "#FFF3C4",
+      textColor: "#FFC107",
+    },
+    {
+      id: "afternoon",
+      label: "Chiều (12:00 - 17:59)",
+      color: "#F5C3C8",
+      textColor: "#DC3545",
+    },
+    {
+      id: "evening",
+      label: "Tối (18:00 - 22:59)",
+      color: "#BADBCC",
+      textColor: "#198754",
+    },
+    {
+      id: "night",
+      label: "Khuya (23:00 - 3:59)",
+      color: "#D0C9FF",
+      textColor: "#624BFF",
+    },
   ];
+  const dayMapping = {
+    THU_HAI: "Monday",
+    THU_BA: "Tuesday",
+    THU_TU: "Wednesday",
+    THU_NAM: "Thursday",
+    THU_SAU: "Friday",
+    THU_BAY: "Saturday",
+    CHU_NHAT: "Sunday",
+  };
+
+  const isSunday = (date) => {
+    return moment(date, "DD/MM/YYYY").day() === 0;
+  };
+
+  const getMondayOfWeek = (date) => {
+    const dueDate = moment(date, "DD/MM/YYYY");
+    if (isSunday(date)) {
+      return dueDate.subtract(7, "days");
+    } else {
+      return dueDate.startOf("week").add("day");
+    }
+  };
+
+  const calculateDisplayDates = (todo) => {
+    const displayDates = [];
+    const dueDate = moment(todo.due_date, "DD/MM/YYYY");
+    const repeatOption = todo.todo_repeat.repeat_option;
+    const repeatDays = todo.todo_repeat.repeat_days;
+    const repeatWeekMonth = todo.todo_repeat.repeat_weekMonth;
+    const repeatInterval = todo.todo_repeat.repeat_interval;
+    if (repeatOption === "LAP_LAI") {
+      if (repeatWeekMonth === "TUAN") {
+        repeatDays.forEach((day) => {
+          let currentDate = dueDate.clone();
+          let startOfWeek = getMondayOfWeek(currentDate);
+          let dayOfWeek = dayMapping[day];
+          let dayOfWeekIndex;
+          if (dayOfWeek === "Sunday") {
+            dayOfWeekIndex = 7;
+          } else {
+            dayOfWeekIndex = moment.weekdays().indexOf(dayOfWeek);
+          }
+          let actualDate = startOfWeek.add(dayOfWeekIndex, "days");
+
+          for (let i = 1; i <= repeatInterval; i++) {
+            actualDate.add(1, "weeks");
+            displayDates.push(actualDate.format("YYYY-MM-DD"));
+          }
+        });
+      } else if (repeatWeekMonth === "THANG") {
+        repeatDays.forEach((day) => {
+          let currentDate = dueDate.clone();
+          let startOfWeek = getMondayOfWeek(currentDate);
+          let dayOfWeek = dayMapping[day];
+          let dayOfWeekIndex;
+          if (dayOfWeek === "Sunday") {
+            dayOfWeekIndex = 7;
+          } else {
+            dayOfWeekIndex = moment.weekdays().indexOf(dayOfWeek);
+          }
+          let actualDate = startOfWeek.add(dayOfWeekIndex, "days");
+
+          for (let i = 1; i <= repeatInterval; i++) {
+            actualDate.add(1, "months");
+            displayDates.push(actualDate.format("YYYY-MM-DD"));
+          }
+        });
+      }
+    }
+
+    return displayDates;
+  };
+
+  const processTodos = (allTodos) => {
+    const processedTodos = [];
+    Object.keys(allTodos).forEach((day) => {
+      allTodos[day].forEach((todo) => {
+        const displayDates = calculateDisplayDates(todo);
+        processedTodos.push({
+          ...todo,
+          displayDates,
+        });
+      });
+    });
+    return processedTodos;
+  };
 
   const { account } = useAuth();
 
-  const fetchData = async (startDate, endDate) => {
+  const userId = account.user_id;
+
+  const fetchAllData = async (userId) => {
+    try {
+      const response = await userAPI.getListAllTodo(userId);
+      console.log(response.data);
+      const processedTodos = processTodos(response.data);
+      setRepeatedTodos(processedTodos);
+      console.log("Todo repeat: ", processedTodos);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchData = async (userId, startDate, endDate) => {
     try {
       setLoading(true);
-      const response = await userAPI.getListTodo(startDate, endDate);
-      console.log(response.data);
+      const response = await userAPI.getListTodo(userId, startDate, endDate);
       setAppointments(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -61,9 +182,12 @@ const Schedule = () => {
     setEndDate(formatDateToYYYYMMDD(endOfWeek));
 
     fetchData(
+      userId,
       formatDateToYYYYMMDD(startOfWeek),
       formatDateToYYYYMMDD(endOfWeek)
     );
+    setRepeatedTodos([]);
+    fetchAllData(userId);
   }, []);
 
   useEffect(() => {
@@ -82,6 +206,8 @@ const Schedule = () => {
 
       setDays(daysArray);
     }
+    setRepeatedTodos([]);
+    fetchAllData(userId);
   }, [startDate, endDate]);
 
   const handleTodayClick = () => {
@@ -95,6 +221,7 @@ const Schedule = () => {
     setEndDate(formatDateToYYYYMMDD(endOfWeek));
 
     fetchData(
+      userId,
       formatDateToYYYYMMDD(startOfWeek),
       formatDateToYYYYMMDD(endOfWeek)
     );
@@ -110,6 +237,7 @@ const Schedule = () => {
     setEndDate(formatDateToYYYYMMDD(nextEndDate));
 
     fetchData(
+      userId,
       formatDateToYYYYMMDD(nextStartDate),
       formatDateToYYYYMMDD(nextEndDate)
     );
@@ -125,6 +253,7 @@ const Schedule = () => {
     setEndDate(formatDateToYYYYMMDD(prevEndDate));
 
     fetchData(
+      userId,
       formatDateToYYYYMMDD(prevStartDate),
       formatDateToYYYYMMDD(prevEndDate)
     );
@@ -142,7 +271,6 @@ const Schedule = () => {
   };
 
   const getTimeSlot = (timeWorking) => {
-    //console.log(timeWorking);
     const [hours] = timeWorking.split(":").map(Number);
     if (hours >= 4 && hours < 12) return "morning";
     if (hours >= 12 && hours < 18) return "afternoon";
@@ -184,7 +312,6 @@ const Schedule = () => {
 
   const createEvent = async (postData) => {
     try {
-      //console.log("I come here")
       await userAPI.createToDo(postData);
       toast.success("Tạo sự kiện thành công", {
         position: "top-right",
@@ -199,14 +326,13 @@ const Schedule = () => {
       );
     } finally {
       if (postData?.due_date >= startDate && postData?.due_date <= endDate) {
-        fetchData(startDate, endDate);
+        fetchData(userId, startDate, endDate);
       }
       setOpenModal(false);
     }
   };
   const editEvent = async (postData, id) => {
     try {
-      //console.log("I come here")
       await userAPI.editToDo(postData, id);
       toast.success("Chỉnh sửa sự kiện thành công", {
         position: "top-right",
@@ -220,14 +346,12 @@ const Schedule = () => {
         }
       );
     } finally {
-      fetchData(startDate, endDate);
+      fetchData(userId, startDate, endDate);
 
       setOpenEditModal(false);
     }
   };
-  //
-  
-  const deleteEvent = async (id) =>{
+  const deleteEvent = async (id) => {
     try {
       //console.log("I come here")
       await userAPI.deleteToDo(id);
@@ -248,6 +372,14 @@ const Schedule = () => {
       setOpenEditModal(false);
     }
   };
+
+  // Lọc các todo lặp lại có ngày nằm trong khoảng startDate và endDate
+  const filteredRepeatedTodos = repeatedTodos.filter((todo) =>
+    todo.displayDates.some((date) => {
+      const todoDate = moment(date, "YYYY-MM-DD");
+      return todoDate.isBetween(startDate, endDate, null, "[]");
+    })
+  );
 
   return (
     <div className="calendar-container">
@@ -320,6 +452,18 @@ const Schedule = () => {
                 (event) => timeSlotStates[getTimeSlot(event.timeWorking)]
               );
 
+              const dayRepeatedTodos = filteredRepeatedTodos
+                .filter((todo) =>
+                  todo.displayDates.some((date) => {
+                    const todoDate = moment(date, "YYYY-MM-DD");
+                    const dayDate = moment(day.date, "D/M/YYYY"); // Chuyển đổi day.date thành đối tượng Moment
+                    return todoDate.isSame(dayDate, "day");
+                  })
+                )
+                .filter(
+                  (todo) => timeSlotStates[getTimeSlot(todo.timeWorking)]
+                );
+
               return (
                 <div key={index} className="day-column">
                   <div className="day-header">
@@ -346,6 +490,28 @@ const Schedule = () => {
                         >
                           <div className="event-title">{event.description}</div>
                           <div className="event-time">{event.timeWorking}</div>
+                        </div>
+                      );
+                    })}
+                    {dayRepeatedTodos.map((todo, todoIndex) => {
+                      return (
+                        <div
+                          onClick={() => handleClickOpenEditModal(todo)}
+                          key={todoIndex}
+                          className={`event`}
+                          style={{
+                            backgroundColor: timeSlots.find(
+                              (slot) =>
+                                slot.id === getTimeSlot(todo.timeWorking)
+                            ).color,
+                            color: timeSlots.find(
+                              (slot) =>
+                                slot.id === getTimeSlot(todo.timeWorking)
+                            ).textColor,
+                          }}
+                        >
+                          <div className="event-title">{todo.description}</div>
+                          <div className="event-time">{todo.timeWorking}</div>
                         </div>
                       );
                     })}
