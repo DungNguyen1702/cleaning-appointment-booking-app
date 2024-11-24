@@ -17,7 +17,7 @@ import TimePicker from "react-time-picker"
 
 
 const EditEvent = ({ onClose, open, props,func }) => {
-  console.log(props);
+  
   const [noEdit,setNoEdit] = useState("1");  
   const [title, setTitle] = useState(props?.description);
   const [selectDate, setDate] = useState(parse(props?.due_date, "dd/MM/yyyy", new Date()));
@@ -28,8 +28,14 @@ const EditEvent = ({ onClose, open, props,func }) => {
   const [repeatInterval, setRepeatInterval] = useState(props?.todo_repeat?.repeat_weekMonth||"TUAN");
   const [taskContent, setTaskContent] = useState(props?.task_content);
   const [location, setLocation] = useState(props?.location);
-  const [selectedDays, setSelectedDays] = useState(props?.todo_repeat?.repeat_days||"");
-
+  const [selectedDays, setSelectedDays] = useState(()=>{
+    const repeatDays = props?.todo_repeat?.repeat_days ?? [];
+    if (typeof repeatDays ==='string'){
+      return [repeatDays];
+    }
+    return Array.isArray(repeatDays)? repeatDays:[];
+  });
+  console.log(props,selectedDays);
   const editEvent = (e) => {
     e.preventDefault();
     // console.log(postData);
@@ -52,17 +58,23 @@ const EditEvent = ({ onClose, open, props,func }) => {
     T7:"THU_BAY",
     CN:"CHU_NHAT"
   }
-  const daysArray = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+  const daysArray = ["THU_HAI",
+    "THU_BA",
+    "THU_TU",
+    "THU_NAM",
+    "THU_SAU",
+    "THU_BAY",
+    "CHU_NHAT"];
 
   const toggleDay = (day) => {
-    // const dayValue = daysMap[day]
-    // setSelectedDays(dayValue
-    // );
+    
+    const dayValue = daysMap[day]
+    setSelectedDays(prev=>(
+      prev.includes(dayValue)? prev.filter(d=>d!==dayValue):[...prev,dayValue]
+    )
+    );
+    
   };
-  // const addEvent = () => {
-  //   console.log(repeatFrequency)
-  // }
-  
   useEffect(()=>
     { 
       if (noEdit==="0"){
@@ -70,15 +82,15 @@ const EditEvent = ({ onClose, open, props,func }) => {
       
         if (repeat==="LAP_LAI"){
           if (selectDate!==""){
-            const dayKey = daysArray[selectDate.getDay()]
-            const dayValue = daysMap[dayKey]
-            setSelectedDays(dayValue)
+            // const dayKey = daysArray[selectDate.getDay()]
+            // const dayValue = daysMap[dayKey]
+            setSelectedDays([])
             setRepeatFrequency(1);
             setRepeatInterval("TUAN");
           }
         }
         else{
-          setSelectedDays("");
+          
           setRepeatFrequency("");
           setRepeatInterval("");
         } 
@@ -107,7 +119,7 @@ const EditEvent = ({ onClose, open, props,func }) => {
     },
     todoRepeat: repeat==="LAP_LAI" ? {
         repeat_option:repeat,
-        repeat_days:selectedDays,
+        repeat_days:selectedDays[0],
         repeat_weekMonth:repeatInterval,
         repeat_interval:repeatFrequency,
       }
@@ -253,8 +265,8 @@ const EditEvent = ({ onClose, open, props,func }) => {
                           margin: "5px",
                           padding: "2px",
                           borderRadius:"50%",
-                          background: selectedDays===daysMap[day] ? "#F5C3C8" : "#ccc",
-                          color: selectedDays===daysMap[day] ? "#102C57" : "#000",
+                          background: selectedDays.includes(daysMap[day] )? "#F5C3C8" : "#ccc",
+                          color: selectedDays.includes(daysMap[day]) ? "#102C57" : "#000",
                           fontSize:'14px',
                           fontWeight:'550',
                           border:'none'
