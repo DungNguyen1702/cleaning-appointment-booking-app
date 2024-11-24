@@ -107,7 +107,7 @@
     position: relative;
     width: 220px;
   }
-  .input-date span{
+  .input-date > .span{
     position: absolute;
     top:5px;
     left:5px;
@@ -129,6 +129,10 @@
     gap:8px;
     justify-content: center;
     align-items: center;
+  }
+  .input-hour >div{
+    width: 150px;
+    text-align: center;
   }
   .react-time-picker {
     font-size: 16px; /* Cỡ chữ */
@@ -266,3 +270,37 @@
   .react-time-picker__inputGroup__leadingZero{
     display: none;
   }
+
+  
+.required {
+  position: relative ;
+}
+.required > .error{
+  position: absolute;
+  background-color: white;
+  left:0;
+  bottom:-20px ;
+  z-index: 2;
+  color:red !important;
+  border:1px solid black;
+  font-size: 15px;
+  padding:5px;
+}
+.error-date{
+  bottom:-40px !important;
+}
+.error-hour{
+  left: -15px;
+  width: 180px;
+  bottom:-40px !important;
+}
+.error-time{
+  bottom:-40px !important;
+}
+.error-text{
+  color:red !important;
+}
+.error-loop-day{
+  
+  left: 170px !important;
+}

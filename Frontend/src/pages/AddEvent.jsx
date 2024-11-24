@@ -138,13 +138,13 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
         if (selectDate!==""){
           // const dayKey = daysArray[selectDate.getDay()]
           // const dayValue = daysMap[dayKey]
-          setSelectedDays([])
+          
           setRepeatFrequency(1);
           setRepeatInterval("TUAN");
         }
       }
       else{
-        
+        setSelectedDays([])
         setRepeatFrequency("");
         setRepeatInterval("");
       } 
@@ -196,6 +196,10 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
   const handleChangeEndTime = (time) =>{
     setEndTime(time)
     setErrors({...errors,endTime:"",time:""})
+  }
+  const handleChangeRepeat = (e) =>{
+    setRepeat(e.target.value);
+    setErrors({...errors,loop_day:""})
   }
   return (
     <div className="event-modal-hon">
@@ -298,7 +302,7 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                   className="select-repeat" 
                   value={repeat} 
                   onChange={
-                    (e)=>setRepeat(e.target.value)
+                    handleChangeRepeat
                   }>
                   <option value="LAP_LAI">Lặp lại</option>
                   <option value="KHONG_LAP_LAI">Không lặp lại</option>
