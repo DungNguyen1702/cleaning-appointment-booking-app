@@ -226,6 +226,28 @@ const Schedule = () => {
     }
   };
   //
+  
+  const deleteEvent = async (id) =>{
+    try {
+      //console.log("I come here")
+      await userAPI.deleteToDo(id);
+      toast.success("Xoá sự kiện thành công", {
+        position: "top-right",
+      });
+    } catch (error) {
+      console.error("Failed to update event status:", error);
+      toast.error(
+        error.response?.data.message || "Xoá sự kiện không thành công",
+        {
+          position: "top-right",
+        }
+      );
+    } finally {
+      fetchData(startDate, endDate);
+
+      setOpenEditModal(false);
+    }
+  };
 
   return (
     <div className="calendar-container">
@@ -348,6 +370,7 @@ const Schedule = () => {
           onClose={handleCloseEditModal}
           func={editEvent}
           props={prop}
+          func_Delete={deleteEvent}
         />
       )}
     </div>

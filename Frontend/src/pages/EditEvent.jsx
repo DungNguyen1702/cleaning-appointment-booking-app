@@ -16,7 +16,7 @@ import { vi } from "date-fns/locale";
 import TimePicker from "react-time-picker"
 
 
-const EditEvent = ({ onClose, open, props,func }) => {
+const EditEvent = ({ onClose, open, props,func,func_Delete }) => {
   
   const [noEdit,setNoEdit] = useState("1");  
   const [title, setTitle] = useState(props?.description);
@@ -110,6 +110,9 @@ const EditEvent = ({ onClose, open, props,func }) => {
     }
     // onClose();
   };
+  const deleteEvent = () => {
+    func_Delete(props?.todo_id)
+  }
   
 
   
@@ -147,14 +150,10 @@ const EditEvent = ({ onClose, open, props,func }) => {
 
       
         if (repeat==="LAP_LAI"){
-          if (selectDate!==""){
-            // const dayKey = daysArray[selectDate.getDay()]
-            // const dayValue = daysMap[dayKey]
-            
+          
             setRepeatFrequency(1);
             setRepeatInterval("TUAN");
           }
-        }
         else{
           setSelectedDays([])
           setRepeatFrequency("");
@@ -162,7 +161,7 @@ const EditEvent = ({ onClose, open, props,func }) => {
         } 
       }
     },
-      [repeat, selectDate,noEdit]
+      [repeat,noEdit]
     );
   const formatDate = (date) => {
     if (!date) return "";
@@ -239,12 +238,15 @@ const EditEvent = ({ onClose, open, props,func }) => {
         {
             noEdit==="1"?
             (
+              <>
                 <img
                     src={editIcon}
                     className="add-event-icon"
                     alt="Edit"
                     onClick={handleAbleEdit}
                 />
+                <button className="delete-event-icon" onClick={deleteEvent}></button>
+              </>  
             )
             :
             (
