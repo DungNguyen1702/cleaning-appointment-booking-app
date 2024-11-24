@@ -4,6 +4,7 @@ import {
   createTodo,
   updateTodo,
   getUserTodosForWeekService,
+  deleteTodoByIdService,
 } from '../services/todo.service';
 import { CreateTodoOptions } from '../dtos/todo.dto';
 
@@ -181,3 +182,27 @@ export const getUserTodosForWeek = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const deleteTodoByIdController = async (req: Request, res: Response) => {
+  try {
+    const todoId = parseInt(req.params.todoId, 10);
+
+    if (isNaN(todoId)) {
+      return res.status(400).json({ message: 'ID công việc không hợp lệ' });
+    }
+
+    // Gọi service để xóa Todo
+    const result = await deleteTodoByIdService(todoId);
+
+    if (result) {
+      return res.status(200).json({ message: 'Đã xóa thành công công việc' });
+    } else {
+      return res.status(404).json({ message: 'Không tìm thấy công việc để xóa' });
+    }
+  } catch (error) {
+    console.error('Lỗi trong quá trình xóa công việc:', error);
+    return res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xóa công việc.' });
+  }
+};
+
+

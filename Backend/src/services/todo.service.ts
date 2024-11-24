@@ -444,3 +444,27 @@ export const getUserTodosForWeekService = async (
 
   return weekData;
 };
+
+export const deleteTodoByIdService = async (todoId: number): Promise<boolean> => {
+  try {
+    // Tìm Todo và TodoRepeat liên quan
+    const todo = await todoRepo.findOne({ where: { todo_id: todoId }, relations: ['todo_repeat'] });
+
+    if (!todo) {
+      return false; // Không tìm thấy công việc
+    }
+
+    // Xóa Todo trước
+    await todoRepo.delete({ todo_id: todoId });
+
+    // Nếu có todo_repeat, xóa luôn todo_repeat
+    if (todo.todo_repeat) {
+      await todoRepeatRepo.delete({ repeat_id: todo.todo_repeat.repeat_id });
+    }
+
+    return true; // Xóa thành công
+  } catch (error) {
+    console.error('Lỗi trong quá trình xóa Todo:', error);
+    throw new Error('Không thể xóa công việc');
+  }
+};

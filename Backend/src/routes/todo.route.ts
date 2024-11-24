@@ -23,5 +23,11 @@ router.put(
   todoController.updateTodoController
 );
 
+router.delete(
+  '/:todoId',
+  verifyToken,
+  todoController.deleteTodoByIdController
+);
+
 
 export default router;
