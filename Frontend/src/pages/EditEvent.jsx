@@ -35,13 +35,79 @@ const EditEvent = ({ onClose, open, props,func }) => {
     }
     return Array.isArray(repeatDays)? repeatDays:[];
   });
-  console.log(props,selectedDays);
+
+  // console.log(props,selectedDays);
+
+  const [err,setErrors] = useState({})
+  const errors = {
+    title:"",
+    due_day:"",
+    startTime:"",
+    endTime:"",
+    time:"",
+    content:"",
+    location:""
+  }
+
+  const validForm =()=>{
+    setErrors({
+      title: "",
+      due_day: "",
+      startTime: "",
+      endTime: "",
+      time: "",
+      content: "",
+      location: "",
+      loop_day:""
+    });
+  
+    if(!title.trim()) {
+      setErrors(prev=>({...prev,title:"Tiêu đề không được để trống!!!!"}))
+      return false;
+    }
+    if(!selectDate){
+      setErrors(prev=>({...prev,due_day:"Ngày không được để trống!!!!"}))
+      return false;
+    }
+    // if(formatDate(selectDate)<formatDate(new Date())){
+    //   setErrors(prev=>({...prev,due_day:"Không được chọn ngày trong quá khứ!!!!"}))
+    //   return false;
+    // }
+    if(!startTime){
+      setErrors(prev=>({...prev,startTime:"Ngày bắt đầu không được để trống!!!!"}))
+      return false;
+    }
+    if(!endTime){
+      setErrors(prev=>({...prev,endTime:"Ngày kết thúc không được để trống!!!!"}))
+      return false;
+    }
+    if(startTime>=endTime){
+      setErrors(prev=>({...prev,time:"Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!!!!"}))
+      return false;
+    }
+    if (repeat==="LAP_LAI" && selectedDays.length===0){
+      setErrors(prev=>({...prev,loop_day:"Chọn ngày lặp lại !!!!"}))
+      return false;
+    }
+    if(!taskContent.trim()) {
+      setErrors(prev=>({...prev,content:"Nội dung không được để trống!!!!"}))
+      return false;
+    }
+    if(!location.trim()) {
+      setErrors(prev=>({...prev,location:"Địa chỉ không được để trống!!!!"}))
+      return false;
+    }
+    return true
+    
+  }  
+
   const editEvent = (e) => {
     e.preventDefault();
-    // console.log(postData);
-    // console.log(props?.todo_repeat?.repeat_interval,
-    //   props?.todo_repeat?.repeat_weekMonth,repeatFrequency,repeatInterval)
+    console.log(postData);
+    
+    if (validForm()===true){
     func(postData,props?.todo_id);
+    }
     // onClose();
   };
   
@@ -84,13 +150,13 @@ const EditEvent = ({ onClose, open, props,func }) => {
           if (selectDate!==""){
             // const dayKey = daysArray[selectDate.getDay()]
             // const dayValue = daysMap[dayKey]
-            setSelectedDays([])
+            
             setRepeatFrequency(1);
             setRepeatInterval("TUAN");
           }
         }
         else{
-          
+          setSelectedDays([])
           setRepeatFrequency("");
           setRepeatInterval("");
         } 
@@ -105,7 +171,7 @@ const EditEvent = ({ onClose, open, props,func }) => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-  console.log(props)
+  // console.log(props)
   
   const postData = {
     todo:{
@@ -119,7 +185,7 @@ const EditEvent = ({ onClose, open, props,func }) => {
     },
     todoRepeat: repeat==="LAP_LAI" ? {
         repeat_option:repeat,
-        repeat_days:selectedDays[0],
+        repeat_days:selectedDays.sort((a, b) => daysArray.indexOf(a) - daysArray.indexOf(b)),
         repeat_weekMonth:repeatInterval,
         repeat_interval:repeatFrequency,
       }
@@ -132,7 +198,34 @@ const EditEvent = ({ onClose, open, props,func }) => {
   const handleAbleEdit = () =>{
     setNoEdit("0");
   }
-  
+  const handleChangeTitle = (e) => {
+    setTitle(e.target.value)
+    setErrors({...errors,title:""})
+  }
+  const handleChangeContent = (e) => {
+    setTaskContent(e.target.value)
+    setErrors({...errors,content:""})
+  }
+  const handleChangeLocation = (e) => {
+    setLocation(e.target.value)
+    setErrors({...errors,location:""})
+  }
+  const handleChangeDate = (e) => {
+    setDate(e)
+    setErrors({...errors,due_day:""})
+  }
+  const handleChangeStartTime = (time) =>{
+    setStartTime(time)
+    setErrors({...errors,startTime:"",time:""})
+  }
+  const handleChangeEndTime = (time) =>{
+    setEndTime(time)
+    setErrors({...errors,endTime:"",time:""})
+  }
+  const handleChangeRepeat = (e) =>{
+    setRepeat(e.target.value);
+    setErrors({...errors,loop_day:""})
+  }
   
   return (
     <div className="event-modal-hon">
@@ -173,13 +266,16 @@ const EditEvent = ({ onClose, open, props,func }) => {
         <div className="content">
           <div className="row-input">
             <div className="image-icon"></div>
-            <div className="input-content">
+            <div className="input-content required">
               <input type="text" className="input-title" placeholder="Thêm tiêu đề" 
               value={title} 
               required 
-              onChange={(e)=>setTitle(e.target.value)}
+              onChange={handleChangeTitle}
               readOnly={noEdit==="1"}
               />
+              {err.title  &&(
+                <span className="error">{err.title}</span>
+              )}
             </div>
           </div>
           
@@ -189,10 +285,10 @@ const EditEvent = ({ onClose, open, props,func }) => {
             </div>
             <div className="time-loop">
               <div className="input-time">
-                <div className="input-date">
+                <div className="input-date requried">
                   <DatePicker
                     selected={selectDate}
-                    onChange={(date) => setDate(date)}
+                    onChange={handleChangeDate}
                     dateFormat="yyyy-mm-dd"
                     locale={vi} // Tiếng Việt
                     placeholderText="Chọn ngày"
@@ -201,17 +297,20 @@ const EditEvent = ({ onClose, open, props,func }) => {
                     disabled={noEdit==="1"}
                   />
                   {selectDate && (
-                    <span>
+                    <span className="span">
                       {format(selectDate, "EEEE, dd MMMM", { locale: vi })}
                     </span>
                   )}
+                  {err.due_day  &&(
+                    <span className="error error-date">{err.due_day}</span>
+                  )}
                 </div>
               
-                <div className="input-hour">
-                  <div>
+                <div className="input-hour required">
+                  <div className="required">
                   <TimePicker 
                     
-                    onChange={setStartTime} 
+                    onChange={handleChangeStartTime} 
                     value={startTime}
                     clearIcon={null} 
                     clockIcon={null} 
@@ -219,12 +318,15 @@ const EditEvent = ({ onClose, open, props,func }) => {
                     required
                     disabled={noEdit==="1"}
                   />
+                  {err.startTime &&(
+                    <span className="error error-hour">{err.startTime}</span>
+                  )}
                   </div>
                   <span>-</span>
-                  <div>
+                  <div className="required">
                   <TimePicker 
                     
-                    onChange={setEndTime} 
+                    onChange={handleChangeEndTime} 
                     value={endTime}
                     clearIcon={null} 
                     clockIcon={null} 
@@ -232,7 +334,13 @@ const EditEvent = ({ onClose, open, props,func }) => {
                     required
                     disabled={noEdit==="1"}
                   />
+                  {err.endTime &&(
+                    <span className="error error-hour">{err.endTime}</span>
+                  )}
                   </div>
+                  {err.time  &&(
+                    <span className="error error-time">{err.time}</span>
+                  )}
                 </div>
               </div>
 
@@ -242,7 +350,7 @@ const EditEvent = ({ onClose, open, props,func }) => {
                   className="select-repeat" 
                   value={repeat} 
                   onChange={
-                    (e)=>setRepeat(e.target.value)
+                    handleChangeRepeat
                   }
                   disabled={noEdit==="1"}
                   >
@@ -252,13 +360,14 @@ const EditEvent = ({ onClose, open, props,func }) => {
                 </select>
                 </div>
                 <div className="loop-right">
-                  <div className="days-loop">
+                  <div className="days-loop required">
                     <label htmlFor="">Cứ lặp lại vào mỗi</label>
                     <div>
                     {Object.keys(daysMap).map((day) => (
                       <button
                         key={day}
                         onClick={() => toggleDay(day)}
+                        disabled={repeat==="KHONG_LAP_LAI" ||noEdit==="1"}
                         style={{
                           width:'25px',
                           height:'25px',
@@ -276,6 +385,9 @@ const EditEvent = ({ onClose, open, props,func }) => {
                       </button>
                     ))}
                     </div>
+                    { err.loop_day && (
+                      <span className="error error-loop-day">{err.loop_day}</span>
+                    )}
 
                   </div>
                   <div className="frep-loop">
@@ -312,9 +424,12 @@ const EditEvent = ({ onClose, open, props,func }) => {
                 type="text" 
                 value={taskContent} 
                 required
-                onChange={(e)=>setTaskContent(e.target.value)} 
+                onChange={handleChangeContent} 
                 readOnly={noEdit==="1"}
                 />
+              {err.content  &&(
+                    <span className="error error-text">{err.content}</span>
+                  )}    
             </div>
           </div>
           <div className="row-input">
@@ -328,9 +443,12 @@ const EditEvent = ({ onClose, open, props,func }) => {
                 type="text" 
                 required
                 value={location} 
-                onChange={(e)=>setLocation(e.target.value)} 
+                onChange={handleChangeLocation} 
                 readOnly={noEdit==="1"}
                 />
+              {err.location  &&(
+                  <span className="error error-text">{err.location}</span>
+              )}   
 
             </div>
           </div>
