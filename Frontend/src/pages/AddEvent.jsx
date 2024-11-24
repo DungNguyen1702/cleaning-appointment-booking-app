@@ -24,13 +24,79 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
   const [repeatInterval, setRepeatInterval] = useState("");
   const [taskContent, setTaskContent] = useState("");
   const [location, setLocation] = useState("");
-  const [selectedDays, setSelectedDays] = useState("");
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [err,setErrors] = useState({})
+  const errors = {
+    title:"",
+    due_day:"",
+    startTime:"",
+    endTime:"",
+    time:"",
+    content:"",
+    location:""
+  }
+
+  const validForm =()=>{
+    setErrors({
+      title: "",
+      due_day: "",
+      startTime: "",
+      endTime: "",
+      time: "",
+      content: "",
+      location: "",
+      loop_day:""
+    });
+  
+    if(!title.trim()) {
+      setErrors(prev=>({...prev,title:"Tiêu đề không được để trống!!!!"}))
+      return false;
+    }
+    if(!selectDate){
+      setErrors(prev=>({...prev,due_day:"Ngày không được để trống!!!!"}))
+      return false;
+    }
+    if(formatDate(selectDate)<formatDate(new Date())){
+      setErrors(prev=>({...prev,due_day:"Không được chọn ngày trong quá khứ!!!!"}))
+      return false;
+    }
+    if(!startTime){
+      setErrors(prev=>({...prev,startTime:"Ngày bắt đầu không được để trống!!!!"}))
+      return false;
+    }
+    if(!endTime){
+      setErrors(prev=>({...prev,endTime:"Ngày kết thúc không được để trống!!!!"}))
+      return false;
+    }
+    if(startTime>=endTime){
+      setErrors(prev=>({...prev,time:"Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!!!!"}))
+      return false;
+    }
+    if (repeat==="LAP_LAI" && selectedDays.length===0){
+      setErrors(prev=>({...prev,loop_day:"Chọn ngày lặp lại !!!!"}))
+      return false;
+    }
+    if(!taskContent.trim()) {
+      setErrors(prev=>({...prev,content:"Nội dung không được để trống!!!!"}))
+      return false;
+    }
+    if(!location.trim()) {
+      setErrors(prev=>({...prev,location:"Địa chỉ không được để trống!!!!"}))
+      return false;
+    }
+    return true
+    
+  }  
+  
 
   const addEvent = (e) => {
     e.preventDefault();
     console.log(postData);
-    func_CreateEvent(postData);
+    //func_CreateEvent(postData);
     // onClose();
+    if (validForm()===true){
+      func_CreateEvent(postData);
+    }
   };
 
   
@@ -45,12 +111,22 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
     T7:"THU_BAY",
     CN:"CHU_NHAT"
   }
-  const daysArray = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+  const daysArray = ["THU_HAI",
+    "THU_BA",
+    "THU_TU",
+    "THU_NAM",
+    "THU_SAU",
+    "THU_BAY",
+    "CHU_NHAT"];
 
   const toggleDay = (day) => {
-    // const dayValue = daysMap[day]
-    // setSelectedDays(dayValue
-    // );
+    
+    const dayValue = daysMap[day]
+    setSelectedDays(prev=>(
+      prev.includes(dayValue)? prev.filter(d=>d!==dayValue):[...prev,dayValue]
+    )
+    );
+    setErrors({...errors,loop_day:""})
   };
   // const addEvent = () => {
   //   console.log(repeatFrequency)
@@ -60,15 +136,15 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
     {
       if (repeat==="LAP_LAI"){
         if (selectDate!==""){
-          const dayKey = daysArray[selectDate.getDay()]
-          const dayValue = daysMap[dayKey]
-          setSelectedDays(dayValue)
+          // const dayKey = daysArray[selectDate.getDay()]
+          // const dayValue = daysMap[dayKey]
+          setSelectedDays([])
           setRepeatFrequency(1);
           setRepeatInterval("TUAN");
         }
       }
       else{
-        setSelectedDays("");
+        
         setRepeatFrequency("");
         setRepeatInterval("");
       } 
@@ -92,10 +168,34 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
     location:location,
     status:"PENDING",
     repeatOption:repeat,
-    repeatDays:selectedDays,
+    repeatDays:selectedDays.sort((a, b) => daysArray.indexOf(a) - daysArray.indexOf(b)),
     repeatWeekMonth:repeatInterval,
     repeatInterval:repeatFrequency,
     
+  }
+  const handleChangeTitle = (e) => {
+    setTitle(e.target.value)
+    setErrors({...errors,title:""})
+  }
+  const handleChangeContent = (e) => {
+    setTaskContent(e.target.value)
+    setErrors({...errors,content:""})
+  }
+  const handleChangeLocation = (e) => {
+    setLocation(e.target.value)
+    setErrors({...errors,location:""})
+  }
+  const handleChangeDate = (e) => {
+    setDate(e)
+    setErrors({...errors,due_day:""})
+  }
+  const handleChangeStartTime = (time) =>{
+    setStartTime(time)
+    setErrors({...errors,startTime:"",time:""})
+  }
+  const handleChangeEndTime = (time) =>{
+    setEndTime(time)
+    setErrors({...errors,endTime:"",time:""})
   }
   return (
     <div className="event-modal-hon">
@@ -120,8 +220,12 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
         <div className="content">
           <div className="row-input">
             <div className="image-icon"></div>
-            <div className="input-content">
-              <input type="text" className="input-title" placeholder="Thêm tiêu đề" value={title} required onChange={(e)=>setTitle(e.target.value)}/>
+            <div className="input-content required">
+              <input type="text" className="input-title" placeholder="Thêm tiêu đề" value={title} required onChange={handleChangeTitle}/>
+              {err.title  &&(
+                <span className="error">{err.title}</span>
+              )}
+              
             </div>
           </div>
           
@@ -131,10 +235,10 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
             </div>
             <div className="time-loop">
               <div className="input-time">
-                <div className="input-date">
+                <div className="input-date required">
                   <DatePicker
                     selected={selectDate}
-                    onChange={(date) => setDate(date)}
+                    onChange={handleChangeDate}
                     dateFormat="yyyy-mm-dd"
                     locale={vi} // Tiếng Việt
                     placeholderText="Chọn ngày"
@@ -142,36 +246,49 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                     required
                   />
                   {selectDate && (
-                    <span>
+                    <span className="span">
                       {format(selectDate, "EEEE, dd MMMM", { locale: vi })}
                     </span>
                   )}
+                  {err.due_day  &&(
+                    <span className="error error-date">{err.due_day}</span>
+                  )}
+                  
                 </div>
               
-                <div className="input-hour">
-                  <div>
+                <div className="input-hour required">
+                  <div className="required">
                   <TimePicker 
                     
-                    onChange={setStartTime} 
+                    onChange={handleChangeStartTime} 
                     value={startTime}
                     clearIcon={null} 
                     clockIcon={null} 
                     className="start-time-picker"
                     required
                   />
+                  {err.startTime &&(
+                    <span className="error error-hour">{err.startTime}</span>
+                  )}
                   </div>
                   <span>-</span>
-                  <div>
+                  <div className="required">
                   <TimePicker 
                     
-                    onChange={setEndTime} 
+                    onChange={handleChangeEndTime} 
                     value={endTime}
                     clearIcon={null} 
                     clockIcon={null} 
                     className="end-time-picker"
                     required
                   />
+                  {err.endTime  &&(
+                    <span className="error error-hour">{err.endTime}</span>
+                  )}
                   </div>
+                  {err.time  &&(
+                    <span className="error error-time">{err.time}</span>
+                  )}
                 </div>
               </div>
 
@@ -189,21 +306,22 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                 </select>
                 </div>
                 <div className="loop-right">
-                  <div className="days-loop">
+                  <div className="days-loop required">
                     <label htmlFor="">Cứ lặp lại vào mỗi</label>
                     <div>
                     {Object.keys(daysMap).map((day) => (
                       <button
                         key={day}
                         onClick={() => toggleDay(day)}
+                        disabled={repeat==="KHONG_LAP_LAI"}
                         style={{
                           width:'25px',
                           height:'25px',
                           margin: "5px",
                           padding: "2px",
                           borderRadius:"50%",
-                          background: selectedDays===daysMap[day] ? "#F5C3C8" : "#ccc",
-                          color: selectedDays===daysMap[day] ? "#102C57" : "#000",
+                          background: selectedDays.includes(daysMap[day]) ? "#F5C3C8" : "#ccc",
+                          color: selectedDays.includes(daysMap[day]) ? "#102C57" : "#000",
                           fontSize:'14px',
                           fontWeight:'550',
                           border:'none'
@@ -212,7 +330,11 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                         {day}
                       </button>
                     ))}
+                    
                     </div>
+                    { err.loop_day && (
+                      <span className="error error-loop-day">{err.loop_day}</span>
+                    )}
 
                   </div>
                   <div className="frep-loop">
@@ -247,7 +369,11 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                 type="text" 
                 value={taskContent} 
                 required
-                onChange={(e)=>setTaskContent(e.target.value)} />
+                onChange={handleChangeContent}/>
+              {err.content  &&(
+                    <span className="error error-text">{err.content}</span>
+                  )}  
+
             </div>
           </div>
           <div className="row-input">
@@ -261,7 +387,11 @@ const AddEvent = ({ onClose, open,func_CreateEvent }) => {
                 type="text" 
                 required
                 value={location} 
-                onChange={(e)=>setLocation(e.target.value)} />
+                onChange={handleChangeLocation}/>
+
+              {err.location  &&(
+                  <span className="error error-text">{err.location}</span>
+              )}  
 
             </div>
           </div>
