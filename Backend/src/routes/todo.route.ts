@@ -4,11 +4,11 @@ import { verifyToken } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// router.get(
-//   '/:id',
-//   verifyToken,
-//   todoController.getCustomerRequestsForWeekController
-// );
+router.get(
+  '/all/:userId',
+  verifyToken,
+  todoController.getCustomerRequestsAllController
+);
 
 router.get(
   '/:userId',

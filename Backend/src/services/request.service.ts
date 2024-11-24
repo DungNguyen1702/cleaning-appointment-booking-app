@@ -393,10 +393,58 @@ export class RequestService {
       // Xử lý lỗi liên quan đến cơ sở dữ liệu hoặc truy vấn
       throw new Error(
         'Lỗi khi truy vấn yêu cầu: ' +
-          (error instanceof Error ? error.message : 'lỗi không xác định')
+        (error instanceof Error ? error.message : 'lỗi không xác định')
       );
     }
   }
+
+  // async getRequestsByCompanyId(
+  //   companyId: number,
+  //   page: number,
+  //   limit: number,
+  //   name?: string
+  // ) {
+  //   const requestRepository = AppDataSource.getRepository(Request);
+
+  //   const queryBuilder = requestRepository
+  //     .createQueryBuilder('request')
+  //     .where('request.company_id = :companyId', { companyId })
+  //     .orderBy('request.createdAt', 'DESC')
+  //     .skip((page - 1) * limit) // Xác định vị trí bắt đầu
+  //     .take(limit); // Số lượng bản ghi trả về
+
+  //   if (name) {
+  //     queryBuilder.andWhere('request.name LIKE :name', {
+  //       name: `%${name}%`,
+  //     });
+  //   }
+
+  //   const [requests, totalRequests] = await queryBuilder.getManyAndCount();
+  //   const totalPages = Math.ceil(totalRequests / limit);
+
+  //   // Định dạng lại thời gian của từng request
+  //   const formatTimejob = (date: Date) => {
+  //     const hours = date.getHours().toString().padStart(2, '0');
+  //     const minutes = date.getMinutes().toString().padStart(2, '0');
+  //     const day = date.getDate().toString().padStart(2, '0');
+  //     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  //     const year = date.getFullYear();
+  //     return `${hours}:${minutes} ${day}/${month}/${year}`;
+  //   };
+
+  //   // Cập nhật lại `timejob` cho từng request
+  //   const formattedRequests = requests.map(request => ({
+  //     ...request,
+  //     timejob: formatTimejob(new Date(request.timejob)),
+  //   }));
+
+  //   return {
+  //     totalRequests,
+  //     totalPages,
+  //     currentPage: page,
+  //     requests: formattedRequests,
+  //   };
+  // }
 
   async getRequestsByCompanyId(
     companyId: number,
@@ -408,10 +456,11 @@ export class RequestService {
 
     const queryBuilder = requestRepository
       .createQueryBuilder('request')
+      .leftJoinAndSelect('request.user', 'user')
       .where('request.company_id = :companyId', { companyId })
       .orderBy('request.createdAt', 'DESC')
-      .skip((page - 1) * limit) // Xác định vị trí bắt đầu
-      .take(limit); // Số lượng bản ghi trả về
+      .skip((page - 1) * limit)
+      .take(limit);
 
     if (name) {
       queryBuilder.andWhere('request.name LIKE :name', {
@@ -422,7 +471,7 @@ export class RequestService {
     const [requests, totalRequests] = await queryBuilder.getManyAndCount();
     const totalPages = Math.ceil(totalRequests / limit);
 
-    // Định dạng lại thời gian của từng request
+
     const formatTimejob = (date: Date) => {
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -432,9 +481,14 @@ export class RequestService {
       return `${hours}:${minutes} ${day}/${month}/${year}`;
     };
 
-    // Cập nhật lại `timejob` cho từng request
+
     const formattedRequests = requests.map(request => ({
       ...request,
+      user: {
+        user_id: request.user.user_id,
+        full_name: request.user.full_name,
+        avatar: request.user.avatar,
+      },
       timejob: formatTimejob(new Date(request.timejob)),
     }));
 
@@ -445,6 +499,8 @@ export class RequestService {
       requests: formattedRequests,
     };
   }
+
+
   async updateRequestByCompany(
     requestId: number,
     updateData: { workingHours?: string; status?: string }

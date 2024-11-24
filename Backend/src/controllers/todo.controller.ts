@@ -1,32 +1,28 @@
 import { Request, Response } from 'express';
 import {
-  getCustomerRequestsForWeek,
+  getCustomerRequestsAll,
   createTodo,
   updateTodo,
   getUserTodosForWeekService,
 } from '../services/todo.service';
 import { CreateTodoOptions } from '../dtos/todo.dto';
 
-export const getCustomerRequestsForWeekController = async (
+export const getCustomerRequestsAllController = async (
   req: Request,
   res: Response
 ) => {
-  const companyId = parseInt(req.params.id, 10);
-  const startDate = new Date(req.query.startDate as string);
-  const endDate = new Date(req.query.endDate as string);
-
-  // Kiểm tra dữ liệu đầu vào
-  if (!startDate || !endDate) {
+  const userId = parseInt(req.params.userId, 10);
+  const userIdFromToken = req.userId;
+  if (userId !== userIdFromToken) {
+    console.log(userId, userIdFromToken);
     return res
-      .status(400)
-      .json({ message: 'Tham số startDate và endDate là bắt buộc!' });
+      .status(403)
+      .json({ message: 'Bạn không có quyền truy cập tài nguyên này!' });
   }
 
   try {
-    const weekData = await getCustomerRequestsForWeek(
-      companyId,
-      startDate,
-      endDate
+    const weekData = await getCustomerRequestsAll(
+      userId,
     );
 
     if (!weekData || Object.keys(weekData).length === 0) {
