@@ -211,7 +211,11 @@ export const ListRequest = () => {
                       onClick={() => openModal(item)}
                     >
                       <div className="cell account">
-                        <img className="avatar" alt={item.name} src={avatar1} />
+                        <img
+                          className="avatar"
+                          alt={item.name}
+                          src={item.user.avatar ? item.user.avatar : avatar1}
+                        />
                         {item.name}
                       </div>
                       <div className="cell phone">{item.phone}</div>
